@@ -24,69 +24,69 @@ struct TextEditorView: View{
             Color.black.opacity(0.35)
                 .ignoresSafeArea()
             VStack{
+                HStack {
+                    Button{
+                        closeKeyboard()
+                        viewModel.cancelTextEditor()
+                    } label: {
+                        Text("Cancel")
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(Color.secondary, in: RoundedRectangle(cornerRadius: 20))
+                    }
+
+                    Spacer()
+
+                    Button {
+                        closeKeyboard()
+                        viewModel.saveTapped()
+                        onSave(viewModel.textBoxes)
+                    } label: {
+                        Text("Save")
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .foregroundColor(.white)
+                            .background(Color.green, in: RoundedRectangle(cornerRadius: 20))
+                            .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
+                    }
+                    .disabled(viewModel.currentTextBox.text.isEmpty)
+                }
+                .padding(.horizontal)
+
                 Spacer()
                 TextView(textBox: $viewModel.currentTextBox, isFirstResponder: $isFocused, minHeight: textHeight, calculatedHeight: $textHeight)
                     .frame(maxHeight: textHeight)
                 Spacer()
-                
-                Button {
-                    closeKeyboard()
-                    viewModel.saveTapped()
-                    onSave(viewModel.textBoxes)
-                } label: {
-                    Text("Save")
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .foregroundColor(.black)
-                        .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
-                        .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
-                        .disabled(viewModel.currentTextBox.text.isEmpty)
-                }
-                .hCenter()
-                .overlay(alignment: .leading) {
-                    HStack {
-                        Button{
-                            closeKeyboard()
-                            viewModel.cancelTextEditor()
-                        } label: {
-                            Image(systemName: "xmark")
-                                .padding(12)
-                                .foregroundColor(.white)
-                                .background(Color.secondary, in: Circle())
-                        }
-                        
-                        Spacer()
-                        HStack(spacing: 20){
-                            ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
-                            }.labelsHidden()
+                HStack(spacing: 20){
+                    ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
+                    }.labelsHidden()
 
-                            // Tool buttons
-                            ToolButton(
-                                color: viewModel.currentTextBox.bgColor,
-                                accessibilityLabel: "Background color"
-                            ) {
-                                activeSheet = .bgColor
-                            }
-                            
-                            ToolButton(
-                                color: viewModel.currentTextBox.strokeColor,
-                                accessibilityLabel: "Stroke color"
-                            ) {
-                                activeSheet = .stroke
-                            }
-                            
-                            ToolButton(
-                                color: .blue.opacity(0.8),
-                                text: "\(Int(viewModel.currentTextBox.fontSize))",
-                                accessibilityLabel: "Font size"
-                            ) {
-                                activeSheet = .fontSize
-                            }
-                        }
+                    // Tool buttons
+                    ToolButton(
+                        color: viewModel.currentTextBox.bgColor,
+                        accessibilityLabel: "Background color"
+                    ) {
+                        activeSheet = .bgColor
+                    }
+                    
+                    ToolButton(
+                        color: viewModel.currentTextBox.strokeColor,
+                        accessibilityLabel: "Stroke color"
+                    ) {
+                        activeSheet = .stroke
+                    }
+                    
+                    ToolButton(
+                        color: .blue.opacity(0.8),
+                        text: "\(Int(viewModel.currentTextBox.fontSize))",
+                        accessibilityLabel: "Font size"
+                    ) {
+                        activeSheet = .fontSize
                     }
                 }
+                .padding(.bottom)
             }
-            .padding(.bottom)
             .padding(.horizontal)
 
             // Custom overlays for pickers, anchored to bottom

@@ -13,6 +13,7 @@ struct TextEditorView: View{
     @State private var isFocused: Bool = true
     @State private var showBgColorSheet: Bool = false
     @State private var showStrokeSheet: Bool = false
+    @State private var showFontSizeSheet: Bool = false
     let onSave: ([TextBox]) -> Void
     var body: some View{
         Color.black.opacity(0.35)
@@ -74,9 +75,7 @@ struct TextEditorView: View{
                         .buttonStyle(.plain)
                         .accessibilityLabel("Background color")
                         .sheet(isPresented: $showBgColorSheet) {
-                            BgColorPickerSheet(selectedColor: $viewModel.currentTextBox.bgColor) {
-                                showBgColorSheet = false
-                            }
+                            BgColorPickerSheet(selectedColor: $viewModel.currentTextBox.bgColor, onCancel: { showBgColorSheet = false })
                         }
                         
                         // Custom stroke picker with 'no stroke' option
@@ -101,10 +100,33 @@ struct TextEditorView: View{
                         .sheet(isPresented: $showStrokeSheet) {
                             StrokePickerSheet(
                                 selectedColor: $viewModel.currentTextBox.strokeColor,
-                                strokeWidth: $viewModel.currentTextBox.strokeWidth
-                            ) {
-                                showStrokeSheet = false
+                                strokeWidth: $viewModel.currentTextBox.strokeWidth,
+                                onCancel: { showStrokeSheet = false }
+                            )
+                        }
+                        
+                        // Font size picker
+                        Button {
+                            showFontSizeSheet = true
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.blue.opacity(0.8))
+                                    .frame(width: 28, height: 28)
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: 2)
+                                    )
+                                Text("\(Int(viewModel.currentTextBox.fontSize))")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
                             }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Font size")
+                        .sheet(isPresented: $showFontSizeSheet) {
+                            FontSizePickerSheet(fontSize: $viewModel.currentTextBox.fontSize,
+                                onCancel: { showFontSizeSheet = false })
                         }
                     }
                 }
@@ -234,21 +256,34 @@ struct TextView: UIViewRepresentable {
 
 private struct BgColorPickerSheet: View {
     @Binding var selectedColor: Color
-    let onSelect: () -> Void
+    let onCancel: () -> Void
     let colors: [Color] = [
         .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
     ]
     let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     var body: some View {
         VStack(spacing: 20) {
+            HStack {
+                Spacer()
+                Button {
+                    onCancel()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(10)
+                        .background(Color(.systemGray3).opacity(0.8), in: Circle())
+                }
+            }
             Text("Background Color")
                 .font(.headline)
+                .foregroundColor(.white)
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 24) {
                     ForEach(colors, id: \.self) { color in
                         Button {
                             selectedColor = color
-                            onSelect()
+                            onCancel()
                         } label: {
                             ZStack {
                                 Circle()
@@ -273,13 +308,15 @@ private struct BgColorPickerSheet: View {
         }
         .padding()
         .frame(maxWidth: 350)
+        .background(Color(.black).opacity(0.95))
+        .cornerRadius(20)
     }
 }
 
 private struct StrokePickerSheet: View {
     @Binding var selectedColor: Color
     @Binding var strokeWidth: CGFloat
-    let onSelect: () -> Void
+    let onCancel: () -> Void
     let colors: [Color] = [
         .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
     ]
@@ -287,8 +324,21 @@ private struct StrokePickerSheet: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            HStack {
+                Spacer()
+                Button {
+                    onCancel()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(10)
+                        .background(Color(.systemGray3).opacity(0.8), in: Circle())
+                }
+            }
             Text("Stroke Outline")
                 .font(.headline)
+                .foregroundColor(.white)
             
             // Stroke width slider
             VStack(alignment: .leading, spacing: 10) {
@@ -334,7 +384,7 @@ private struct StrokePickerSheet: View {
                             } else if strokeWidth == 0 {
                                 strokeWidth = 2
                             }
-                            onSelect()
+                            onCancel()
                         } label: {
                             ZStack {
                                 Circle()
@@ -355,9 +405,81 @@ private struct StrokePickerSheet: View {
                 .padding(.bottom, 20)
             }
             .frame(maxHeight: 220)
-            Spacer()
+            
+            // Confirm button
+            Button {
+                onCancel()
+            } label: {
+                Image(systemName: "checkmark")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(Color.green, in: Circle())
+            }
         }
         .padding()
         .frame(maxWidth: 350)
+        .background(Color(.black).opacity(0.95))
+        .cornerRadius(20)
+    }
+}
+
+private struct FontSizePickerSheet: View {
+    @Binding var fontSize: CGFloat
+    let onCancel: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            HStack {
+                Spacer()
+                Button {
+                    onCancel()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(10)
+                        .background(Color(.systemGray3).opacity(0.8), in: Circle())
+                }
+            }
+            Text("Font Size")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            // Font size slider
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("Size: \(Int(fontSize))")
+                        .font(.subheadline)
+                    Spacer()
+                    Text("Sample")
+                        .font(.system(size: fontSize, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.black)
+                }
+                
+                Slider(value: $fontSize, in: 8...100, step: 1)
+            }
+            .padding(.horizontal)
+            
+            Spacer()
+            
+            // Confirm button
+            Button {
+                onCancel()
+            } label: {
+                Image(systemName: "checkmark")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(12)
+                    .background(Color.green, in: Circle())
+            }
+        }
+        .padding()
+        .frame(maxWidth: 350)
+        .background(Color(.black).opacity(0.95))
+        .cornerRadius(20)
     }
 }

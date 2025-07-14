@@ -11,11 +11,14 @@ struct TextEditorView: View{
     @ObservedObject var viewModel: TextEditorViewModel
     @State private var textHeight: CGFloat = 100
     @State private var isFocused: Bool = true
-    @State private var showBgColorSheet: Bool = false
-    @State private var showStrokeSheet: Bool = false
-    @State private var showFontSizeSheet: Bool = false
+    @State private var activeSheet: SheetType? = nil
     @State private var sheetOffset: CGFloat = UIScreen.main.bounds.height * 0.7
     let onSave: ([TextBox]) -> Void
+    
+    // MARK: - Sheet Types
+    enum SheetType {
+        case bgColor, stroke, fontSize
+    }
     var body: some View{
         ZStack {
             Color.black.opacity(0.35)
@@ -57,65 +60,28 @@ struct TextEditorView: View{
                             ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
                             }.labelsHidden()
 
-                            // Custom background color picker with 'no color' option
-                            Button {
-                                showBgColorSheet = true
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(viewModel.currentTextBox.bgColor == .clear ? Color.gray.opacity(0.2) : viewModel.currentTextBox.bgColor)
-                                        .frame(width: 28, height: 28)
-                                        .overlay(
-                                            Circle().stroke(Color.white, lineWidth: 2)
-                                        )
-                                    if viewModel.currentTextBox.bgColor == .clear {
-                                        Image(systemName: "slash.circle")
-                                            .foregroundColor(.white)
-                                    }
-                                }
+                            // Tool buttons
+                            ToolButton(
+                                color: viewModel.currentTextBox.bgColor,
+                                accessibilityLabel: "Background color"
+                            ) {
+                                activeSheet = .bgColor
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Background color")
                             
-                            // Custom stroke picker with 'no stroke' option
-                            Button {
-                                showStrokeSheet = true
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(viewModel.currentTextBox.strokeColor == .clear ? Color.gray.opacity(0.2) : viewModel.currentTextBox.strokeColor)
-                                        .frame(width: 28, height: 28)
-                                        .overlay(
-                                            Circle().stroke(Color.white, lineWidth: 2)
-                                        )
-                                    if viewModel.currentTextBox.strokeColor == .clear {
-                                        Image(systemName: "slash.circle")
-                                            .foregroundColor(.white)
-                                    }
-                                }
+                            ToolButton(
+                                color: viewModel.currentTextBox.strokeColor,
+                                accessibilityLabel: "Stroke color"
+                            ) {
+                                activeSheet = .stroke
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Stroke color")
                             
-                            // Font size picker
-                            Button {
-                                showFontSizeSheet = true
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.blue.opacity(0.8))
-                                        .frame(width: 28, height: 28)
-                                        .overlay(
-                                            Circle().stroke(Color.white, lineWidth: 2)
-                                        )
-                                    Text("\(Int(viewModel.currentTextBox.fontSize))")
-                                        .font(.caption2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                }
+                            ToolButton(
+                                color: .blue.opacity(0.8),
+                                text: "\(Int(viewModel.currentTextBox.fontSize))",
+                                accessibilityLabel: "Font size"
+                            ) {
+                                activeSheet = .fontSize
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Font size")
                         }
                     }
                 }
@@ -124,137 +90,216 @@ struct TextEditorView: View{
             .padding(.horizontal)
 
             // Custom overlays for pickers, anchored to bottom
-            if showFontSizeSheet {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                    .onTapGesture {
-                        withAnimation(.spring()) {
-                            sheetOffset = UIScreen.main.bounds.height * 0.7
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showFontSizeSheet = false
-                            }
-                        }
-                    }
-                VStack {
-                    Spacer()
-                    FontSizePickerSheet(
-                        fontSize: $viewModel.currentTextBox.fontSize,
-                        onCancel: {
-                            withAnimation(.spring()) {
-                                sheetOffset = UIScreen.main.bounds.height * 0.7
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    showFontSizeSheet = false
-                                }
-                            }
-                        }
-                    )
-                    .offset(y: sheetOffset)
-                    .animation(.spring(), value: sheetOffset)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(2)
-                }
-                .ignoresSafeArea()
-                .onAppear {
-                    withAnimation(.spring()) {
-                        sheetOffset = 0
-                    }
-                }
-            }
-            if showStrokeSheet {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                    .onTapGesture {
-                        withAnimation(.spring()) {
-                            sheetOffset = UIScreen.main.bounds.height * 0.7
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showStrokeSheet = false
-                            }
-                        }
-                    }
-                VStack {
-                    Spacer()
-                    StrokePickerSheet(
-                        selectedColor: $viewModel.currentTextBox.strokeColor,
-                        strokeWidth: $viewModel.currentTextBox.strokeWidth,
-                        onCancel: {
-                            withAnimation(.spring()) {
-                                sheetOffset = UIScreen.main.bounds.height * 0.7
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    showStrokeSheet = false
-                                }
-                            }
-                        }
-                    )
-                    .offset(y: sheetOffset)
-                    .animation(.spring(), value: sheetOffset)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(2)
-                }
-                .ignoresSafeArea()
-                .onAppear {
-                    withAnimation(.spring()) {
-                        sheetOffset = 0
-                    }
-                }
-            }
-            if showBgColorSheet {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                    .onTapGesture {
-                        withAnimation(.spring()) {
-                            sheetOffset = UIScreen.main.bounds.height * 0.7
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showBgColorSheet = false
-                            }
-                        }
-                    }
-                VStack {
-                    Spacer()
-                    BgColorPickerSheet(
-                        selectedColor: $viewModel.currentTextBox.bgColor,
-                        onCancel: {
-                            withAnimation(.spring()) {
-                                sheetOffset = UIScreen.main.bounds.height * 0.7
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    showBgColorSheet = false
-                                }
-                            }
-                        }
-                    )
-                    .offset(y: sheetOffset)
-                    .animation(.spring(), value: sheetOffset)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(2)
-                }
-                .ignoresSafeArea()
-                .onAppear {
-                    withAnimation(.spring()) {
-                        sheetOffset = 0
-                    }
+            if let activeSheet = activeSheet {
+                AnimatedSheetOverlay(
+                    isPresented: Binding(
+                        get: { activeSheet != nil },
+                        set: { if !$0 { self.activeSheet = nil } }
+                    ),
+                    sheetOffset: $sheetOffset
+                ) { dismissSheet in
+                    sheetContent(for: activeSheet, dismissSheet: dismissSheet)
                 }
             }
         }
-        .animation(.easeInOut, value: showFontSizeSheet || showStrokeSheet || showBgColorSheet)
+        .animation(.easeInOut, value: activeSheet != nil)
     }
     
     
     private func closeKeyboard(){
         isFocused = false
+    }
+    
+    // MARK: - Helper Functions
+    @ViewBuilder
+    private func sheetContent(for sheetType: SheetType, dismissSheet: @escaping () -> Void) -> some View {
+        switch sheetType {
+        case .bgColor:
+            BgColorPickerSheet(
+                selectedColor: $viewModel.currentTextBox.bgColor,
+                onCancel: dismissSheet
+            )
+        case .stroke:
+            StrokePickerSheet(
+                selectedColor: $viewModel.currentTextBox.strokeColor,
+                strokeWidth: $viewModel.currentTextBox.strokeWidth,
+                onCancel: dismissSheet
+            )
+        case .fontSize:
+            FontSizePickerSheet(
+                fontSize: $viewModel.currentTextBox.fontSize,
+                onCancel: dismissSheet
+            )
+        }
+    }
+}
+
+// MARK: - Shared Color Palette
+struct ColorPalette {
+    static let colors: [Color] = [
+        .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
+    ]
+}
+
+// MARK: - Reusable Tool Button
+struct ToolButton: View {
+    let color: Color
+    let text: String?
+    let accessibilityLabel: String
+    let action: () -> Void
+    
+    init(color: Color, text: String? = nil, accessibilityLabel: String, action: @escaping () -> Void) {
+        self.color = color
+        self.text = text
+        self.accessibilityLabel = accessibilityLabel
+        self.action = action
+    }
+    
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                Circle()
+                    .fill(color == .clear ? Color.gray.opacity(0.2) : color)
+                    .frame(width: 28, height: 28)
+                    .overlay(
+                        Circle().stroke(Color.white, lineWidth: 2)
+                    )
+                if color == .clear {
+                    Image(systemName: "slash.circle")
+                        .foregroundColor(.white)
+                } else if let text = text {
+                    Text(text)
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+    }
+}
+
+// MARK: - Reusable Sheet Overlay Component
+struct AnimatedSheetOverlay<Content: View>: View {
+    @Binding var isPresented: Bool
+    @Binding var sheetOffset: CGFloat
+    let content: (@escaping () -> Void) -> Content
+    
+    init(isPresented: Binding<Bool>, sheetOffset: Binding<CGFloat>, @ViewBuilder content: @escaping (@escaping () -> Void) -> Content) {
+        self._isPresented = isPresented
+        self._sheetOffset = sheetOffset
+        self.content = content
+    }
+    
+    var body: some View {
+        Color.black.opacity(0.4)
+            .ignoresSafeArea()
+            .transition(.opacity)
+            .onTapGesture {
+                dismissSheet()
+            }
+        VStack {
+            Spacer()
+            content(dismissSheet)
+                .offset(y: sheetOffset)
+                .animation(.spring(), value: sheetOffset)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .zIndex(2)
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            withAnimation(.spring()) {
+                sheetOffset = 0
+            }
+        }
+    }
+    
+    private func dismissSheet() {
+        withAnimation(.spring()) {
+            sheetOffset = UIScreen.main.bounds.height * 0.7
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isPresented = false
+            }
+        }
+    }
+}
+
+// MARK: - Reusable Sheet Styling
+struct SheetStyleModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: 420)
+            .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+}
+
+// MARK: - Reusable Sheet Header
+struct SheetHeaderView: View {
+    let title: String
+    let onCancel: () -> Void
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            Button {
+                onCancel()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding(10)
+                    .background(Color(.systemGray3).opacity(0.8), in: Circle())
+            }
+        }
+        .padding(.top, 8)
+        .padding(.horizontal, 8)
+        Text(title)
+            .font(.headline)
+            .foregroundColor(.white)
+            .padding(.top, 8)
+            .padding(.bottom, 20)
+    }
+}
+
+// MARK: - Reusable Color Grid
+struct ColorGridView: View {
+    let colors: [Color]
+    let selectedColor: Color
+    let onColorSelected: (Color) -> Void
+    
+    private let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    
+    var body: some View {
+        ScrollView(.vertical, showsIndicators: false) {
+            LazyVGrid(columns: columns, spacing: 24) {
+                ForEach(colors, id: \.self) { color in
+                    Button {
+                        onColorSelected(color)
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(color == .clear ? Color.gray.opacity(0.2) : color)
+                                .frame(width: 36, height: 36)
+                                .overlay(
+                                    Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
+                                )
+                            if color == .clear {
+                                Image(systemName: "slash.circle")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.top, 10)
+            .padding(.bottom, 20)
+        }
+        .frame(maxHeight: 220)
     }
 }
 struct TextEditorView_Previews: PreviewProvider {
@@ -373,63 +418,21 @@ struct TextView: UIViewRepresentable {
 private struct BgColorPickerSheet: View {
     @Binding var selectedColor: Color
     let onCancel: () -> Void
-    let colors: [Color] = [
-        .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
-    ]
-    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                Button {
+            SheetHeaderView(title: "Background Color", onCancel: onCancel)
+            ColorGridView(
+                colors: ColorPalette.colors,
+                selectedColor: selectedColor,
+                onColorSelected: { color in
+                    selectedColor = color
                     onCancel()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(10)
-                        .background(Color(.systemGray3).opacity(0.8), in: Circle())
                 }
-            }
-            .padding(.top, 8)
-            .padding(.horizontal, 8)
-            Text("Background Color")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.top, 8)
-                .padding(.bottom, 20)
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVGrid(columns: columns, spacing: 24) {
-                    ForEach(colors, id: \.self) { color in
-                        Button {
-                            selectedColor = color
-                            onCancel()
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(color == .clear ? Color.gray.opacity(0.2) : color)
-                                    .frame(width: 36, height: 36)
-                                    .overlay(
-                                        Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
-                                    )
-                                if color == .clear {
-                                    Image(systemName: "slash.circle")
-                                        .foregroundColor(.white)
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(.top, 10)
-                .padding(.bottom, 20)
-            }
-            .frame(maxHeight: 220)
+            )
             Spacer()
         }
-        .frame(maxWidth: 420)
-        .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .modifier(SheetStyleModifier())
     }
 }
 
@@ -437,32 +440,11 @@ private struct StrokePickerSheet: View {
     @Binding var selectedColor: Color
     @Binding var strokeWidth: CGFloat
     let onCancel: () -> Void
-    let colors: [Color] = [
-        .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
-    ]
-    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                Button {
-                    onCancel()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(10)
-                        .background(Color(.systemGray3).opacity(0.8), in: Circle())
-                }
-            }
-            .padding(.top, 8)
-            .padding(.horizontal, 8)
-            Text("Stroke Outline")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.top, 8)
-                .padding(.bottom, 20)
+            SheetHeaderView(title: "Stroke Outline", onCancel: onCancel)
+            
             // Stroke width slider
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -497,43 +479,22 @@ private struct StrokePickerSheet: View {
             .padding(.horizontal)
             
             // Color picker
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVGrid(columns: columns, spacing: 24) {
-                    ForEach(colors, id: \.self) { color in
-                        Button {
-                            selectedColor = color
-                            if color == .clear {
-                                strokeWidth = 0
-                            } else if strokeWidth == 0 {
-                                strokeWidth = 2
-                            }
-                            onCancel()
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(color == .clear ? Color.gray.opacity(0.2) : color)
-                                    .frame(width: 36, height: 36)
-                                    .overlay(
-                                        Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
-                                    )
-                                if color == .clear {
-                                    Image(systemName: "slash.circle")
-                                        .foregroundColor(.white)
-                                }
-                            }
-                        }
+            ColorGridView(
+                colors: ColorPalette.colors,
+                selectedColor: selectedColor,
+                onColorSelected: { color in
+                    selectedColor = color
+                    if color == .clear {
+                        strokeWidth = 0
+                    } else if strokeWidth == 0 {
+                        strokeWidth = 2
                     }
+                    onCancel()
                 }
-                .padding(.top, 10)
-                .padding(.bottom, 20)
-            }
-            .frame(maxHeight: 220)
+            )
             Spacer()
         }
-        .frame(maxWidth: 420)
-        .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .modifier(SheetStyleModifier())
     }
 }
 
@@ -543,25 +504,8 @@ private struct FontSizePickerSheet: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Spacer()
-                Button {
-                    onCancel()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(10)
-                        .background(Color(.systemGray3).opacity(0.8), in: Circle())
-                }
-            }
-            .padding(.top, 8)
-            .padding(.horizontal, 8)
-            Text("Font Size")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.top, 8)
-                .padding(.bottom, 20)
+            SheetHeaderView(title: "Font Size", onCancel: onCancel)
+            
             // Font size slider
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -582,9 +526,8 @@ private struct FontSizePickerSheet: View {
             
             Spacer()
         }
-        .frame(maxWidth: 420)
-        .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
-        .background(.ultraThinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .modifier(SheetStyleModifier())
     }
 }
+
+

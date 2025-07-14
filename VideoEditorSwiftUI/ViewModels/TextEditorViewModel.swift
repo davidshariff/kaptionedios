@@ -24,6 +24,10 @@ class TextEditorViewModel: ObservableObject{
         selectedTextBox = texBox
     }
     
+    func deselectTextBox(){
+        selectedTextBox = nil
+    }
+    
     func isSelected(_ id: UUID) -> Bool{
         selectedTextBox?.id == id
     }

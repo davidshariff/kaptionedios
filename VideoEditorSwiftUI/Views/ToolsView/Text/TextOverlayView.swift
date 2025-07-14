@@ -69,7 +69,11 @@ struct TextOverlayView: View {
                     }).onEnded({ value in
                         guard isSelected else {return}
                         DispatchQueue.main.async {
-                            viewModel.textBoxes[getIndex(textBox.id)].lastOffset = value.translation
+                            // Update lastOffset to be the accumulated offset, not just the last drag translation
+                            viewModel.textBoxes[getIndex(textBox.id)].lastOffset = CGSize(
+                                width: textBox.offset.width,
+                                height: textBox.offset.height
+                            )
                         }
                     }))
                 }

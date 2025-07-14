@@ -61,6 +61,11 @@ extension PlayerHolderView{
                                         .scaleEffect(scale)
                                         .disabled(isFullScreen)
                                 }
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    // Deselect text when tapping outside
+                                    textEditor.deselectTextBox()
+                                }
                                 .scaleEffect(editorVM.frames.scale)
                             }
                         }

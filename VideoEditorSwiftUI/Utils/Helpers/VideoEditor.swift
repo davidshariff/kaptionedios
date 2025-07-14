@@ -397,12 +397,13 @@ extension VideoEditor{
         print("   Stroke width: \(model.strokeWidth)")
         
         let calculatedFontSize = model.fontSize * ratio
+        let calculatedPadding = model.backgroundPadding * ratio
         
         // Create attributed string for reliable text rendering
         var attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
             .foregroundColor: UIColor(model.fontColor),
-            .backgroundColor: UIColor(model.bgColor)
+            .backgroundColor: UIColor.clear // We'll draw the background manually
         ]
         
         // Apply stroke if stroke color is not clear and stroke width is greater than 0
@@ -412,35 +413,30 @@ extension VideoEditor{
         }
         
         let attributedString = NSAttributedString(string: model.text, attributes: attributes)
-        
-        // Calculate text size
         let textSize = attributedString.size()
-        print("   Text size: \(textSize)")
+        let paddedSize = CGSize(width: textSize.width + 2 * calculatedPadding, height: textSize.height + 2 * calculatedPadding)
         
         // Create layer with background - adjust position to center the text
         let textLayer = CALayer()
-        let adjustedX = position.width - (textSize.width / 2)
-        let adjustedY = position.height - (textSize.height / 2)
-        textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: textSize.width, height: textSize.height)
-        print("   Raw position: \(position)")
-        print("   Text size: \(textSize)")
-        print("   Adjusted position: (\(adjustedX), \(adjustedY))")
-        print("   Final frame: \(textLayer.frame)")
+        let adjustedX = position.width - (paddedSize.width / 2)
+        let adjustedY = position.height - (paddedSize.height / 2)
+        textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
         textLayer.backgroundColor = UIColor(model.bgColor).cgColor
         textLayer.cornerRadius = 4
         
         // Render text to image and set as contents
-        let renderer = UIGraphicsImageRenderer(size: textSize)
+        let renderer = UIGraphicsImageRenderer(size: paddedSize)
         let textImage = renderer.image { context in
-            attributedString.draw(at: .zero)
+            // Draw background (already handled by layer, but for completeness)
+            // context.cgContext.setFillColor(UIColor(model.bgColor).cgColor)
+            // context.cgContext.fill(CGRect(origin: .zero, size: paddedSize))
+            // Draw text with padding
+            attributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
         }
         textLayer.contents = textImage.cgImage
         textLayer.contentsScale = UIScreen.main.scale
         
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
-        
-        print("   Text layer created with opacity: \(textLayer.opacity)")
-        print("   Text layer contents: \(textLayer.contents != nil ? "has contents" : "no contents")")
         
         return textLayer
     }

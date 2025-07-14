@@ -22,6 +22,21 @@ struct TextBox: Identifiable{
     var timeRange: ClosedRange<Double> = 0...3
     var offset: CGSize = .zero
     var lastOffset: CGSize = .zero
+    var backgroundPadding: CGFloat = 8
+    
+    init(text: String = "", fontSize: CGFloat = 20, lastFontSize: CGFloat = .zero, bgColor: Color = .white, fontColor: Color = .black, strokeColor: Color = .clear, strokeWidth: CGFloat = 0, timeRange: ClosedRange<Double> = 0...3, offset: CGSize = .zero, lastOffset: CGSize = .zero, backgroundPadding: CGFloat = 8) {
+        self.text = text
+        self.fontSize = fontSize
+        self.lastFontSize = lastFontSize
+        self.bgColor = bgColor
+        self.fontColor = fontColor
+        self.strokeColor = strokeColor
+        self.strokeWidth = strokeWidth
+        self.timeRange = timeRange
+        self.offset = offset
+        self.lastOffset = lastOffset
+        self.backgroundPadding = backgroundPadding
+    }
     
     
 }

@@ -57,6 +57,12 @@ struct TextEditorView: View{
                 Spacer()
                 TextView(textBox: $viewModel.currentTextBox, isFirstResponder: $isFocused, minHeight: textHeight, calculatedHeight: $textHeight)
                     .frame(maxHeight: textHeight)
+                    .padding(.horizontal, viewModel.currentTextBox.backgroundPadding)
+                    .padding(.vertical, viewModel.currentTextBox.backgroundPadding / 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(viewModel.currentTextBox.bgColor)
+                    )
                 Spacer()
                 HStack(spacing: 20){
                     ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
@@ -117,6 +123,7 @@ struct TextEditorView: View{
         case .bgColor:
             BgColorPickerSheet(
                 selectedColor: $viewModel.currentTextBox.bgColor,
+                backgroundPadding: $viewModel.currentTextBox.backgroundPadding,
                 onCancel: dismissSheet
             )
         case .stroke:
@@ -417,6 +424,7 @@ struct TextView: UIViewRepresentable {
 
 private struct BgColorPickerSheet: View {
     @Binding var selectedColor: Color
+    @Binding var backgroundPadding: CGFloat
     let onCancel: () -> Void
     
     var body: some View {
@@ -430,6 +438,12 @@ private struct BgColorPickerSheet: View {
                     onCancel()
                 }
             )
+            VStack(alignment: .leading) {
+                Text("Background Padding: \(Int(backgroundPadding))")
+                    .font(.subheadline)
+                Slider(value: $backgroundPadding, in: 0...40, step: 1)
+            }
+            .padding(.horizontal)
             Spacer()
         }
         .modifier(SheetStyleModifier())

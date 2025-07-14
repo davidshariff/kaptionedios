@@ -41,9 +41,12 @@ struct TextOverlayView: View {
                                 Text(textBox.text)
                                     .font(.system(size: textBox.fontSize, weight: .medium))
                                     .foregroundColor(textBox.strokeColor)
-                                    .background(textBox.bgColor)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, textBox.backgroundPadding)
+                                    .padding(.vertical, textBox.backgroundPadding / 2)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(textBox.bgColor)
+                                    )
                                     .scaleEffect(1 + (textBox.strokeWidth / 50))
                             }
                             
@@ -51,9 +54,12 @@ struct TextOverlayView: View {
                             Text(textBox.text)
                                 .font(.system(size: textBox.fontSize, weight: .medium))
                                 .foregroundColor(textBox.fontColor)
-                                .background(textBox.bgColor)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
+                                .padding(.horizontal, textBox.backgroundPadding)
+                                .padding(.vertical, textBox.backgroundPadding / 2)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(textBox.bgColor)
+                                )
                         }
                             .overlay {
                                 if isSelected{

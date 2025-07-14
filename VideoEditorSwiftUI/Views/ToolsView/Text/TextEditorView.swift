@@ -131,7 +131,11 @@ struct TextEditorView: View{
                     .onTapGesture {
                         withAnimation(.spring()) {
                             sheetOffset = UIScreen.main.bounds.height * 0.7
-                            showFontSizeSheet = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showFontSizeSheet = false
+                            }
                         }
                     }
                 VStack {
@@ -141,7 +145,11 @@ struct TextEditorView: View{
                         onCancel: {
                             withAnimation(.spring()) {
                                 sheetOffset = UIScreen.main.bounds.height * 0.7
-                                showFontSizeSheet = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showFontSizeSheet = false
+                                }
                             }
                         }
                     )
@@ -164,7 +172,11 @@ struct TextEditorView: View{
                     .onTapGesture {
                         withAnimation(.spring()) {
                             sheetOffset = UIScreen.main.bounds.height * 0.7
-                            showStrokeSheet = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showStrokeSheet = false
+                            }
                         }
                     }
                 VStack {
@@ -175,7 +187,11 @@ struct TextEditorView: View{
                         onCancel: {
                             withAnimation(.spring()) {
                                 sheetOffset = UIScreen.main.bounds.height * 0.7
-                                showStrokeSheet = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showStrokeSheet = false
+                                }
                             }
                         }
                     )
@@ -198,7 +214,11 @@ struct TextEditorView: View{
                     .onTapGesture {
                         withAnimation(.spring()) {
                             sheetOffset = UIScreen.main.bounds.height * 0.7
-                            showBgColorSheet = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                showBgColorSheet = false
+                            }
                         }
                     }
                 VStack {
@@ -208,7 +228,11 @@ struct TextEditorView: View{
                         onCancel: {
                             withAnimation(.spring()) {
                                 sheetOffset = UIScreen.main.bounds.height * 0.7
-                                showBgColorSheet = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showBgColorSheet = false
+                                }
                             }
                         }
                     )

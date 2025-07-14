@@ -14,6 +14,7 @@ struct TextEditorView: View{
     @State private var showBgColorSheet: Bool = false
     @State private var showStrokeSheet: Bool = false
     @State private var showFontSizeSheet: Bool = false
+    @State private var sheetOffset: CGFloat = UIScreen.main.bounds.height * 0.7
     let onSave: ([TextBox]) -> Void
     var body: some View{
         ZStack {
@@ -131,12 +132,24 @@ struct TextEditorView: View{
                     Spacer()
                     FontSizePickerSheet(
                         fontSize: $viewModel.currentTextBox.fontSize,
-                        onCancel: { showFontSizeSheet = false }
+                        onCancel: {
+                            withAnimation(.spring()) {
+                                sheetOffset = UIScreen.main.bounds.height * 0.7
+                                showFontSizeSheet = false
+                            }
+                        }
                     )
+                    .offset(y: sheetOffset)
+                    .animation(.spring(), value: sheetOffset)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(2)
                 }
                 .ignoresSafeArea()
+                .onAppear {
+                    withAnimation(.spring()) {
+                        sheetOffset = 0
+                    }
+                }
             }
             if showStrokeSheet {
                 Color.black.opacity(0.4)
@@ -147,12 +160,24 @@ struct TextEditorView: View{
                     StrokePickerSheet(
                         selectedColor: $viewModel.currentTextBox.strokeColor,
                         strokeWidth: $viewModel.currentTextBox.strokeWidth,
-                        onCancel: { showStrokeSheet = false }
+                        onCancel: {
+                            withAnimation(.spring()) {
+                                sheetOffset = UIScreen.main.bounds.height * 0.7
+                                showStrokeSheet = false
+                            }
+                        }
                     )
+                    .offset(y: sheetOffset)
+                    .animation(.spring(), value: sheetOffset)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(2)
                 }
                 .ignoresSafeArea()
+                .onAppear {
+                    withAnimation(.spring()) {
+                        sheetOffset = 0
+                    }
+                }
             }
             if showBgColorSheet {
                 Color.black.opacity(0.4)
@@ -162,12 +187,24 @@ struct TextEditorView: View{
                     Spacer()
                     BgColorPickerSheet(
                         selectedColor: $viewModel.currentTextBox.bgColor,
-                        onCancel: { showBgColorSheet = false }
+                        onCancel: {
+                            withAnimation(.spring()) {
+                                sheetOffset = UIScreen.main.bounds.height * 0.7
+                                showBgColorSheet = false
+                            }
+                        }
                     )
+                    .offset(y: sheetOffset)
+                    .animation(.spring(), value: sheetOffset)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(2)
                 }
                 .ignoresSafeArea()
+                .onAppear {
+                    withAnimation(.spring()) {
+                        sheetOffset = 0
+                    }
+                }
             }
         }
         .animation(.easeInOut, value: showFontSizeSheet || showStrokeSheet || showBgColorSheet)

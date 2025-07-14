@@ -393,16 +393,24 @@ extension VideoEditor{
         print("   Text: '\(model.text)'")
         print("   Font size: \(model.fontSize) * \(ratio) = \(model.fontSize * ratio)")
         print("   Position: \(position)")
-        print("   Colors: fg=\(model.fontColor), bg=\(model.bgColor)")
+        print("   Colors: fg=\(model.fontColor), bg=\(model.bgColor), stroke=\(model.strokeColor)")
+        print("   Stroke width: \(model.strokeWidth)")
         
         let calculatedFontSize = model.fontSize * ratio
         
         // Create attributed string for reliable text rendering
-        let attributes: [NSAttributedString.Key: Any] = [
+        var attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
             .foregroundColor: UIColor(model.fontColor),
             .backgroundColor: UIColor(model.bgColor)
         ]
+        
+        // Apply stroke if stroke color is not clear and stroke width is greater than 0
+        if model.strokeColor != .clear && model.strokeWidth > 0 {
+            attributes[.strokeColor] = UIColor(model.strokeColor)
+            attributes[.strokeWidth] = -model.strokeWidth
+        }
+        
         let attributedString = NSAttributedString(string: model.text, attributes: attributes)
         
         // Calculate text size

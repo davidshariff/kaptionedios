@@ -24,7 +24,15 @@ extension ProjectEntity{
         wrappedBoxes.compactMap { entity -> TextBox? in
             if let text = entity.text, let bgColor = entity.bgColor,
                let fontColor = entity.fontColor{
-                return .init(text: text, fontSize: entity.fontSize, bgColor: Color(hex: bgColor), fontColor: Color(hex: fontColor), timeRange: (entity.lowerTime...entity.upperTime), offset: .init(width: entity.offsetX, height: entity.offsetY))
+                var textBox = TextBox(text: text, fontSize: entity.fontSize, bgColor: Color(hex: bgColor), fontColor: Color(hex: fontColor), timeRange: (entity.lowerTime...entity.upperTime), offset: .init(width: entity.offsetX, height: entity.offsetY))
+                
+                // Handle stroke properties if they exist
+                if let strokeColor = entity.strokeColor {
+                    textBox.strokeColor = Color(hex: strokeColor)
+                }
+                textBox.strokeWidth = entity.strokeWidth
+                
+                return textBox
             }
             return nil
         }
@@ -74,6 +82,8 @@ extension ProjectEntity{
             entity.upperTime = box.timeRange.upperBound
             entity.offsetX = offset.width
             entity.offsetY = offset.height
+            entity.strokeColor = box.strokeColor.toHex()
+            entity.strokeWidth = box.strokeWidth
             
             return entity
         }

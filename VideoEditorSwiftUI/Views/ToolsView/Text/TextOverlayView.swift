@@ -35,9 +35,26 @@ struct TextOverlayView: View {
                     
                     ZStack(alignment: .topLeading) {
                         // Text positioned with offset
-                        Text(createAttr(textBox))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
+                        ZStack {
+                            // Stroke layer (if stroke is enabled)
+                            if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+                                Text(textBox.text)
+                                    .font(.system(size: textBox.fontSize, weight: .medium))
+                                    .foregroundColor(textBox.strokeColor)
+                                    .background(textBox.bgColor)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .scaleEffect(1 + (textBox.strokeWidth / 50))
+                            }
+                            
+                            // Main text layer
+                            Text(textBox.text)
+                                .font(.system(size: textBox.fontSize, weight: .medium))
+                                .foregroundColor(textBox.fontColor)
+                                .background(textBox.bgColor)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                        }
                             .overlay {
                                 if isSelected{
                                     RoundedRectangle(cornerRadius: 6)
@@ -87,9 +104,38 @@ struct TextOverlayView: View {
         result.font = .systemFont(ofSize: textBox.fontSize, weight: .medium)
         result.foregroundColor = UIColor(textBox.fontColor)
         result.backgroundColor = UIColor(textBox.bgColor)
+        
+        // Apply stroke if stroke color is not clear and stroke width is greater than 0
+        if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+            result.strokeColor = UIColor(textBox.strokeColor)
+            result.strokeWidth = -textBox.strokeWidth
+        }
+        
         return result
     }
 }
+
+
+    
+    private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
+        let attrStr = NSMutableAttributedString(string: textBox.text)
+        let range = NSRange(location: 0, length: attrStr.length)
+        
+        attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor(textBox.bgColor), range: range)
+        
+        // Apply stroke if stroke color is not clear and stroke width is greater than 0
+        if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+            attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
+            attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
+        }
+        
+        return attrStr
+    }
+
+
+
 
 struct TextOverlayView_Previews: PreviewProvider {
     static var previews: some View {

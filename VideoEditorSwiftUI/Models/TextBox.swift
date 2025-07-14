@@ -17,6 +17,8 @@ struct TextBox: Identifiable{
     var lastFontSize: CGFloat = .zero
     var bgColor: Color = .white
     var fontColor: Color = .black
+    var strokeColor: Color = .clear
+    var strokeWidth: CGFloat = 0
     var timeRange: ClosedRange<Double> = 0...3
     var offset: CGSize = .zero
     var lastOffset: CGSize = .zero

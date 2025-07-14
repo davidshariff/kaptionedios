@@ -12,6 +12,7 @@ struct TextEditorView: View{
     @State private var textHeight: CGFloat = 100
     @State private var isFocused: Bool = true
     @State private var showBgColorSheet: Bool = false
+    @State private var showStrokeSheet: Bool = false
     let onSave: ([TextBox]) -> Void
     var body: some View{
         Color.black.opacity(0.35)
@@ -75,6 +76,34 @@ struct TextEditorView: View{
                         .sheet(isPresented: $showBgColorSheet) {
                             BgColorPickerSheet(selectedColor: $viewModel.currentTextBox.bgColor) {
                                 showBgColorSheet = false
+                            }
+                        }
+                        
+                        // Custom stroke picker with 'no stroke' option
+                        Button {
+                            showStrokeSheet = true
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(viewModel.currentTextBox.strokeColor == .clear ? Color.gray.opacity(0.2) : viewModel.currentTextBox.strokeColor)
+                                    .frame(width: 28, height: 28)
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: 2)
+                                    )
+                                if viewModel.currentTextBox.strokeColor == .clear {
+                                    Image(systemName: "slash.circle")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Stroke color")
+                        .sheet(isPresented: $showStrokeSheet) {
+                            StrokePickerSheet(
+                                selectedColor: $viewModel.currentTextBox.strokeColor,
+                                strokeWidth: $viewModel.currentTextBox.strokeWidth
+                            ) {
+                                showStrokeSheet = false
                             }
                         }
                     }
@@ -150,6 +179,12 @@ struct TextView: UIViewRepresentable {
         attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
         attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
         
+        // Apply stroke if stroke color is not clear and stroke width is greater than 0
+        if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+            attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
+            attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
+        }
+        
         textView.attributedText = attrStr
         textView.textAlignment = .center
     }
@@ -213,6 +248,92 @@ private struct BgColorPickerSheet: View {
                     ForEach(colors, id: \.self) { color in
                         Button {
                             selectedColor = color
+                            onSelect()
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(color == .clear ? Color.gray.opacity(0.2) : color)
+                                    .frame(width: 36, height: 36)
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
+                                    )
+                                if color == .clear {
+                                    Image(systemName: "slash.circle")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+            }
+            .frame(maxHeight: 220)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: 350)
+    }
+}
+
+private struct StrokePickerSheet: View {
+    @Binding var selectedColor: Color
+    @Binding var strokeWidth: CGFloat
+    let onSelect: () -> Void
+    let colors: [Color] = [
+        .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
+    ]
+    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Stroke Outline")
+                .font(.headline)
+            
+            // Stroke width slider
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("Width: \(Int(strokeWidth))")
+                        .font(.subheadline)
+                    Spacer()
+                    if selectedColor != .clear {
+                        Text("Sample")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(selectedColor)
+                            .overlay(
+                                Text("Sample")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundColor(selectedColor)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.clear)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .stroke(selectedColor, lineWidth: strokeWidth)
+                                    )
+                            )
+                    }
+                }
+                
+                Slider(value: $strokeWidth, in: 0...10, step: 0.5)
+                    .disabled(selectedColor == .clear)
+            }
+            .padding(.horizontal)
+            
+            // Color picker
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVGrid(columns: columns, spacing: 24) {
+                    ForEach(colors, id: \.self) { color in
+                        Button {
+                            selectedColor = color
+                            if color == .clear {
+                                strokeWidth = 0
+                            } else if strokeWidth == 0 {
+                                strokeWidth = 2
+                            }
                             onSelect()
                         } label: {
                             ZStack {

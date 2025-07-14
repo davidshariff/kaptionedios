@@ -128,6 +128,12 @@ struct TextEditorView: View{
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
                     .transition(.opacity)
+                    .onTapGesture {
+                        withAnimation(.spring()) {
+                            sheetOffset = UIScreen.main.bounds.height * 0.7
+                            showFontSizeSheet = false
+                        }
+                    }
                 VStack {
                     Spacer()
                     FontSizePickerSheet(
@@ -155,6 +161,12 @@ struct TextEditorView: View{
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
                     .transition(.opacity)
+                    .onTapGesture {
+                        withAnimation(.spring()) {
+                            sheetOffset = UIScreen.main.bounds.height * 0.7
+                            showStrokeSheet = false
+                        }
+                    }
                 VStack {
                     Spacer()
                     StrokePickerSheet(
@@ -183,6 +195,12 @@ struct TextEditorView: View{
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
                     .transition(.opacity)
+                    .onTapGesture {
+                        withAnimation(.spring()) {
+                            sheetOffset = UIScreen.main.bounds.height * 0.7
+                            showBgColorSheet = false
+                        }
+                    }
                 VStack {
                     Spacer()
                     BgColorPickerSheet(

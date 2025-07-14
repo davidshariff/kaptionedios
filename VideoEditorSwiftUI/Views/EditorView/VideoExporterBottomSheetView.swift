@@ -79,15 +79,40 @@ extension VideoExporterBottomSheetView{
     
     
     private var saveView: some View{
-        VStack(spacing: 30){
+        VStack(spacing: 20){
             Image(systemName: "checkmark.circle")
                 .font(.system(size: 40, weight: .light))
-            Text("Video saved")
+                .foregroundColor(.green)
+            
+            Text("Video saved to Photos")
                 .font(.title2.bold())
-        }
-        .onAppear{
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5){
+            
+            Button {
+                openPhotosApp()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "photo.on.rectangle")
+                    Text("Open in Photos")
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .foregroundColor(.white)
+                .background(Color.blue, in: RoundedRectangle(cornerRadius: 20))
+            }
+            
+            Button {
                 viewModel.renderState = .unknown
+            } label: {
+                Text("Done")
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+    
+    private func openPhotosApp() {
+        if let url = URL(string: "photos-redirect://") {
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
             }
         }
     }

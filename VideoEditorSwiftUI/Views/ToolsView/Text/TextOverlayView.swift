@@ -44,7 +44,7 @@ struct TextOverlayView: View {
                                     .padding(.horizontal, textBox.backgroundPadding)
                                     .padding(.vertical, textBox.backgroundPadding / 2)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 4)
+                                        RoundedRectangle(cornerRadius: textBox.cornerRadius)
                                             .fill(textBox.bgColor)
                                     )
                                     .scaleEffect(1 + (textBox.strokeWidth / 50))
@@ -57,7 +57,7 @@ struct TextOverlayView: View {
                                 .padding(.horizontal, textBox.backgroundPadding)
                                 .padding(.vertical, textBox.backgroundPadding / 2)
                                 .background(
-                                    RoundedRectangle(cornerRadius: 4)
+                                    RoundedRectangle(cornerRadius: textBox.cornerRadius)
                                         .fill(textBox.bgColor)
                                 )
                         }

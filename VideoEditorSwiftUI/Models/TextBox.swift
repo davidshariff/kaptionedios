@@ -23,8 +23,9 @@ struct TextBox: Identifiable{
     var offset: CGSize = .zero
     var lastOffset: CGSize = .zero
     var backgroundPadding: CGFloat = 8
+    var cornerRadius: CGFloat = 0
     
-    init(text: String = "", fontSize: CGFloat = 20, lastFontSize: CGFloat = .zero, bgColor: Color = .white, fontColor: Color = .black, strokeColor: Color = .clear, strokeWidth: CGFloat = 0, timeRange: ClosedRange<Double> = 0...3, offset: CGSize = .zero, lastOffset: CGSize = .zero, backgroundPadding: CGFloat = 8) {
+    init(text: String = "", fontSize: CGFloat = 20, lastFontSize: CGFloat = .zero, bgColor: Color = .white, fontColor: Color = .black, strokeColor: Color = .clear, strokeWidth: CGFloat = 0, timeRange: ClosedRange<Double> = 0...3, offset: CGSize = .zero, lastOffset: CGSize = .zero, backgroundPadding: CGFloat = 8, cornerRadius: CGFloat = 0) {
         self.text = text
         self.fontSize = fontSize
         self.lastFontSize = lastFontSize
@@ -36,6 +37,7 @@ struct TextBox: Identifiable{
         self.offset = offset
         self.lastOffset = lastOffset
         self.backgroundPadding = backgroundPadding
+        self.cornerRadius = cornerRadius
     }
     
     

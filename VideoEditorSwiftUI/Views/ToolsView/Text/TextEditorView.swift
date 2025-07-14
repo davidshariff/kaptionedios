@@ -60,7 +60,7 @@ struct TextEditorView: View{
                     .padding(.horizontal, viewModel.currentTextBox.backgroundPadding)
                     .padding(.vertical, viewModel.currentTextBox.backgroundPadding / 2)
                     .background(
-                        RoundedRectangle(cornerRadius: 4)
+                        RoundedRectangle(cornerRadius: viewModel.currentTextBox.cornerRadius)
                             .fill(viewModel.currentTextBox.bgColor)
                     )
                 Spacer()
@@ -124,6 +124,7 @@ struct TextEditorView: View{
             BgColorPickerSheet(
                 selectedColor: $viewModel.currentTextBox.bgColor,
                 backgroundPadding: $viewModel.currentTextBox.backgroundPadding,
+                cornerRadius: $viewModel.currentTextBox.cornerRadius,
                 onCancel: dismissSheet
             )
         case .stroke:
@@ -425,6 +426,7 @@ struct TextView: UIViewRepresentable {
 private struct BgColorPickerSheet: View {
     @Binding var selectedColor: Color
     @Binding var backgroundPadding: CGFloat
+    @Binding var cornerRadius: CGFloat
     let onCancel: () -> Void
     
     var body: some View {
@@ -442,6 +444,9 @@ private struct BgColorPickerSheet: View {
                 Text("Background Padding: \(Int(backgroundPadding))")
                     .font(.subheadline)
                 Slider(value: $backgroundPadding, in: 0...40, step: 1)
+                Text("Corner Radius: \(Int(cornerRadius))")
+                    .font(.subheadline)
+                Slider(value: $cornerRadius, in: 0...20, step: 1)
             }
             .padding(.horizontal)
             Spacer()

@@ -17,9 +17,19 @@ struct ToolsSectionView: View {
     var body: some View {
         ZStack{
             LazyVGrid(columns: columns, alignment: .center, spacing: 8) {
-                ForEach(ToolEnum.allCases, id: \.self) { tool in
-                    ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
-                        editorVM.selectedTools = tool
+                ForEach(Array(ToolEnum.allCases.enumerated()), id: \.element) { index, tool in
+                    VStack(spacing: 4) {
+                        ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
+                            editorVM.selectedTools = tool
+                        }
+                        
+                        // Add small label between tools
+                        if index < ToolEnum.allCases.count - 1 {
+                            Text(toolLabel(for: tool))
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 2)
+                        }
                     }
                 }
             }
@@ -156,5 +166,20 @@ extension ToolsSectionView{
         }
     }
     
+}
+
+extension ToolsSectionView {
+    private func toolLabel(for tool: ToolEnum) -> String {
+        switch tool {
+        case .text:
+            return "Add text overlays"
+        case .filters:
+            return "Apply visual effects"
+        case .corrections:
+            return "Adjust colors"
+        case .cut:
+            return "Trim video"
+        }
+    }
 }
 

@@ -398,6 +398,7 @@ extension VideoEditor{
         
         let calculatedFontSize = model.fontSize * ratio
         let calculatedPadding = model.backgroundPadding * ratio
+        let calculatedCornerRadius = model.cornerRadius * ratio
         
         // Create attributed string for reliable text rendering
         var attributes: [NSAttributedString.Key: Any] = [
@@ -422,7 +423,7 @@ extension VideoEditor{
         let adjustedY = position.height - (paddedSize.height / 2)
         textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
         textLayer.backgroundColor = UIColor(model.bgColor).cgColor
-        textLayer.cornerRadius = model.cornerRadius
+        textLayer.cornerRadius = calculatedCornerRadius
         
         // Render text to image and set as contents
         let renderer = UIGraphicsImageRenderer(size: paddedSize)

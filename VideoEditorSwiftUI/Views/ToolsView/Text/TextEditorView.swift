@@ -64,34 +64,55 @@ struct TextEditorView: View{
                             .fill(viewModel.currentTextBox.bgColor)
                     )
                 Spacer()
-                HStack(spacing: 20){
-                    ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
-                    }.labelsHidden()
-
-                    // Tool buttons
-                    ToolButton(
-                        color: viewModel.currentTextBox.bgColor,
-                        accessibilityLabel: "Background color"
-                    ) {
-                        activeSheet = .bgColor
+                HStack(spacing: 20) {
+                    VStack {
+                        ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
+                        }.labelsHidden()
+                        Text("Text Color")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
                     }
-                    
-                    ToolButton(
-                        color: viewModel.currentTextBox.strokeColor,
-                        accessibilityLabel: "Stroke color"
-                    ) {
-                        activeSheet = .stroke
+                    VStack {
+                        ToolButton(
+                            color: viewModel.currentTextBox.bgColor,
+                            accessibilityLabel: "Background color"
+                        ) {
+                            activeSheet = .bgColor
+                        }
+                        Text("Background")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
                     }
-                    
-                    ToolButton(
-                        color: .blue.opacity(0.8),
-                        text: "\(Int(viewModel.currentTextBox.fontSize))",
-                        accessibilityLabel: "Font size"
-                    ) {
-                        activeSheet = .fontSize
+                    VStack {
+                        ToolButton(
+                            color: viewModel.currentTextBox.strokeColor,
+                            accessibilityLabel: "Stroke color"
+                        ) {
+                            activeSheet = .stroke
+                        }
+                        Text("Stroke")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
+                    }
+                    VStack {
+                        ToolButton(
+                            color: .blue.opacity(0.8),
+                            text: "\(Int(viewModel.currentTextBox.fontSize))",
+                            accessibilityLabel: "Font size"
+                        ) {
+                            activeSheet = .fontSize
+                        }
+                        Text("Font Size")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
                     }
                 }
                 .padding(.bottom)
+                .hCenter()
             }
             .padding(.horizontal)
 

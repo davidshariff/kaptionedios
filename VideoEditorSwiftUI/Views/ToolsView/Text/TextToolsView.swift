@@ -49,16 +49,7 @@ extension TextToolsView{
         .frame(width: 80, height: 80)
         .overlay(alignment: .topLeading) {
             if isSelected{
-                Button {
-                    editor.removeTextBox()
-                } label: {
-                    Image(systemName: "trash")
-                        .imageScale(.small)
-                        .foregroundColor(Color(.systemGray2))
-                        .padding(5)
-                        .background(Color.black, in: Circle())
-                }
-                .padding(5)
+                TrashButtonWithConfirmation(onDelete: { editor.removeTextBox() })
             }
         }
         .onTapGesture {

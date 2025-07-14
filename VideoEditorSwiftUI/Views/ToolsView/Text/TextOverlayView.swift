@@ -154,13 +154,7 @@ extension TextOverlayView{
     
     private func textBoxButtons(_ textBox: TextBox) -> some View{
         HStack(spacing: 10){
-            Button {
-                viewModel.removeTextBox()
-            } label: {
-                Image(systemName: "trash")
-                    .padding(5)
-                    .background(Color(.systemGray2), in: Circle())
-            }
+            TrashButtonWithConfirmation(onDelete: { viewModel.removeTextBox() })
             Button {
                 viewModel.copy(textBox)
             } label: {
@@ -184,6 +178,30 @@ extension TextOverlayView{
     private func getIndex(_ id: UUID) -> Int{
         let index = viewModel.textBoxes.firstIndex(where: {$0.id == id})
         return index ?? 0
+    }
+}
+
+struct TrashButtonWithConfirmation: View {
+    @State private var showAlert = false
+    let onDelete: () -> Void
+    var body: some View {
+        Button {
+            showAlert = true
+        } label: {
+            Image(systemName: "trash")
+                .padding(5)
+                .background(Color(.systemGray2), in: Circle())
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Are you sure?"),
+                message: Text("This action cannot be undone."),
+                primaryButton: .destructive(Text("Delete")) {
+                    onDelete()
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 }
 

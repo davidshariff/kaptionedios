@@ -52,7 +52,7 @@ extension TextToolsView{
                 Button {
                     editor.removeTextBox()
                 } label: {
-                    Image(systemName: "xmark")
+                    Image(systemName: "trash")
                         .imageScale(.small)
                         .foregroundColor(Color(.systemGray2))
                         .padding(5)

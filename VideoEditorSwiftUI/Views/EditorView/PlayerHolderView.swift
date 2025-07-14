@@ -52,7 +52,7 @@ extension PlayerHolderView{
                         originalSize: .init(width: video.frameSize.width * scale, height: video.frameSize.height * scale),
                         rotation: editorVM.currentVideo?.rotation,
                         isMirror: editorVM.currentVideo?.isMirror ?? false,
-                        isActiveCrop: editorVM.selectedTools == .crop) {
+                        isActiveCrop: false) {
                             ZStack{
                                 editorVM.frames.frameColor
                                 ZStack{

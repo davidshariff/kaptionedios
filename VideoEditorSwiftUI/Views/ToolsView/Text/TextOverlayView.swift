@@ -105,7 +105,7 @@ extension TextOverlayView{
             Button {
                 viewModel.removeTextBox()
             } label: {
-                Image(systemName: "xmark")
+                Image(systemName: "trash")
                     .padding(5)
                     .background(Color(.systemGray2), in: Circle())
             }

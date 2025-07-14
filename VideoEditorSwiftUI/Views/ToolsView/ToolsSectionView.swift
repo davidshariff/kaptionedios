@@ -83,15 +83,15 @@ extension ToolsSectionView{
                     videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                     editorVM.setTools()
                 }
-            case .speed:
-                VideoSpeedSlider(value: Double(video.rate), isChangeState: isAppliedTool) {rate in
-                    videoPlayer.pause()
-                    editorVM.updateRate(rate: rate)
-                }
-            case .crop:
-                CropSheetView(editorVM: editorVM)
-            case .audio:
-                AudioSheetView(videoPlayer: videoPlayer, editorVM: editorVM)
+            //case .speed:
+            //    VideoSpeedSlider(value: Double(video.rate), isChangeState: isAppliedTool) {rate in
+            //        videoPlayer.pause()
+            //        editorVM.updateRate(rate: rate)
+            //    }
+            //case .crop:
+            //    CropSheetView(editorVM: editorVM)
+            //case .audio:
+            //    AudioSheetView(videoPlayer: videoPlayer, editorVM: editorVM)
             case .text:
                 TextToolsView(video: video, editor: textEditor)
             case .filters:
@@ -108,8 +108,8 @@ extension ToolsSectionView{
                     videoPlayer.setFilters(mainFilter: CIFilter(name: video.filterName ?? ""), colorCorrection: corrections)
                     editorVM.setCorrections(corrections)
                 }
-            case .frames:
-                FramesToolView(selectedColor: $editorVM.frames.frameColor, scaleValue: $editorVM.frames.scaleValue, onChange: editorVM.setFrames)
+            //case .frames:
+            //    FramesToolView(selectedColor: $editorVM.frames.frameColor, scaleValue: $editorVM.frames.scaleValue, onChange: editorVM.setFrames)
             }
             Spacer()
         }
@@ -132,7 +132,7 @@ extension ToolsSectionView{
                     .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 5))
             }
             Spacer()
-            if tool != .filters, tool != .audio, tool != .text{
+            if tool != .filters, /*tool != .audio,*/ tool != .text{
                 Button {
                     editorVM.reset()
                 } label: {

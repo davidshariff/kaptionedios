@@ -28,9 +28,10 @@ struct MainEditorView: View {
                     PlayerHolderView(isFullScreen: $isFullScreen, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                         .frame(height: proxy.size.height / (isFullScreen ?  1.25 : 1.8))
                     PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+                    Spacer()
                     ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor)
                         .opacity(isFullScreen ? 0 : 1)
-                        .padding(.top, 5)
+                        .padding(.bottom, 20)
                 }
                 .onAppear{
                     setVideo(proxy)

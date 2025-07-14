@@ -355,6 +355,7 @@ private struct BgColorPickerSheet: View {
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.top, 8)
+                .padding(.bottom, 20)
             ScrollView(.vertical, showsIndicators: false) {
                 LazyVGrid(columns: columns, spacing: 24) {
                     ForEach(colors, id: \.self) { color in
@@ -419,6 +420,7 @@ private struct StrokePickerSheet: View {
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.top, 8)
+                .padding(.bottom, 20)
             // Stroke width slider
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -517,6 +519,7 @@ private struct FontSizePickerSheet: View {
                 .font(.headline)
                 .foregroundColor(.white)
                 .padding(.top, 8)
+                .padding(.bottom, 20)
             // Font size slider
             VStack(alignment: .leading, spacing: 10) {
                 HStack {

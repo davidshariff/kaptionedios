@@ -22,14 +22,12 @@ struct ToolsSectionView: View {
                         ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
                             editorVM.selectedTools = tool
                         }
-                        
-                        // Add small label between tools
-                        if index < ToolEnum.allCases.count - 1 {
-                            Text(toolLabel(for: tool))
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                                .padding(.top, 2)
-                        }
+                        Text(toolLabel(for: tool))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
+                            .frame(height: 32)
+                            .multilineTextAlignment(.center)
                     }
                 }
             }

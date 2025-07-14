@@ -36,21 +36,21 @@ struct TextEditorView: View{
                             .background(Color.secondary, in: RoundedRectangle(cornerRadius: 20))
                     }
 
-                    Spacer()
-
-                    Button {
-                        closeKeyboard()
-                        viewModel.saveTapped()
-                        onSave(viewModel.textBoxes)
-                    } label: {
-                        Text("Save")
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
+                Spacer()
+                
+                Button {
+                    closeKeyboard()
+                    viewModel.saveTapped()
+                    onSave(viewModel.textBoxes)
+                } label: {
+                    Text("Save")
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
                             .foregroundColor(.white)
                             .background(Color.green, in: RoundedRectangle(cornerRadius: 20))
-                            .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
+                        .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
                     }
-                    .disabled(viewModel.currentTextBox.text.isEmpty)
+                        .disabled(viewModel.currentTextBox.text.isEmpty)
                 }
                 .padding(.horizontal)
 
@@ -130,8 +130,8 @@ struct TextEditorView: View{
             }
         }
         .animation(.easeInOut, value: activeSheet != nil)
-    }
-    
+                        }
+                        
     
     private func closeKeyboard(){
         isFocused = false
@@ -186,28 +186,28 @@ struct ToolButton: View {
     
     var body: some View {
         Button(action: action) {
-            ZStack {
-                Circle()
+                                ZStack {
+                                    Circle()
                     .fill(color == .clear ? Color.gray.opacity(0.2) : color)
-                    .frame(width: 28, height: 28)
-                    .overlay(
-                        Circle().stroke(Color.white, lineWidth: 2)
-                    )
+                                        .frame(width: 28, height: 28)
+                                        .overlay(
+                                            Circle().stroke(Color.white, lineWidth: 2)
+                                        )
                 if color == .clear {
                     Image(systemName: "slash.circle")
                         .foregroundColor(.white)
                 } else if let text = text {
                     Text(text)
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
+                                        .font(.caption2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
                 }
-            }
-        }
-        .buttonStyle(.plain)
+                                }
+                            }
+                            .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
-    }
-}
+                        }
+                    }
 
 // MARK: - Reusable Sheet Overlay Component
 struct AnimatedSheetOverlay<Content: View>: View {
@@ -222,37 +222,37 @@ struct AnimatedSheetOverlay<Content: View>: View {
     }
     
     var body: some View {
-        Color.black.opacity(0.4)
-            .ignoresSafeArea()
-            .transition(.opacity)
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .transition(.opacity)
             .onTapGesture {
                 dismissSheet()
             }
-        VStack {
-            Spacer()
+                VStack {
+                    Spacer()
             content(dismissSheet)
-                .offset(y: sheetOffset)
-                .animation(.spring(), value: sheetOffset)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .zIndex(2)
-        }
-        .ignoresSafeArea()
-        .onAppear {
-            withAnimation(.spring()) {
-                sheetOffset = 0
+                    .offset(y: sheetOffset)
+                    .animation(.spring(), value: sheetOffset)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(2)
+                }
+                .ignoresSafeArea()
+                .onAppear {
+                    withAnimation(.spring()) {
+                        sheetOffset = 0
+                    }
+                }
             }
-        }
-    }
     
     private func dismissSheet() {
-        withAnimation(.spring()) {
-            sheetOffset = UIScreen.main.bounds.height * 0.7
+                            withAnimation(.spring()) {
+                                sheetOffset = UIScreen.main.bounds.height * 0.7
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 isPresented = false
-            }
-        }
+                            }
+                        }
     }
 }
 
@@ -320,7 +320,7 @@ struct ColorGridView: View {
                             if color == .clear {
                                 Image(systemName: "slash.circle")
                                     .foregroundColor(.white)
-                            }
+    }
                         }
                     }
                 }
@@ -523,13 +523,13 @@ private struct StrokePickerSheet: View {
                 colors: ColorPalette.colors,
                 selectedColor: selectedColor,
                 onColorSelected: { color in
-                    selectedColor = color
-                    if color == .clear {
-                        strokeWidth = 0
-                    } else if strokeWidth == 0 {
-                        strokeWidth = 2
-                    }
-                    onCancel()
+                            selectedColor = color
+                            if color == .clear {
+                                strokeWidth = 0
+                            } else if strokeWidth == 0 {
+                                strokeWidth = 2
+                            }
+                            onCancel()
                 }
             )
             Spacer()

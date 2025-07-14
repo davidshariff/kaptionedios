@@ -33,11 +33,8 @@ struct TextOverlayView: View {
                 
                 if textBox.timeRange.contains(currentTime){
                     
-                    VStack(alignment: .leading, spacing: 2) {
-                        if isSelected{
-                            textBoxButtons(textBox)
-                        }
-                        
+                    ZStack(alignment: .topLeading) {
+                        // Text positioned with offset
                         Text(createAttr(textBox))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
@@ -51,9 +48,14 @@ struct TextOverlayView: View {
                             .onTapGesture {
                                 editOrSelectTextBox(textBox, isSelected)
                             }
+                            .offset(textBox.offset)
                         
+                        // Buttons positioned absolutely, not affecting text position
+                        if isSelected{
+                            textBoxButtons(textBox)
+                                .offset(x: textBox.offset.width, y: textBox.offset.height - 30)
+                        }
                     }
-                    .offset(textBox.offset)
                     .simultaneousGesture(DragGesture(minimumDistance: 1).onChanged({ value in
                         guard isSelected else {return}
                         let current = value.translation

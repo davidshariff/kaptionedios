@@ -11,6 +11,7 @@ struct TextEditorView: View{
     @ObservedObject var viewModel: TextEditorViewModel
     @State private var textHeight: CGFloat = 100
     @State private var isFocused: Bool = true
+    @State private var showBgColorSheet: Bool = false
     let onSave: ([TextBox]) -> Void
     var body: some View{
         Color.black.opacity(0.35)
@@ -51,9 +52,31 @@ struct TextEditorView: View{
                     HStack(spacing: 20){
                         ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
                         }.labelsHidden()
-                       
-                        ColorPicker(selection: $viewModel.currentTextBox.bgColor, supportsOpacity: true) {
-                        }.labelsHidden()
+
+                        // Custom background color picker with 'no color' option
+                        Button {
+                            showBgColorSheet = true
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(viewModel.currentTextBox.bgColor == .clear ? Color.gray.opacity(0.2) : viewModel.currentTextBox.bgColor)
+                                    .frame(width: 28, height: 28)
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: 2)
+                                    )
+                                if viewModel.currentTextBox.bgColor == .clear {
+                                    Image(systemName: "slash.circle")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Background color")
+                        .sheet(isPresented: $showBgColorSheet) {
+                            BgColorPickerSheet(selectedColor: $viewModel.currentTextBox.bgColor) {
+                                showBgColorSheet = false
+                            }
+                        }
                     }
                 }
             }
@@ -171,5 +194,49 @@ struct TextView: UIViewRepresentable {
 //        func textViewDidBeginEditing(_ textView: UITextView) {
 //            parent.isFirstResponder = true
 //        }
+    }
+}
+
+private struct BgColorPickerSheet: View {
+    @Binding var selectedColor: Color
+    let onSelect: () -> Void
+    let colors: [Color] = [
+        .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
+    ]
+    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Background Color")
+                .font(.headline)
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVGrid(columns: columns, spacing: 24) {
+                    ForEach(colors, id: \.self) { color in
+                        Button {
+                            selectedColor = color
+                            onSelect()
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(color == .clear ? Color.gray.opacity(0.2) : color)
+                                    .frame(width: 36, height: 36)
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
+                                    )
+                                if color == .clear {
+                                    Image(systemName: "slash.circle")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+            }
+            .frame(maxHeight: 220)
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: 350)
     }
 }

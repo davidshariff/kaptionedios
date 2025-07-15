@@ -344,9 +344,6 @@ struct KaraokeTextByLetterOverlay: View {
                             }
                         )
                 }
-                .overlay(
-                    isActive ? Rectangle().frame(height: 2).foregroundColor(.green).offset(y: fontSize * 0.4) : nil
-                )
             }
         }
     }
@@ -392,9 +389,6 @@ struct KaraokeTextByWordOverlay: View {
                         .opacity(progress)
                         .animation(.linear(duration: 0.05), value: progress)
                 }
-                .overlay(
-                    isActive ? Rectangle().frame(height: 2).foregroundColor(.green).offset(y: fontSize * 0.4) : nil
-                )
             }
         }
     }

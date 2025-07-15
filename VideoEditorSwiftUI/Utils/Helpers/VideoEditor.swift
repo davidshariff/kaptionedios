@@ -17,11 +17,14 @@ class VideoEditor{
     
     ///The renderer is made up of half-sequential operations:
     func startRender(video: Video, videoQuality: VideoQuality) async throws -> URL{
+        print("🚀 [VideoEditor] startRender called – quality: \(videoQuality)  resolution: \(videoQuality.size)")
         do{
             let url = try await resizeAndLayerOperation(video: video, videoQuality: videoQuality)
             let finalUrl = try await applyFiltersOperations(video, fromUrl: url)
+            print("✅ [VideoEditor] Finished render – output: \(finalUrl)")
             return finalUrl
         }catch{
+            print("🛑 [VideoEditor] Render failed: \(error)")
             throw error
         }
     }
@@ -91,13 +94,16 @@ class VideoEditor{
         
         ///Create exportSession
         let session = try exportSession(composition: composition, videoComposition: videoComposition, outputURL: outputURL, timeRange: timeRange)
+        print("⏳ [VideoEditor] Starting first pass export (resize/compose) to \(outputURL.path)")
         
         await session.export()
         
         if let error = session.error {
+            print("🛑 [VideoEditor] First pass export error: \(error)")
             throw error
         } else {
             if let url = session.outputURL{
+                print("✅ [VideoEditor] First pass export finished: \(url)")
                 return url
             }
             throw ExporterError.failed
@@ -131,12 +137,15 @@ class VideoEditor{
         session.outputFileType = .mp4
         session.outputURL = outputURL
         
+        print("⏳ [VideoEditor] Starting second pass export (filters) to \(outputURL.path)")
         await session.export()
         
         if let error = session.error {
+            print("🛑 [VideoEditor] Second pass export error: \(error)")
             throw error
         } else {
             if let url = session.outputURL{
+                print("✅ [VideoEditor] Second pass export finished: \(url)")
                 return url
             }
             throw ExporterError.failed
@@ -208,7 +217,16 @@ extension VideoEditor{
         }
         #endif
        
-        
+        // Debug: dump layer hierarchy to confirm text layers before export
+        #if DEBUG
+        func dump(layer: CALayer, indent: String = "") {
+            print("\(indent)- Layer: \(layer.self) frame: \(layer.frame) opacity: \(layer.opacity) sublayers: \(layer.sublayers?.count ?? 0)")
+            layer.sublayers?.forEach { dump(layer: $0, indent: indent + "  ") }
+        }
+        print("📐 [VideoEditor] Overlay layer tree before export:")
+        dump(layer: outputLayer)
+        #endif
+
         #if targetEnvironment(simulator)
         // Work-around simulator crash: use additionalLayer variant. We need to supply a unique trackID and add a matching layer instruction later.
         let overlayTrackID: CMPersistentTrackID = CMPersistentTrackID(videoComposition.sourceTrackIDForFrameTiming == kCMPersistentTrackID_Invalid ? 1 : videoComposition.sourceTrackIDForFrameTiming + 1)
@@ -423,32 +441,61 @@ extension VideoEditor{
                 var x: CGFloat = calculatedPadding
                 for (i, word) in karaokeWords.enumerated() {
                     let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
-                    // Animate highlight mask
-                    let highlightColor = UIColor.yellow
-                    let normalColor = UIColor(model.fontColor)
-                    // For export, animate highlight using CABasicAnimation on foreground color
-                    let wordLayer = CATextLayer()
-                    wordLayer.string = word.text
-                    wordLayer.font = font
-                    wordLayer.fontSize = calculatedFontSize
-                    wordLayer.frame = wordRect
-                    wordLayer.contentsScale = UIScreen.main.scale
-                    wordLayer.alignmentMode = .left
-                    wordLayer.foregroundColor = normalColor.cgColor
-                    textLayer.addSublayer(wordLayer)
-                    // Animate color
-                    let highlightAnim = CABasicAnimation(keyPath: "foregroundColor")
-                    highlightAnim.fromValue = normalColor.cgColor
-                    highlightAnim.toValue = highlightColor.cgColor
+                    // Base layer (always visible)​
+                    let baseLayer = CATextLayer()
+                    baseLayer.string = word.text
+                    baseLayer.font = font
+                    baseLayer.fontSize = calculatedFontSize
+                    baseLayer.frame = wordRect
+                    baseLayer.contentsScale = UIScreen.main.scale
+                    baseLayer.alignmentMode = .left
+                    baseLayer.foregroundColor = UIColor(model.fontColor).cgColor // Use original color
+                    
+                    // Render base layer to bitmap
+                    let baseRenderer = UIGraphicsImageRenderer(size: wordRect.size)
+                    let baseImage = baseRenderer.image { _ in
+                        word.text.draw(in: CGRect(origin: .zero, size: wordRect.size), withAttributes: [
+                            .font: font,
+                            .foregroundColor: UIColor(model.fontColor) // Ensure correct color
+                        ])
+                    }
+                    baseLayer.contents = baseImage.cgImage
+                    textLayer.addSublayer(baseLayer)
+
+                    // Highlight layer (fades in with opacity) – this is reliably captured by AVVideoCompositionCoreAnimationTool.​​
+                    let highlightLayer = CATextLayer()
+                    highlightLayer.string = word.text
+                    highlightLayer.font = font
+                    highlightLayer.fontSize = calculatedFontSize
+                    highlightLayer.frame = wordRect
+                    highlightLayer.contentsScale = UIScreen.main.scale
+                    highlightLayer.alignmentMode = .left
+                    highlightLayer.foregroundColor = UIColor.green.cgColor // Change highlight to green
+                    highlightLayer.opacity = 0
+                    
+                    // Render highlight layer to bitmap
+                    let highlightRenderer = UIGraphicsImageRenderer(size: wordRect.size)
+                    let highlightImage = highlightRenderer.image { _ in
+                        word.text.draw(in: CGRect(origin: .zero, size: wordRect.size), withAttributes: [.font: font, .foregroundColor: UIColor.green])
+                    }
+                    highlightLayer.contents = highlightImage.cgImage
+                    textLayer.addSublayer(highlightLayer)
+
+                    // Opacity animation to reveal the highlight.​
+                    let highlightAnim = CABasicAnimation(keyPath: "opacity")
+                    highlightAnim.fromValue = 0
+                    highlightAnim.toValue = 1
                     highlightAnim.beginTime = word.start
                     highlightAnim.duration = word.end - word.start
                     highlightAnim.fillMode = .forwards
                     highlightAnim.isRemovedOnCompletion = false
-                    wordLayer.add(highlightAnim, forKey: "karaokeColor")
+                    highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")
                     x += wordWidths[i] + 8
                 }
             }
-            textLayer.contents = textImage.cgImage
+            // We rely on the live `CATextLayer` sublayers above; a pre-rendered bitmap isn’t needed and
+            // can actually hide the sublayers when AVFoundation flattens the hierarchy during export.
+            // textLayer.contents = nil
             textLayer.contentsScale = UIScreen.main.scale
             addAnimation(to: textLayer, with: model.timeRange, duration: duration)
             return textLayer

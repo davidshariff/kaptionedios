@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TextOverlayView: View {
     var currentTime: Double
@@ -37,47 +38,24 @@ struct TextOverlayView: View {
                         ZStack(alignment: .topLeading) {
                             // Text positioned with offset
                             ZStack {
-                                // Stroke layer (if stroke is enabled)
-                                if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
-                                    Text(textBox.text)
-                                        .font(.system(size: textBox.fontSize, weight: .medium))
-                                        .foregroundColor(textBox.strokeColor)
-                                        .padding(.horizontal, textBox.backgroundPadding)
-                                        .padding(.vertical, textBox.backgroundPadding / 2)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: textBox.cornerRadius)
-                                                .fill(textBox.bgColor)
-                                        )
-                                        .scaleEffect(1 + (textBox.strokeWidth / 50))
-                                        .lineLimit(1)
-                                        .fixedSize(horizontal: true, vertical: false)
-                                }
-                                
-                                // Main text layer
-                                Text(textBox.text)
-                                    .font(.system(size: textBox.fontSize, weight: .medium))
-                                    .foregroundColor(textBox.fontColor)
-                                    .padding(.horizontal, textBox.backgroundPadding)
-                                    .padding(.vertical, textBox.backgroundPadding / 2)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: textBox.cornerRadius)
-                                            .fill(textBox.bgColor)
-                                    )
-                                    .shadow(color: textBox.shadowColor.opacity(textBox.shadowOpacity), radius: textBox.shadowRadius, x: textBox.shadowX, y: textBox.shadowY)
-                                    .lineLimit(1)
-                                    .fixedSize(horizontal: true, vertical: false)
+                                RoundedRectangle(cornerRadius: textBox.cornerRadius)
+                                    .fill(textBox.bgColor)
+                                AttributedTextOverlay(
+                                    attributedString: createNSAttr(textBox),
+                                    offset: .zero, // offset applied to ZStack
+                                    isSelected: isSelected,
+                                    bgColor: .clear, // background handled by RoundedRectangle
+                                    cornerRadius: textBox.cornerRadius
+                                )
+                                .padding(.horizontal, textBox.backgroundPadding)
+                                .padding(.vertical, textBox.backgroundPadding / 2)
                             }
-                                .overlay {
-                                    if isSelected{
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .stroke(lineWidth: 1)
-                                            .foregroundColor(.cyan)
-                                    }
-                                }
-                                .onTapGesture {
-                                    editOrSelectTextBox(textBox, isSelected)
-                                }
-                                .offset(textBox.offset)
+                            .fixedSize()
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                editOrSelectTextBox(textBox, isSelected)
+                            }
+                            .offset(textBox.offset)
                             
                             // Buttons positioned absolutely, not affecting text position
                             if isSelected{
@@ -209,6 +187,41 @@ struct TrashButtonWithConfirmation: View {
                 },
                 secondaryButton: .cancel()
             )
+        }
+    }
+}
+
+// UIViewRepresentable for NSAttributedString rendering
+struct AttributedTextOverlay: UIViewRepresentable {
+    let attributedString: NSAttributedString
+    let offset: CGSize
+    let isSelected: Bool
+    let bgColor: UIColor
+    let cornerRadius: CGFloat
+
+    func makeUIView(context: Context) -> UILabel {
+        let label = UILabel()
+        label.numberOfLines = 1
+        label.lineBreakMode = .byClipping
+        label.backgroundColor = bgColor
+        label.layer.cornerRadius = cornerRadius
+        label.layer.masksToBounds = true
+        return label
+    }
+
+    func updateUIView(_ uiView: UILabel, context: Context) {
+        uiView.attributedText = attributedString
+        uiView.sizeToFit()
+        uiView.frame = CGRect(origin: .zero, size: uiView.intrinsicContentSize)
+        uiView.backgroundColor = bgColor
+        uiView.layer.cornerRadius = cornerRadius
+        uiView.layer.masksToBounds = true
+        // Selection border
+        if isSelected {
+            uiView.layer.borderColor = UIColor.cyan.cgColor
+            uiView.layer.borderWidth = 1
+        } else {
+            uiView.layer.borderWidth = 0
         }
     }
 }

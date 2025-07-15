@@ -60,6 +60,7 @@ struct TextOverlayView: View {
                                     RoundedRectangle(cornerRadius: textBox.cornerRadius)
                                         .fill(textBox.bgColor)
                                 )
+                                .shadow(color: textBox.shadowColor.opacity(textBox.shadowOpacity), radius: textBox.shadowRadius, x: textBox.shadowX, y: textBox.shadowY)
                         }
                             .overlay {
                                 if isSelected{

@@ -51,8 +51,25 @@ Video editing application with great functionality of tools and the ability to e
   
 
 
-###
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
+### Text Features
+
+This app always tries to ensure WYSIWYG (what you see is what you get) consistency between the editor, overlay, and exported video. This is important for accurate subtitle and caption editing.
+
+### Implementation Summary
+- **Model**: The `TextBox` model now includes shadow properties: `shadowColor`, `shadowRadius`, `shadowX`, `shadowY`, and `shadowOpacity`.
+- **UI**: A new bottom sheet ("Shadow") was added to the text editor, allowing users to adjust shadow color, blur, offset, and opacity. Live preview is provided.
+- **Editor/Overlay**: Both the text editor and overlay views use SwiftUI's `.shadow` modifier to render the shadow exactly as configured.
+- **Export**: The export logic in `VideoEditor.swift` was updated to render the shadow using CoreGraphics, so the burned-in video matches the editor preview.
+
+**Note:** When adding new text features, ensure changes are reflected in:
+- The `TextBox` model
+- The text editing UI (bottom sheets, controls)
+- The overlay and editor rendering (SwiftUI views)
+- The export logic (CoreGraphics/AVFoundation)
+
+This guarantees that all text features are WYSIWYG and consistent across the app and exported videos.
 
   
   

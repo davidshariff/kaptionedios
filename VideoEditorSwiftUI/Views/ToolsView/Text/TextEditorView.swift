@@ -17,7 +17,7 @@ struct TextEditorView: View{
     
     // MARK: - Sheet Types
     enum SheetType {
-        case bgColor, stroke, fontSize
+        case bgColor, stroke, fontSize, shadow
     }
     var body: some View{
         ZStack {
@@ -110,6 +110,18 @@ struct TextEditorView: View{
                             .foregroundColor(.secondary)
                             .padding(.top, 4)
                     }
+                    VStack {
+                        ToolButton(
+                            color: viewModel.currentTextBox.shadowColor.opacity(viewModel.currentTextBox.shadowOpacity),
+                            accessibilityLabel: "Shadow"
+                        ) {
+                            activeSheet = .shadow
+                        }
+                        Text("Shadow")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
+                    }
                 }
                 .padding(.bottom)
                 .hCenter()
@@ -157,6 +169,15 @@ struct TextEditorView: View{
         case .fontSize:
             FontSizePickerSheet(
                 fontSize: $viewModel.currentTextBox.fontSize,
+                onCancel: dismissSheet
+            )
+        case .shadow:
+            ShadowPickerSheet(
+                shadowColor: $viewModel.currentTextBox.shadowColor,
+                shadowRadius: $viewModel.currentTextBox.shadowRadius,
+                shadowX: $viewModel.currentTextBox.shadowX,
+                shadowY: $viewModel.currentTextBox.shadowY,
+                shadowOpacity: $viewModel.currentTextBox.shadowOpacity,
                 onCancel: dismissSheet
             )
         }
@@ -396,7 +417,14 @@ struct TextView: UIViewRepresentable {
             attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
             attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
         }
-        
+        // Apply shadow
+        if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity)
+            shadow.shadowBlurRadius = textBox.shadowRadius
+            shadow.shadowOffset = CGSize(width: textBox.shadowX, height: textBox.shadowY)
+            attrStr.addAttribute(.shadow, value: shadow, range: range)
+        }
         textView.attributedText = attrStr
         textView.textAlignment = .center
     }
@@ -564,6 +592,54 @@ private struct FontSizePickerSheet: View {
             }
             .padding(.horizontal)
             
+            Spacer()
+        }
+        .modifier(SheetStyleModifier())
+    }
+}
+
+// MARK: - Shadow Picker Sheet
+private struct ShadowPickerSheet: View {
+    @Binding var shadowColor: Color
+    @Binding var shadowRadius: CGFloat
+    @Binding var shadowX: CGFloat
+    @Binding var shadowY: CGFloat
+    @Binding var shadowOpacity: Double
+    let onCancel: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            SheetHeaderView(title: "Text Shadow", onCancel: onCancel)
+            ColorGridView(
+                colors: ColorPalette.colors,
+                selectedColor: shadowColor,
+                onColorSelected: { color in
+                    shadowColor = color
+                }
+            )
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text("Blur: \(String(format: "%.1f", shadowRadius))")
+                        .font(.subheadline)
+                    Slider(value: $shadowRadius, in: 0...20, step: 0.5)
+                }
+                HStack {
+                    Text("X Offset: \(String(format: "%.1f", shadowX))")
+                        .font(.subheadline)
+                    Slider(value: $shadowX, in: -20...20, step: 0.5)
+                }
+                HStack {
+                    Text("Y Offset: \(String(format: "%.1f", shadowY))")
+                        .font(.subheadline)
+                    Slider(value: $shadowY, in: -20...20, step: 0.5)
+                }
+                HStack {
+                    Text("Opacity: \(String(format: "%.2f", shadowOpacity))")
+                        .font(.subheadline)
+                    Slider(value: $shadowOpacity, in: 0...1, step: 0.01)
+                }
+            }
+            .padding(.horizontal)
             Spacer()
         }
         .modifier(SheetStyleModifier())

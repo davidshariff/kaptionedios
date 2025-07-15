@@ -428,10 +428,15 @@ extension VideoEditor{
         // Render text to image and set as contents
         let renderer = UIGraphicsImageRenderer(size: paddedSize)
         let textImage = renderer.image { context in
-            // Draw background (already handled by layer, but for completeness)
-            // context.cgContext.setFillColor(UIColor(model.bgColor).cgColor)
-            // context.cgContext.fill(CGRect(origin: .zero, size: paddedSize))
-            // Draw text with padding
+            // Draw shadow if needed
+            if model.shadowRadius > 0 && model.shadowOpacity > 0 {
+                let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
+                context.cgContext.saveGState()
+                context.cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: model.shadowRadius, color: shadowColor.cgColor)
+                attributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+                context.cgContext.restoreGState()
+            }
+            // Draw main text (without shadow)
             attributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
         }
         textLayer.contents = textImage.cgImage

@@ -32,6 +32,16 @@ struct PlayerHolderView: View{
             }
             .allFrame()
         }
+        .onReceive(videoPlayer.$currentTime) { _ in
+            guard videoPlayer.isPlaying, let video = editorVM.currentVideo else { return }
+            debugPlayerInfo(video: video)
+        }
+    }
+    
+    private func debugPlayerInfo(video: Video) {
+        print("[DEBUG] isFullScreen: \(isFullScreen), scale: \(scale)")
+        print("[DEBUG] frameSize: \(video.frameSize), geometrySize: \(video.geometrySize ?? .zero)")
+        print("[DEBUG] currentTime: \(videoPlayer.currentTime)")
     }
 }
 

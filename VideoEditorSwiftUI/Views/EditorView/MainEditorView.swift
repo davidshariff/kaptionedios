@@ -9,6 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct MainEditorView: View {
+
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     var project: ProjectEntity?
@@ -20,6 +21,7 @@ struct MainEditorView: View {
     @StateObject var audioRecorder = AudioRecorderManager()
     @StateObject var videoPlayer = VideoPlayerManager()
     @StateObject var textEditor = TextEditorViewModel()
+    
     var body: some View {
         ZStack{
             GeometryReader { proxy in

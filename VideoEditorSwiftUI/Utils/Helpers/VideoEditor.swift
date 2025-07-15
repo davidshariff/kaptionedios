@@ -481,12 +481,20 @@ extension VideoEditor{
                     highlightLayer.contents = highlightImage.cgImage
                     textLayer.addSublayer(highlightLayer)
 
-                    // Opacity animation to reveal the highlight.​
+                    // Opacity animation to reveal the highlight - different behavior for letter vs word karaoke
                     let highlightAnim = CABasicAnimation(keyPath: "opacity")
                     highlightAnim.fromValue = 0
                     highlightAnim.toValue = 1
                     highlightAnim.beginTime = word.start
-                    highlightAnim.duration = word.end - word.start
+                    
+                    // For letter-by-letter: gradual highlight over the word duration
+                    // For word-by-word: instant highlight
+                    if model.karaokeType == .letter {
+                        highlightAnim.duration = word.end - word.start
+                    } else {
+                        highlightAnim.duration = 0.01 // Very short duration to make it appear instantly
+                    }
+                    
                     highlightAnim.fillMode = .forwards
                     highlightAnim.isRemovedOnCompletion = false
                     highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")

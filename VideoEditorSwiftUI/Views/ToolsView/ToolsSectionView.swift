@@ -17,6 +17,8 @@ struct ToolsSectionView: View {
     @State private var showPresetAlert = false
     @State private var selectedPresetName: String? = nil
     @State private var showPresetsSheet = false
+    @State private var showPresetConfirm = false
+    @State private var pendingPreset: SubtitleStyle? = nil
     var body: some View {
         let mainContent = ZStack {
             toolGrid
@@ -29,18 +31,31 @@ struct ToolsSectionView: View {
         }
         return mainContent
             .sheet(isPresented: $showPresetsSheet) {
-                PresetsListView(showPresetAlert: $showPresetAlert, selectedPresetName: $selectedPresetName, onSelect: { name in
-                    selectedPresetName = name
-                    showPresetAlert = true
+                PresetsListView(showPresetConfirm: $showPresetConfirm, pendingPreset: $pendingPreset, onSelect: { style in
+                    pendingPreset = style
+                    showPresetConfirm = true
                 })
-                .alert(isPresented: $showPresetAlert) {
-                    Alert(
-                        title: Text("Preset Selected"),
-                        message: Text(selectedPresetName ?? ""),
-                        dismissButton: .default(Text("OK")) {
+                .confirmationDialog(
+                    "Apply preset to all subtitles?",
+                    isPresented: $showPresetConfirm,
+                    titleVisibility: .visible
+                ) {
+                    Button("Apply", role: .destructive) {
+                        if let style = pendingPreset {
+                            textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
+                            editorVM.setText(textEditor.textBoxes)
+                        }
+                        showPresetConfirm = false
+                        pendingPreset = nil
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             showPresetsSheet = false
                         }
-                    )
+                    }
+                    Button("Cancel", role: .cancel) {
+                        pendingPreset = nil
+                    }
+                } message: {
+                    Text("This will replace the style of all subtitles with the selected preset.")
                 }
             }
         .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
@@ -239,50 +254,34 @@ extension ToolsSectionView {
 }
 
 struct PresetsListView: View {
-    @Binding var showPresetAlert: Bool
-    @Binding var selectedPresetName: String?
-    var onSelect: (String) -> Void
-    let presets = [
-        "Classic Yellow",
-        "Modern White",
-        "Bold Black",
-        "Shadowed",
-        "Large Font",
-        "Outlined",
-        "Minimalist",
-        "Comic Sans",
-        "Elegant Serif",
-        "Retro",
-        "Transparent",
-        "High Contrast",
-        "Drop Shadow",
-        "Handwritten",
-        "Typewriter",
-        "Bubble",
-        "Glow",
-        "Rainbow",
-        "Subtitle Pro",
-        "Cinematic",
-        "Blocky",
-        "Pastel",
-        "Neon",
-        "Classic Blue",
-        "Modern Gray"
-    ]
+    @Binding var showPresetConfirm: Bool
+    @Binding var pendingPreset: SubtitleStyle?
+    var onSelect: (SubtitleStyle) -> Void
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Select a Subtitle Style")
                 .font(.headline)
                 .padding(.bottom, 8)
-            ForEach(presets, id: \.self) { preset in
+            ForEach(SubtitleStyle.allPresets) { style in
                 Button(action: {
-                    onSelect(preset)
+                    onSelect(style)
                 }) {
-                    Text(preset)
-                        .padding()
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(.systemGray5))
-                        .cornerRadius(8)
+                    HStack {
+                        Text(style.name)
+                            .padding()
+                        Spacer()
+                        RoundedRectangle(cornerRadius: style.cornerRadius)
+                            .fill(style.bgColor)
+                            .frame(width: 60, height: 24)
+                            .overlay(
+                                Text("Aa")
+                                    .font(.system(size: style.fontSize * 0.5))
+                                    .foregroundColor(style.fontColor)
+                                    .shadow(color: style.shadowColor.opacity(style.shadowOpacity), radius: style.shadowRadius, x: style.shadowX, y: style.shadowY)
+                            )
+                    }
+                    .background(Color(.systemGray5))
+                    .cornerRadius(8)
                 }
             }
         }

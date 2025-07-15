@@ -101,6 +101,5 @@ struct SubtitleStyle: Identifiable, Equatable {
         SubtitleStyle(name: "Comic Sans", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .blue, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .blue, shadowRadius: 6, shadowX: 2, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Elegant Serif", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 1, backgroundPadding: 8, cornerRadius: 8, shadowColor: .gray, shadowRadius: 4, shadowX: 1, shadowY: 1, shadowOpacity: 0.5),
         SubtitleStyle(name: "Retro", fontSize: 32, bgColor: .clear, fontColor: .orange, strokeColor: .brown, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .brown, shadowRadius: 6, shadowX: 2, shadowY: 2, shadowOpacity: 0.7)
-        // Add more styles as needed
     ]
 }

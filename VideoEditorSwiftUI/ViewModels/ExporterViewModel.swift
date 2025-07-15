@@ -14,7 +14,9 @@ import SwiftUI
 
 class ExporterViewModel: ObservableObject{
     
-    let video: Video
+    var video: Video
+    /// Closure to provide the latest textBoxes before export
+    var syncTextBoxes: (() -> [TextBox])?
     
     @Published var renderState: ExportState = .unknown
     @Published var showAlert: Bool = false
@@ -40,6 +42,10 @@ class ExporterViewModel: ObservableObject{
     @MainActor
     private func renderVideo() async{
         renderState = .loading
+        // Defensive: sync latest textBoxes from UI if available
+        if let latest = syncTextBoxes?() {
+            video.textBoxes = latest
+        }
         do{
             let url = try await editorHelper.startRender(video: video, videoQuality: selectedQuality)
             renderState = .loaded(url)

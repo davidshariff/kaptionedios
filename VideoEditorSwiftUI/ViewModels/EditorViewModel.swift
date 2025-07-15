@@ -44,6 +44,16 @@ class EditorViewModel: ObservableObject{
         if let audio = project.audio?.audioModel{
             currentVideo?.audio = audio
         }
+        debugPrintTextBoxes()
+    }
+
+    func debugPrintTextBoxes(){
+        if let boxes = currentVideo?.textBoxes, !boxes.isEmpty {
+            print("[DEBUG] Project loaded with pre-existing textBoxes:")
+            for box in boxes {
+                print("   '\(box.text)'")
+            }
+        }
     }
         
 }

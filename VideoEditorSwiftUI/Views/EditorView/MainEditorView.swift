@@ -71,6 +71,65 @@ struct RootView_Previews: PreviewProvider {
     }
 }
 
+// Helper to generate test subtitles (made internal for use in ToolsSectionView)
+func generateTestSubs(for video: Video) -> [TextBox] {
+    let w = video.frameSize.width
+    let h = video.frameSize.height
+    return [
+        TextBox(
+            text: "Welcome to the Editor 1",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .black,
+            strokeWidth: 2,
+            timeRange: 0.0...0.7,
+            offset: CGSize(width: 0, height: (h/2) - 80),
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        TextBox(
+            text: "This is a yellow tip!",
+            fontSize: 28,
+            bgColor: .clear,
+            fontColor: .yellow,
+            strokeColor: .clear,
+            strokeWidth: 0,
+            timeRange: 0.7...1.3,
+            offset: CGSize(width: -(w/2) + 120, height: -(h/2) + 60),
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .clear,
+            shadowRadius: 0,
+            shadowX: 0,
+            shadowY: 0,
+            shadowOpacity: 0
+        ),
+        TextBox(
+            text: "Red with blue shadow!",
+            fontSize: 30,
+            bgColor: .clear,
+            fontColor: .red,
+            strokeColor: .white,
+            strokeWidth: 2,
+            timeRange: 1.3...2.0,
+            offset: CGSize(width: (w/2) - 120, height: (h/2) - 120),
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .blue,
+            shadowRadius: 8,
+            shadowX: 4,
+            shadowY: 4,
+            shadowOpacity: 0.8
+        )
+    ]
+}
+
 extension MainEditorView{
     private var headerView: some View{
         HStack{

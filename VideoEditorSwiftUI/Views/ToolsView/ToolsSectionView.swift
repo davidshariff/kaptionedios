@@ -17,6 +17,32 @@ struct ToolsSectionView: View {
     var body: some View {
         ZStack{
             LazyVGrid(columns: columns, alignment: .center, spacing: 8) {
+                // Autogenerate button
+                if let video = editorVM.currentVideo {
+                    VStack(spacing: 4) {
+                        ToolButtonView(label: "Generate", image: "wand.and.stars", isChange: false) {
+                            let alert = UIAlertController(title: "Generate Subtitles?", 
+                                message: "This will replace any existing subtitles. Continue?",
+                                preferredStyle: .alert)
+                            
+                            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                            
+                            alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
+                                let subs = generateTestSubs(for: video)
+                                textEditor.textBoxes = subs
+                                editorVM.setText(subs)
+                            })
+                            
+                            UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
+                        }
+                        Text("Test Subs")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .padding(.top, 4)
+                            .frame(height: 32)
+                            .multilineTextAlignment(.center)
+                    }
+                }
                 ForEach(Array(ToolEnum.allCases.enumerated()), id: \.element) { index, tool in
                     VStack(spacing: 4) {
                         ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {

@@ -19,6 +19,7 @@ struct ToolsSectionView: View {
     @State private var showPresetsSheet = false
     @State private var showPresetConfirm = false
     @State private var pendingPreset: SubtitleStyle? = nil
+    @State private var selectedPreset: SubtitleStyle? = nil
     var body: some View {
         let mainContent = ZStack {
             toolGrid
@@ -44,6 +45,7 @@ struct ToolsSectionView: View {
                         if let style = pendingPreset {
                             textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
                             editorVM.setText(textEditor.textBoxes)
+                            selectedPreset = style // Track the selected preset
                         }
                         showPresetConfirm = false
                         pendingPreset = nil
@@ -100,7 +102,8 @@ struct ToolsSectionView: View {
                         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
                         
                         alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
-                            let subs = Helpers.generateTestSubs(for: video)
+                            let isKaraoke = (selectedPreset?.name ?? "") == "Karaoke Highlight"
+                            let subs = isKaraoke ? Helpers.generateKaraokeSubs(for: video) : Helpers.generateTestSubs(for: video)
                             textEditor.textBoxes = subs
                             editorVM.setText(subs)
                         })

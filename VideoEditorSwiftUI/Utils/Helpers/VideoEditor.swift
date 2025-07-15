@@ -399,7 +399,60 @@ extension VideoEditor{
         let calculatedFontSize = model.fontSize * ratio
         let calculatedPadding = model.backgroundPadding * ratio
         let calculatedCornerRadius = model.cornerRadius * ratio
-        
+
+        // Karaoke rendering
+        if let karaokeWords = model.karaokeWords {
+            // Calculate total text width
+            let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
+            let attributes: [NSAttributedString.Key: Any] = [
+                .font: font
+            ]
+            let wordWidths = karaokeWords.map { ($0.text as NSString).size(withAttributes: attributes).width }
+            let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing
+            let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
+            let textLayer = CALayer()
+            let adjustedX = position.width - (paddedSize.width / 2)
+            let adjustedY = position.height - (paddedSize.height / 2)
+            textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
+            textLayer.backgroundColor = UIColor(model.bgColor).cgColor
+            textLayer.cornerRadius = calculatedCornerRadius
+
+            // Animate karaoke highlight
+            let renderer = UIGraphicsImageRenderer(size: paddedSize)
+            let textImage = renderer.image { context in
+                var x: CGFloat = calculatedPadding
+                for (i, word) in karaokeWords.enumerated() {
+                    let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
+                    // Animate highlight mask
+                    let highlightColor = UIColor.yellow
+                    let normalColor = UIColor(model.fontColor)
+                    // For export, animate highlight using CABasicAnimation on foreground color
+                    let wordLayer = CATextLayer()
+                    wordLayer.string = word.text
+                    wordLayer.font = font
+                    wordLayer.fontSize = calculatedFontSize
+                    wordLayer.frame = wordRect
+                    wordLayer.contentsScale = UIScreen.main.scale
+                    wordLayer.alignmentMode = .left
+                    wordLayer.foregroundColor = normalColor.cgColor
+                    textLayer.addSublayer(wordLayer)
+                    // Animate color
+                    let highlightAnim = CABasicAnimation(keyPath: "foregroundColor")
+                    highlightAnim.fromValue = normalColor.cgColor
+                    highlightAnim.toValue = highlightColor.cgColor
+                    highlightAnim.beginTime = word.start
+                    highlightAnim.duration = word.end - word.start
+                    highlightAnim.fillMode = .forwards
+                    highlightAnim.isRemovedOnCompletion = false
+                    wordLayer.add(highlightAnim, forKey: "karaokeColor")
+                    x += wordWidths[i] + 8
+                }
+            }
+            textLayer.contents = textImage.cgImage
+            textLayer.contentsScale = UIScreen.main.scale
+            addAnimation(to: textLayer, with: model.timeRange, duration: duration)
+            return textLayer
+        }
         // Create attributed string for reliable text rendering
         var attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),

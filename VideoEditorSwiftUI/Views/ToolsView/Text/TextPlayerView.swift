@@ -40,19 +40,32 @@ struct TextPlayerView: View {
                             ZStack {
                                 RoundedRectangle(cornerRadius: textBox.cornerRadius)
                                     .fill(textBox.bgColor)
-                                AttributedTextOverlay(
-                                    attributedString: createNSAttr(textBox),
-                                    offset: .zero, // offset applied to ZStack
-                                    isSelected: isSelected,
-                                    bgColor: .clear, // background handled by RoundedRectangle
-                                    cornerRadius: textBox.cornerRadius,
-                                    shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
-                                    shadowRadius: textBox.shadowRadius,
-                                    shadowX: textBox.shadowX,
-                                    shadowY: textBox.shadowY
-                                )
-                                .padding(.horizontal, textBox.backgroundPadding)
-                                .padding(.vertical, textBox.backgroundPadding / 2)
+                                if let karaokeWords = textBox.karaokeWords {
+                                    KaraokeTextOverlay(
+                                        text: textBox.text,
+                                        words: karaokeWords,
+                                        fontSize: textBox.fontSize,
+                                        fontColor: textBox.fontColor,
+                                        highlightColor: .yellow,
+                                        currentTime: currentTime
+                                    )
+                                    .padding(.horizontal, textBox.backgroundPadding)
+                                    .padding(.vertical, textBox.backgroundPadding / 2)
+                                } else {
+                                    AttributedTextOverlay(
+                                        attributedString: createNSAttr(textBox),
+                                        offset: .zero, // offset applied to ZStack
+                                        isSelected: isSelected,
+                                        bgColor: .clear, // background handled by RoundedRectangle
+                                        cornerRadius: textBox.cornerRadius,
+                                        shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
+                                        shadowRadius: textBox.shadowRadius,
+                                        shadowX: textBox.shadowX,
+                                        shadowY: textBox.shadowY
+                                    )
+                                    .padding(.horizontal, textBox.backgroundPadding)
+                                    .padding(.vertical, textBox.backgroundPadding / 2)
+                                }
                             }
                             .fixedSize()
                             .contentShape(Rectangle())
@@ -249,5 +262,45 @@ struct AttributedTextOverlay: UIViewRepresentable {
         uiView.layer.shadowRadius = shadowRadius
         uiView.layer.shadowOpacity = Float(shadowColor.cgColor.alpha)
         uiView.layer.shadowOffset = CGSize(width: shadowX, height: shadowY)
+    }
+} 
+
+// KaraokeTextOverlay SwiftUI view
+struct KaraokeTextOverlay: View {
+    let text: String
+    let words: [KaraokeWord]
+    let fontSize: CGFloat
+    let fontColor: Color
+    let highlightColor: Color
+    let currentTime: Double
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(words) { word in
+                let isActive = currentTime >= word.start && currentTime < word.end
+                let progress: CGFloat = isActive ? CGFloat((currentTime - word.start) / (word.end - word.start)) : (currentTime >= word.end ? 1 : 0)
+                ZStack(alignment: .leading) {
+                    // Base text (normal color)
+                    Text(word.text)
+                        .font(.system(size: fontSize, weight: .bold))
+                        .foregroundColor(fontColor)
+                    // Animated green mask text
+                    Text(word.text)
+                        .font(.system(size: fontSize, weight: .bold))
+                        .foregroundColor(.green)
+                        .mask(
+                            GeometryReader { geo in
+                                let width = geo.size.width * progress
+                                Rectangle()
+                                    .frame(width: width, height: geo.size.height)
+                                    .animation(.linear(duration: 0.05), value: progress)
+                            }
+                        )
+                }
+                .overlay(
+                    isActive ? Rectangle().frame(height: 2).foregroundColor(.green).offset(y: fontSize * 0.4) : nil
+                )
+            }
+        }
     }
 } 

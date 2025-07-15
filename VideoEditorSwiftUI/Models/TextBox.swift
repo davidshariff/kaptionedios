@@ -9,6 +9,13 @@ import Foundation
 import SwiftUI
 
 
+struct KaraokeWord: Identifiable, Equatable {
+    let id = UUID()
+    let text: String
+    let start: Double
+    let end: Double
+}
+
 struct TextBox: Identifiable{
     
     var id: UUID = UUID()
@@ -30,8 +37,9 @@ struct TextBox: Identifiable{
     var shadowX: CGFloat = 0
     var shadowY: CGFloat = 0
     var shadowOpacity: Double = 0.5
+    var karaokeWords: [KaraokeWord]? = nil
     
-    init(text: String = "", fontSize: CGFloat = 20, lastFontSize: CGFloat = .zero, bgColor: Color = .white, fontColor: Color = .black, strokeColor: Color = .clear, strokeWidth: CGFloat = 0, timeRange: ClosedRange<Double> = 0...3, offset: CGSize = .zero, lastOffset: CGSize = .zero, backgroundPadding: CGFloat = 8, cornerRadius: CGFloat = 0, shadowColor: Color = .black, shadowRadius: CGFloat = 0, shadowX: CGFloat = 0, shadowY: CGFloat = 0, shadowOpacity: Double = 0.5) {
+    init(text: String = "", fontSize: CGFloat = 20, lastFontSize: CGFloat = .zero, bgColor: Color = .white, fontColor: Color = .black, strokeColor: Color = .clear, strokeWidth: CGFloat = 0, timeRange: ClosedRange<Double> = 0...3, offset: CGSize = .zero, lastOffset: CGSize = .zero, backgroundPadding: CGFloat = 8, cornerRadius: CGFloat = 0, shadowColor: Color = .black, shadowRadius: CGFloat = 0, shadowX: CGFloat = 0, shadowY: CGFloat = 0, shadowOpacity: Double = 0.5, karaokeWords: [KaraokeWord]? = nil) {
         self.text = text
         self.fontSize = fontSize
         self.lastFontSize = lastFontSize
@@ -49,6 +57,7 @@ struct TextBox: Identifiable{
         self.shadowX = shadowX
         self.shadowY = shadowY
         self.shadowOpacity = shadowOpacity
+        self.karaokeWords = karaokeWords
     }
     
     
@@ -91,6 +100,7 @@ struct SubtitleStyle: Identifiable, Equatable {
     }
 
     static let allPresets: [SubtitleStyle] = [
+        SubtitleStyle(name: "Karaoke Highlight", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Classic Yellow", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Modern White", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Bold Black", fontSize: 32, bgColor: .clear, fontColor: .black, strokeColor: .white, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .white, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),

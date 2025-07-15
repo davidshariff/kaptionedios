@@ -31,6 +31,14 @@ extension ProjectEntity{
                     textBox.strokeColor = Color(hex: strokeColor)
                 }
                 textBox.strokeWidth = entity.strokeWidth
+                // Restore shadow properties
+                if let shadowColor = entity.shadowColor {
+                    textBox.shadowColor = Color(hex: shadowColor)
+                }
+                textBox.shadowRadius = entity.shadowRadius
+                textBox.shadowX = entity.shadowX
+                textBox.shadowY = entity.shadowY
+                textBox.shadowOpacity = entity.shadowOpacity
                 
                 return textBox
             }
@@ -84,6 +92,11 @@ extension ProjectEntity{
             entity.offsetY = offset.height
             entity.strokeColor = box.strokeColor.toHex()
             entity.strokeWidth = box.strokeWidth
+            entity.shadowColor = box.shadowColor.toHex()
+            entity.shadowRadius = box.shadowRadius
+            entity.shadowX = box.shadowX
+            entity.shadowY = box.shadowY
+            entity.shadowOpacity = box.shadowOpacity
             
             return entity
         }

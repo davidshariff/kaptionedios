@@ -101,6 +101,7 @@ struct SubtitleStyle: Identifiable, Equatable {
 
     static let allPresets: [SubtitleStyle] = [
         SubtitleStyle(name: "Karaoke Highlight", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
+        SubtitleStyle(name: "Word Highlight", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Classic Yellow", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Modern White", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Bold Black", fontSize: 32, bgColor: .clear, fontColor: .black, strokeColor: .white, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .white, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
@@ -108,8 +109,6 @@ struct SubtitleStyle: Identifiable, Equatable {
         SubtitleStyle(name: "Large Font", fontSize: 40, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Outlined", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 4, backgroundPadding: 8, cornerRadius: 8, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
         SubtitleStyle(name: "Minimalist", fontSize: 28, bgColor: .clear, fontColor: .white, strokeColor: .clear, strokeWidth: 0, backgroundPadding: 4, cornerRadius: 4, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
-        SubtitleStyle(name: "Comic Sans", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .blue, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .blue, shadowRadius: 6, shadowX: 2, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Elegant Serif", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 1, backgroundPadding: 8, cornerRadius: 8, shadowColor: .gray, shadowRadius: 4, shadowX: 1, shadowY: 1, shadowOpacity: 0.5),
         SubtitleStyle(name: "Retro", fontSize: 32, bgColor: .clear, fontColor: .orange, strokeColor: .brown, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .brown, shadowRadius: 6, shadowX: 2, shadowY: 2, shadowOpacity: 0.7)
     ]
 }

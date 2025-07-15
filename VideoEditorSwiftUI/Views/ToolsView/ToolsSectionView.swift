@@ -128,22 +128,24 @@ extension ToolsSectionView{
             //    AudioSheetView(videoPlayer: videoPlayer, editorVM: editorVM)
             case .text:
                 TextToolsView(video: video, editor: textEditor)
-            case .filters:
-                FiltersView(selectedFilterName: video.filterName, viewModel: filtersVM) { filterName in
-                    if let filterName{
-                        videoPlayer.setFilters(mainFilter: CIFilter(name: filterName), colorCorrection: filtersVM.colorCorrection)
-                    }else{
-                        videoPlayer.removeFilter()
-                    }
-                    editorVM.setFilter(filterName)
-                }
-            case .corrections:
-                CorrectionsToolView(correction: $filtersVM.colorCorrection) { corrections in
-                    videoPlayer.setFilters(mainFilter: CIFilter(name: video.filterName ?? ""), colorCorrection: corrections)
-                    editorVM.setCorrections(corrections)
-                }
+            // case .filters:
+            //     FiltersView(selectedFilterName: video.filterName, viewModel: filtersVM) { filterName in
+            //         if let filterName{
+            //             videoPlayer.setFilters(mainFilter: CIFilter(name: filterName), colorCorrection: filtersVM.colorCorrection)
+            //         }else{
+            //             videoPlayer.removeFilter()
+            //         }
+            //         editorVM.setFilter(filterName)
+            //     }
+            // case .corrections:
+            //     CorrectionsToolView(correction: $filtersVM.colorCorrection) { corrections in
+            //         videoPlayer.setFilters(mainFilter: CIFilter(name: video.filterName ?? ""), colorCorrection: corrections)
+            //         editorVM.setCorrections(corrections)
+            //     }
             //case .frames:
             //    FramesToolView(selectedColor: $editorVM.frames.frameColor, scaleValue: $editorVM.frames.scaleValue, onChange: editorVM.setFrames)
+            case .presets:
+                Text("Presets")
             }
             Spacer()
         }
@@ -166,7 +168,7 @@ extension ToolsSectionView{
                     .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 5))
             }
             Spacer()
-            if tool != .filters, /*tool != .audio,*/ tool != .text{
+            if tool != .text{
                 Button {
                     editorVM.reset()
                 } label: {
@@ -174,7 +176,8 @@ extension ToolsSectionView{
                         .font(.subheadline)
                 }
                 .buttonStyle(.plain)
-            }else if !editorVM.isSelectVideo{
+            }
+            else if !editorVM.isSelectVideo{
                 Button {
                     videoPlayer.pause()
                     editorVM.removeAudio()
@@ -197,10 +200,8 @@ extension ToolsSectionView {
         switch tool {
         case .text:
             return "Add text overlays"
-        case .filters:
-            return "Apply visual effects"
-        case .corrections:
-            return "Adjust colors"
+        case .presets:
+            return "Select presets"
         case .cut:
             return "Trim video"
         }

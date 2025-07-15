@@ -152,10 +152,12 @@ extension EditorViewModel{
         //    currentVideo?.resetRate()
         case .text:/*, .crop:*/
             break
-        case .filters:
-            currentVideo?.setFilter(nil)
-        case .corrections:
-            currentVideo?.colorCorrection = ColorCorrection()
+        case .presets:
+            break
+        // case .filters:
+        //     currentVideo?.setFilter(nil)
+        // case .corrections:
+        //     currentVideo?.colorCorrection = ColorCorrection()
         //case .frames:
         //    frames.reset()
         //    currentVideo?.videoFrames = nil

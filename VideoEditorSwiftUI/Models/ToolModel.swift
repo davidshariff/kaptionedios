@@ -9,7 +9,7 @@ import Foundation
 
 
 enum ToolEnum: Int, CaseIterable{
-    case text, filters, corrections, cut/*, speed, crop, audio, frames*/
+    case text, presets, cut
     
     
     var title: String{
@@ -19,8 +19,9 @@ enum ToolEnum: Int, CaseIterable{
         //case .crop: return "Crop"
         //case .audio: return "Audio"
         case .text: return "Text"
-        case .filters: return "Filters"
-        case .corrections: return "Corrections"
+        case .presets: return "Presets"
+        //case .filters: return "Filters"
+        //case .corrections: return "Corrections"
         //case .frames: return "Frames"
         }
     }
@@ -32,8 +33,9 @@ enum ToolEnum: Int, CaseIterable{
         //case .crop: return "crop"
         //case .audio: return "waveform"
         case .text: return "t.square.fill"
-        case .filters: return "camera.filters"
-        case .corrections: return "circle.righthalf.filled"
+        case .presets: return "camera.filters"
+        //case .filters: return "camera.filters"
+        //case .corrections: return "circle.righthalf.filled"
         //case .frames: return "person.crop.artframe"
         }
     }

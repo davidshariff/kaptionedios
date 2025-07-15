@@ -110,7 +110,7 @@ final class Helpers{
         ]
     }
     
-    static func generateKaraokeSubs(for video: Video) -> [TextBox] {
+    static func generateKaraokeSubs(for video: Video, karaokeType: KaraokeType = .letter) -> [TextBox] {
         let w = video.frameSize.width
         let h = video.frameSize.height
         let lines = [
@@ -165,7 +165,8 @@ final class Helpers{
                 shadowX: shadowXs[i],
                 shadowY: shadowYs[i],
                 shadowOpacity: shadowOpacities[i],
-                karaokeWords: karaokeWords
+                karaokeWords: karaokeWords,
+                karaokeType: karaokeType
             )
             boxes.append(box)
             startTime += lineDurations[i]

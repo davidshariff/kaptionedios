@@ -102,8 +102,14 @@ struct ToolsSectionView: View {
                         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
                         
                         alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
-                            let isKaraoke = (selectedPreset?.name ?? "") == "Karaoke Highlight"
-                            let subs = isKaraoke ? Helpers.generateKaraokeSubs(for: video) : Helpers.generateTestSubs(for: video)
+                            let presetName = selectedPreset?.name ?? ""
+                            let isKaraokeStyle = presetName == "Letter Highlight" || presetName == "Word Highlight"
+                            let karaokeType: KaraokeType = presetName == "Letter Highlight" ? .letter : .word
+                            
+                            let subs = isKaraokeStyle 
+                                ? Helpers.generateKaraokeSubs(for: video, karaokeType: karaokeType)
+                                : Helpers.generateTestSubs(for: video)
+                                
                             textEditor.textBoxes = subs
                             editorVM.setText(subs)
                         })

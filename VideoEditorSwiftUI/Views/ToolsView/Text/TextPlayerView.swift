@@ -12,100 +12,143 @@ struct TextPlayerView: View {
     var currentTime: Double
     @ObservedObject var viewModel: TextEditorViewModel
     var disabledMagnification: Bool = false
+    
     var body: some View {
         GeometryReader { geo in
-            ZStack{
-                if !disabledMagnification{
-                    Color.secondary.opacity(0.001)
-                        .simultaneousGesture(MagnificationGesture()
-                            .onChanged({ value in
-                                if let box = viewModel.selectedTextBox{
-                                    let lastFontSize = viewModel.textBoxes[getIndex(box.id)].lastFontSize
-                                    viewModel.textBoxes[getIndex(box.id)].fontSize = (value * 10) + lastFontSize
-                                }
-                            }).onEnded({ value in
-                                if let box = viewModel.selectedTextBox{
-                                    viewModel.textBoxes[getIndex(box.id)].lastFontSize = value * 10
-                                }
-                            }))
-                }
-                
-                ForEach(viewModel.textBoxes) { textBox in
-                    let isSelected = viewModel.isSelected(textBox.id)
-                    
-                    if textBox.timeRange.contains(currentTime){
-                        
-                        ZStack(alignment: .topLeading) {
-                            // Text positioned with offset
-                            ZStack {
-                                RoundedRectangle(cornerRadius: textBox.cornerRadius)
-                                    .fill(textBox.bgColor)
-                                if let karaokeWords = textBox.karaokeWords {
-                                    KaraokeTextOverlay(
-                                        text: textBox.text,
-                                        words: karaokeWords,
-                                        fontSize: textBox.fontSize,
-                                        fontColor: textBox.fontColor,
-                                        highlightColor: .yellow,
-                                        currentTime: currentTime
-                                    )
-                                    .padding(.horizontal, textBox.backgroundPadding)
-                                    .padding(.vertical, textBox.backgroundPadding / 2)
-                                } else {
-                                    AttributedTextOverlay(
-                                        attributedString: createNSAttr(textBox),
-                                        offset: .zero, // offset applied to ZStack
-                                        isSelected: isSelected,
-                                        bgColor: .clear, // background handled by RoundedRectangle
-                                        cornerRadius: textBox.cornerRadius,
-                                        shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
-                                        shadowRadius: textBox.shadowRadius,
-                                        shadowX: textBox.shadowX,
-                                        shadowY: textBox.shadowY
-                                    )
-                                    .padding(.horizontal, textBox.backgroundPadding)
-                                    .padding(.vertical, textBox.backgroundPadding / 2)
-                                }
-                            }
-                            .fixedSize()
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                editOrSelectTextBox(textBox, isSelected)
-                            }
-                            .offset(textBox.offset)
-                            
-                            // Buttons positioned absolutely, not affecting text position
-                            if isSelected{
-                                textBoxButtons(textBox)
-                                    .offset(x: textBox.offset.width, y: textBox.offset.height - 30)
-                            }
-                        }
-                        .simultaneousGesture(DragGesture(minimumDistance: 1).onChanged({ value in
-                            guard isSelected else {return}
-                            let current = value.translation
-                            let lastOffset = textBox.lastOffset
-                            let newTranslation: CGSize = .init(width: current.width + lastOffset.width, height: current.height + lastOffset.height)
-                            
-                            DispatchQueue.main.async {
-                                viewModel.textBoxes[getIndex(textBox.id)].offset = newTranslation
-                            }
-                            
-                        }).onEnded({ value in
-                            guard isSelected else {return}
-                            DispatchQueue.main.async {
-                                // Update lastOffset to be the accumulated offset, not just the last drag translation
-                                viewModel.textBoxes[getIndex(textBox.id)].lastOffset = CGSize(
-                                    width: textBox.offset.width,
-                                    height: textBox.offset.height
-                                )
-                            }
-                        }))
-                    }
-                }
+            ZStack {
+                magnificationGestureView
+                textBoxesView
             }
             .frame(width: geo.size.width, height: geo.size.height)
             .clipped()
         }
+    }
+    
+    @ViewBuilder
+    private var magnificationGestureView: some View {
+        if !disabledMagnification {
+            Color.secondary.opacity(0.001)
+                .simultaneousGesture(magnificationGesture)
+        }
+    }
+    
+    private var magnificationGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                if let box = viewModel.selectedTextBox {
+                    let lastFontSize = viewModel.textBoxes[getIndex(box.id)].lastFontSize
+                    viewModel.textBoxes[getIndex(box.id)].fontSize = (value * 10) + lastFontSize
+                }
+            }
+            .onEnded { value in
+                if let box = viewModel.selectedTextBox {
+                    viewModel.textBoxes[getIndex(box.id)].lastFontSize = value * 10
+                }
+            }
+    }
+    
+    @ViewBuilder
+    private var textBoxesView: some View {
+        ForEach(viewModel.textBoxes) { textBox in
+            let isSelected = viewModel.isSelected(textBox.id)
+            
+            if textBox.timeRange.contains(currentTime) {
+                textBoxView(textBox: textBox, isSelected: isSelected)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func textBoxView(textBox: TextBox, isSelected: Bool) -> some View {
+        ZStack(alignment: .topLeading) {
+            textContent(textBox: textBox, isSelected: isSelected)
+            
+            if isSelected {
+                textBoxButtons(textBox)
+                    .offset(x: textBox.offset.width, y: textBox.offset.height - 30)
+            }
+        }
+        .simultaneousGesture(dragGesture(for: textBox, isSelected: isSelected))
+    }
+    
+    @ViewBuilder
+    private func textContent(textBox: TextBox, isSelected: Bool) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: textBox.cornerRadius)
+                .fill(textBox.bgColor)
+            
+            textOverlay(textBox: textBox, isSelected: isSelected)
+        }
+        .fixedSize()
+        .contentShape(Rectangle())
+        .onTapGesture {
+            editOrSelectTextBox(textBox, isSelected)
+        }
+        .offset(textBox.offset)
+    }
+    
+    @ViewBuilder
+    private func textOverlay(textBox: TextBox, isSelected: Bool) -> some View {
+        if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .letter {
+            KaraokeTextByLetterOverlay(
+                text: textBox.text,
+                words: karaokeWords,
+                fontSize: textBox.fontSize,
+                fontColor: textBox.fontColor,
+                highlightColor: .yellow,
+                currentTime: currentTime
+            )
+            .padding(.horizontal, textBox.backgroundPadding)
+            .padding(.vertical, textBox.backgroundPadding / 2)
+        } else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .word {
+            KaraokeTextByWordOverlay(
+                text: textBox.text,
+                words: karaokeWords,
+                fontSize: textBox.fontSize,
+                fontColor: textBox.fontColor,
+                highlightColor: .yellow,
+                currentTime: currentTime
+            )
+            .padding(.horizontal, textBox.backgroundPadding)
+            .padding(.vertical, textBox.backgroundPadding / 2)
+        } else {
+            AttributedTextOverlay(
+                attributedString: createNSAttr(textBox),
+                offset: .zero,
+                isSelected: isSelected,
+                bgColor: .clear,
+                cornerRadius: textBox.cornerRadius,
+                shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
+                shadowRadius: textBox.shadowRadius,
+                shadowX: textBox.shadowX,
+                shadowY: textBox.shadowY
+            )
+            .padding(.horizontal, textBox.backgroundPadding)
+            .padding(.vertical, textBox.backgroundPadding / 2)
+        }
+    }
+    
+    private func dragGesture(for textBox: TextBox, isSelected: Bool) -> some Gesture {
+        DragGesture(minimumDistance: 1)
+            .onChanged { value in
+                guard isSelected else { return }
+                let current = value.translation
+                let lastOffset = textBox.lastOffset
+                let newTranslation: CGSize = .init(width: current.width + lastOffset.width, height: current.height + lastOffset.height)
+                
+                DispatchQueue.main.async {
+                    viewModel.textBoxes[getIndex(textBox.id)].offset = newTranslation
+                }
+            }
+            .onEnded { value in
+                guard isSelected else { return }
+                DispatchQueue.main.async {
+                    viewModel.textBoxes[getIndex(textBox.id)].lastOffset = CGSize(
+                        width: textBox.offset.width,
+                        height: textBox.offset.height
+                    )
+                }
+            }
     }
     
     private func createAttr(_ textBox: TextBox) -> AttributedString{
@@ -266,7 +309,64 @@ struct AttributedTextOverlay: UIViewRepresentable {
 } 
 
 // KaraokeTextOverlay SwiftUI view
-struct KaraokeTextOverlay: View {
+struct KaraokeTextByLetterOverlay: View {
+    let text: String
+    let words: [KaraokeWord]
+    let fontSize: CGFloat
+    let fontColor: Color
+    let highlightColor: Color
+    let currentTime: Double
+
+    var body: some View {
+        // Letter-by-letter highlighting
+        HStack(spacing: 2) {
+            ForEach(Array(text.enumerated()), id: \.offset) { index, character in
+                let letterStart = getLetterStartTime(for: index)
+                let letterEnd = getLetterEndTime(for: index)
+                let isActive = currentTime >= letterStart && currentTime < letterEnd
+                let progress: CGFloat = isActive ? CGFloat((currentTime - letterStart) / (letterEnd - letterStart)) : (currentTime >= letterEnd ? 1 : 0)
+                
+                ZStack(alignment: .leading) {
+                    // Base text (normal color)
+                    Text(String(character))
+                        .font(.system(size: fontSize, weight: .bold))
+                        .foregroundColor(fontColor)
+                    // Animated green mask text
+                    Text(String(character))
+                        .font(.system(size: fontSize, weight: .bold))
+                        .foregroundColor(.green)
+                        .mask(
+                            GeometryReader { geo in
+                                let width = geo.size.width * progress
+                                Rectangle()
+                                    .frame(width: width, height: geo.size.height)
+                                    .animation(.linear(duration: 0.05), value: progress)
+                            }
+                        )
+                }
+                .overlay(
+                    isActive ? Rectangle().frame(height: 2).foregroundColor(.green).offset(y: fontSize * 0.4) : nil
+                )
+            }
+        }
+    }
+    
+    private func getLetterStartTime(for index: Int) -> Double {
+        let totalLetters = text.count
+        let totalDuration = words.last?.end ?? 0
+        let letterDuration = totalDuration / Double(totalLetters)
+        return Double(index) * letterDuration
+    }
+    
+    private func getLetterEndTime(for index: Int) -> Double {
+        let totalLetters = text.count
+        let totalDuration = words.last?.end ?? 0
+        let letterDuration = totalDuration / Double(totalLetters)
+        return Double(index + 1) * letterDuration
+    }
+}
+
+struct KaraokeTextByWordOverlay: View {
     let text: String
     let words: [KaraokeWord]
     let fontSize: CGFloat
@@ -278,7 +378,8 @@ struct KaraokeTextOverlay: View {
         HStack(spacing: 4) {
             ForEach(words) { word in
                 let isActive = currentTime >= word.start && currentTime < word.end
-                let progress: CGFloat = isActive ? CGFloat((currentTime - word.start) / (word.end - word.start)) : (currentTime >= word.end ? 1 : 0)
+                let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+                
                 ZStack(alignment: .leading) {
                     // Base text (normal color)
                     Text(word.text)
@@ -288,14 +389,8 @@ struct KaraokeTextOverlay: View {
                     Text(word.text)
                         .font(.system(size: fontSize, weight: .bold))
                         .foregroundColor(.green)
-                        .mask(
-                            GeometryReader { geo in
-                                let width = geo.size.width * progress
-                                Rectangle()
-                                    .frame(width: width, height: geo.size.height)
-                                    .animation(.linear(duration: 0.05), value: progress)
-                            }
-                        )
+                        .opacity(progress)
+                        .animation(.linear(duration: 0.05), value: progress)
                 }
                 .overlay(
                     isActive ? Rectangle().frame(height: 2).foregroundColor(.green).offset(y: fontSize * 0.4) : nil

@@ -45,7 +45,11 @@ struct TextPlayerView: View {
                                     offset: .zero, // offset applied to ZStack
                                     isSelected: isSelected,
                                     bgColor: .clear, // background handled by RoundedRectangle
-                                    cornerRadius: textBox.cornerRadius
+                                    cornerRadius: textBox.cornerRadius,
+                                    shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
+                                    shadowRadius: textBox.shadowRadius,
+                                    shadowX: textBox.shadowX,
+                                    shadowY: textBox.shadowY
                                 )
                                 .padding(.horizontal, textBox.backgroundPadding)
                                 .padding(.vertical, textBox.backgroundPadding / 2)
@@ -120,6 +124,15 @@ struct TextPlayerView: View {
         if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
             attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
             attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
+        }
+        
+        // Apply shadow if needed
+        if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity)
+            shadow.shadowBlurRadius = textBox.shadowRadius
+            shadow.shadowOffset = CGSize(width: textBox.shadowX, height: textBox.shadowY)
+            attrStr.addAttribute(.shadow, value: shadow, range: range)
         }
         
         return attrStr
@@ -197,6 +210,10 @@ struct AttributedTextOverlay: UIViewRepresentable {
     let isSelected: Bool
     let bgColor: UIColor
     let cornerRadius: CGFloat
+    let shadowColor: UIColor
+    let shadowRadius: CGFloat
+    let shadowX: CGFloat
+    let shadowY: CGFloat
 
     func makeUIView(context: Context) -> UILabel {
         let label = UILabel()
@@ -205,6 +222,11 @@ struct AttributedTextOverlay: UIViewRepresentable {
         label.backgroundColor = bgColor
         label.layer.cornerRadius = cornerRadius
         label.layer.masksToBounds = true
+        // Apply shadow
+        label.layer.shadowColor = shadowColor.cgColor
+        label.layer.shadowRadius = shadowRadius
+        label.layer.shadowOpacity = Float(shadowColor.cgColor.alpha)
+        label.layer.shadowOffset = CGSize(width: shadowX, height: shadowY)
         return label
     }
 
@@ -222,5 +244,10 @@ struct AttributedTextOverlay: UIViewRepresentable {
         } else {
             uiView.layer.borderWidth = 0
         }
+        // Update shadow
+        uiView.layer.shadowColor = shadowColor.cgColor
+        uiView.layer.shadowRadius = shadowRadius
+        uiView.layer.shadowOpacity = Float(shadowColor.cgColor.alpha)
+        uiView.layer.shadowOffset = CGSize(width: shadowX, height: shadowY)
     }
 } 

@@ -39,6 +39,8 @@ extension ProjectEntity{
                 textBox.shadowX = entity.shadowX
                 textBox.shadowY = entity.shadowY
                 textBox.shadowOpacity = entity.shadowOpacity
+                textBox.backgroundPadding = entity.backgroundPadding
+                textBox.cornerRadius = entity.cornerRadius
                 
                 return textBox
             }
@@ -97,6 +99,8 @@ extension ProjectEntity{
             entity.shadowX = box.shadowX
             entity.shadowY = box.shadowY
             entity.shadowOpacity = box.shadowOpacity
+            entity.backgroundPadding = box.backgroundPadding
+            entity.cornerRadius = box.cornerRadius
             
             return entity
         }

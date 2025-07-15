@@ -28,7 +28,7 @@ struct ToolsSectionView: View {
                             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
                             
                             alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
-                                let subs = generateTestSubs(for: video)
+                                let subs = Helpers.generateTestSubs(for: video)
                                 textEditor.textBoxes = subs
                                 editorVM.setText(subs)
                             })

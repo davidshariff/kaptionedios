@@ -14,56 +14,35 @@ struct ToolsSectionView: View {
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var textEditor: TextEditorViewModel
     private let columns = Array(repeating: GridItem(.flexible()), count: 4)
+    @State private var showPresetAlert = false
+    @State private var selectedPresetName: String? = nil
+    @State private var showPresetsSheet = false
     var body: some View {
-        ZStack{
-            LazyVGrid(columns: columns, alignment: .center, spacing: 8) {
-                // Autogenerate button
-                if let video = editorVM.currentVideo {
-                    VStack(spacing: 4) {
-                        ToolButtonView(label: "Generate", image: "wand.and.stars", isChange: false) {
-                            let alert = UIAlertController(title: "Generate Subtitles?", 
-                                message: "This will replace any existing subtitles. Continue?",
-                                preferredStyle: .alert)
-                            
-                            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                            
-                            alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
-                                let subs = Helpers.generateTestSubs(for: video)
-                                textEditor.textBoxes = subs
-                                editorVM.setText(subs)
-                            })
-                            
-                            UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
-                        }
-                        Text("Test Subs")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
-                            .frame(height: 32)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                ForEach(Array(ToolEnum.allCases.enumerated()), id: \.element) { index, tool in
-                    VStack(spacing: 4) {
-                        ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
-                            editorVM.selectedTools = tool
-                        }
-                        Text(toolLabel(for: tool))
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
-                            .frame(height: 32)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-            }
-            .padding()
-            .opacity(editorVM.selectedTools != nil ? 0 : 1)
-            if let toolState = editorVM.selectedTools, let video = editorVM.currentVideo{
+        let mainContent = ZStack {
+            toolGrid
+                .padding()
+                .opacity(editorVM.selectedTools != nil ? 0 : 1)
+            if let toolState = editorVM.selectedTools, let video = editorVM.currentVideo {
                 bottomSheet(toolState, video)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        return mainContent
+            .sheet(isPresented: $showPresetsSheet) {
+                PresetsListView(showPresetAlert: $showPresetAlert, selectedPresetName: $selectedPresetName, onSelect: { name in
+                    selectedPresetName = name
+                    showPresetAlert = true
+                })
+                .alert(isPresented: $showPresetAlert) {
+                    Alert(
+                        title: Text("Preset Selected"),
+                        message: Text(selectedPresetName ?? ""),
+                        dismissButton: .default(Text("OK")) {
+                            showPresetsSheet = false
+                        }
+                    )
+                }
+            }
         .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
         .onChange(of: editorVM.currentVideo){ newValue in
             if let video = newValue, let image = video.thumbnailsImages.first?.image{
@@ -89,6 +68,50 @@ struct ToolsSectionView: View {
             
             if newValue == nil{
                 editorVM.setText(textEditor.textBoxes)
+            }
+        }
+    }
+
+    private var toolGrid: some View {
+        LazyVGrid(columns: columns, alignment: .center, spacing: 8) {
+            // Autogenerate button
+            if let video = editorVM.currentVideo {
+                VStack(spacing: 4) {
+                    ToolButtonView(label: "Generate", image: "wand.and.stars", isChange: false) {
+                        let alert = UIAlertController(title: "Generate Subtitles?", 
+                            message: "This will replace any existing subtitles. Continue?",
+                            preferredStyle: .alert)
+                        
+                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                        
+                        alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
+                            let subs = Helpers.generateTestSubs(for: video)
+                            textEditor.textBoxes = subs
+                            editorVM.setText(subs)
+                        })
+                        
+                        UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
+                    }
+                    Text("Test Subs")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                        .frame(height: 32)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            ForEach(Array(ToolEnum.allCases.enumerated()), id: \.element) { index, tool in
+                VStack(spacing: 4) {
+                    ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
+                        editorVM.selectedTools = tool
+                    }
+                    Text(toolLabel(for: tool))
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                        .frame(height: 32)
+                        .multilineTextAlignment(.center)
+                }
             }
         }
     }
@@ -145,7 +168,14 @@ extension ToolsSectionView{
             //case .frames:
             //    FramesToolView(selectedColor: $editorVM.frames.frameColor, scaleValue: $editorVM.frames.scaleValue, onChange: editorVM.setFrames)
             case .presets:
-                Text("Presets")
+                // Open the custom sheet and close the bottom sheet
+                Color.clear.onAppear {
+                    showPresetsSheet = true
+                    // Close the bottom sheet
+                    DispatchQueue.main.async {
+                        editorVM.selectedTools = nil
+                    }
+                }
             }
             Spacer()
         }
@@ -205,6 +235,58 @@ extension ToolsSectionView {
         case .cut:
             return "Trim video"
         }
+    }
+}
+
+struct PresetsListView: View {
+    @Binding var showPresetAlert: Bool
+    @Binding var selectedPresetName: String?
+    var onSelect: (String) -> Void
+    let presets = [
+        "Classic Yellow",
+        "Modern White",
+        "Bold Black",
+        "Shadowed",
+        "Large Font",
+        "Outlined",
+        "Minimalist",
+        "Comic Sans",
+        "Elegant Serif",
+        "Retro",
+        "Transparent",
+        "High Contrast",
+        "Drop Shadow",
+        "Handwritten",
+        "Typewriter",
+        "Bubble",
+        "Glow",
+        "Rainbow",
+        "Subtitle Pro",
+        "Cinematic",
+        "Blocky",
+        "Pastel",
+        "Neon",
+        "Classic Blue",
+        "Modern Gray"
+    ]
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Select a Subtitle Style")
+                .font(.headline)
+                .padding(.bottom, 8)
+            ForEach(presets, id: \.self) { preset in
+                Button(action: {
+                    onSelect(preset)
+                }) {
+                    Text(preset)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(.systemGray5))
+                        .cornerRadius(8)
+                }
+            }
+        }
+        .padding(.top, 16)
     }
 }
 

@@ -28,7 +28,6 @@
 		5A5E6FA12A03CCFE00F5EBF8 /* AudioEntity+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA02A03CCFE00F5EBF8 /* AudioEntity+Ext.swift */; };
 		5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA22A04F3BF00F5EBF8 /* RecorderButtonView.swift */; };
 		5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA42A05124700F5EBF8 /* UIImage+Ext.swift */; };
-		5A5F956B2A004BE60041C3F6 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F956A2A004BE60041C3F6 /* TextOverlayView.swift */; };
 		5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F956C2A00FA180041C3F6 /* TextToolsView.swift */; };
 		5A5F956F2A01351B0041C3F6 /* TextEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F956E2A01351B0041C3F6 /* TextEditorView.swift */; };
 		5A5F95712A0135490041C3F6 /* TextEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F95702A0135490041C3F6 /* TextEditorViewModel.swift */; };
@@ -72,6 +71,7 @@
 		5AFA25C429FA727C00B820D0 /* FramesToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C329FA727C00B820D0 /* FramesToolView.swift */; };
 		5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C529FA7D9300B820D0 /* Color.swift */; };
 		5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C729FC186F00B820D0 /* TextBox.swift */; };
+		F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,7 +96,6 @@
 		5A5E6FA02A03CCFE00F5EBF8 /* AudioEntity+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioEntity+Ext.swift"; sourceTree = "<group>"; };
 		5A5E6FA22A04F3BF00F5EBF8 /* RecorderButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderButtonView.swift; sourceTree = "<group>"; };
 		5A5E6FA42A05124700F5EBF8 /* UIImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Ext.swift"; sourceTree = "<group>"; };
-		5A5F956A2A004BE60041C3F6 /* TextOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayView.swift; sourceTree = "<group>"; };
 		5A5F956C2A00FA180041C3F6 /* TextToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToolsView.swift; sourceTree = "<group>"; };
 		5A5F956E2A01351B0041C3F6 /* TextEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditorView.swift; sourceTree = "<group>"; };
 		5A5F95702A0135490041C3F6 /* TextEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditorViewModel.swift; sourceTree = "<group>"; };
@@ -141,6 +140,7 @@
 		5AFA25C329FA727C00B820D0 /* FramesToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FramesToolView.swift; sourceTree = "<group>"; };
 		5AFA25C529FA7D9300B820D0 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		5AFA25C729FC186F00B820D0 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
+		F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPlayerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,8 +177,8 @@
 		5A5F95692A004BBF0041C3F6 /* Text */ = {
 			isa = PBXGroup;
 			children = (
-				5A5F956A2A004BE60041C3F6 /* TextOverlayView.swift */,
 				5A5F956C2A00FA180041C3F6 /* TextToolsView.swift */,
+				F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */,
 				5A5F956E2A01351B0041C3F6 /* TextEditorView.swift */,
 			);
 			path = Text;
@@ -568,7 +568,6 @@
 				5ACFF99629EC8A2400827A37 /* AVAssets+Ext.swift in Sources */,
 				5ACFF97129E944FA00827A37 /* ContentView.swift in Sources */,
 				5AE2A2A029F465BD003D217F /* VideoEditor.swift in Sources */,
-				5A5F956B2A004BE60041C3F6 /* TextOverlayView.swift in Sources */,
 				5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */,
 				5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */,
 				5ACFF99829ED53FB00827A37 /* View+Ext.swift in Sources */,
@@ -587,6 +586,7 @@
 				5A5F95712A0135490041C3F6 /* TextEditorViewModel.swift in Sources */,
 				5A9EDD0029F03DCD0014A1CF /* VideoSpeedSlider.swift in Sources */,
 				5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */,
+				F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */,
 				5A3D13B829F2A3E60027E25E /* TestCroppedView.swift in Sources */,
 				5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */,
 				5A17E08929F1744100DB4A47 /* RootView.swift in Sources */,

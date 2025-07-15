@@ -67,7 +67,7 @@ extension PlayerHolderView{
                                 editorVM.frames.frameColor
                                 ZStack{
                                     PlayerView(player: videoPlayer.videoPlayer)
-                                    TextOverlayView(currentTime: videoPlayer.currentTime, viewModel: textEditor,  disabledMagnification: isFullScreen)
+                                    TextPlayerView(currentTime: videoPlayer.currentTime, viewModel: textEditor,  disabledMagnification: isFullScreen)
                                         .scaleEffect(scale)
                                         .disabled(isFullScreen)
                                 }

@@ -1,5 +1,5 @@
 //
-//  TextOverlayView.swift
+//  TextPlayerView.swift
 //  VideoEditorSwiftUI
 //
 //  Created by Bogdan Zykov on 01.05.2023.
@@ -8,7 +8,7 @@
 import SwiftUI
 import UIKit
 
-struct TextOverlayView: View {
+struct TextPlayerView: View {
     var currentTime: Double
     @ObservedObject var viewModel: TextEditorViewModel
     var disabledMagnification: Bool = false
@@ -107,7 +107,6 @@ struct TextOverlayView: View {
     }
 }
 
-
     
     private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
         let attrStr = NSMutableAttributedString(string: textBox.text)
@@ -129,14 +128,14 @@ struct TextOverlayView: View {
 
 
 
-struct TextOverlayView_Previews: PreviewProvider {
+struct TextPlayerView_Previews: PreviewProvider {
     static var previews: some View {
         MainEditorView(selectedVideoURl: Video.mock.url)
     }
 }
 
 
-extension TextOverlayView{
+extension TextPlayerView{
     
     private func textBoxButtons(_ textBox: TextBox) -> some View{
         HStack(spacing: 10){
@@ -224,15 +223,4 @@ struct AttributedTextOverlay: UIViewRepresentable {
             uiView.layer.borderWidth = 0
         }
     }
-}
-
-
-
-
-
-
-
-
-
-
-
+} 

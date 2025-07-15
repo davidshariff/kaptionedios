@@ -24,7 +24,7 @@ struct MainEditorView: View {
         ZStack{
             GeometryReader { proxy in
                 VStack(spacing: 0){
-                    headerView
+                    headerView(safeAreaTop: proxy.safeAreaInsets.top)
                     PlayerHolderView(isFullScreen: $isFullScreen, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                         .frame(height: proxy.size.height / (isFullScreen ?  1.25 : 1.8))
                     PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
@@ -72,13 +72,19 @@ struct RootView_Previews: PreviewProvider {
 }
 
 extension MainEditorView{
-    private var headerView: some View{
+    private func headerView(safeAreaTop: CGFloat) -> some View{
         HStack{
             Button {
                 editorVM.updateProject()
                 dismiss()
             } label: {
-                Image(systemName: "folder.fill")
+                VStack(spacing: 4) {
+                    Image(systemName: "folder.fill")
+                    Text("Back")
+                        .font(.caption2)
+                }
+                .padding(.top, 8)
+                .padding(.leading, 8)
             }
 
             Spacer()
@@ -91,12 +97,17 @@ extension MainEditorView{
                     showVideoQualitySheet.toggle()
                 }
             } label: {
-                Image(systemName: "square.and.arrow.up.fill")
+                VStack(spacing: 4) {
+                    Image(systemName: "square.and.arrow.up.fill")
+                    Text("Export")
+                        .font(.caption2)
+                }
             }
         }
         .foregroundColor(.white)
         .padding(.horizontal, 20)
         .frame(height: 50)
+        .padding(.top, safeAreaTop)
         .padding(.bottom)
     }
     

@@ -54,21 +54,4 @@ struct TextBox: Identifiable{
     
 }
 
-
 extension TextBox: Equatable{}
-
-
-extension TextBox{
-    static let texts: [TextBox] =
-    
-    [
-    
-        .init(text: "Test1", fontSize: 38, bgColor: .red, fontColor: .white, timeRange: 0...2),
-        .init(text: "Test2", fontSize: 38, bgColor: .secondary, fontColor: .white, timeRange: 2...6),
-        .init(text: "Test3", fontSize: 38, bgColor: .black, fontColor: .red, timeRange: 3...6),
-        .init(text: "Test4", fontSize: 38, bgColor: .black, fontColor: .blue, timeRange: 5...6),
-        .init(text: "Test5", fontSize: 38, bgColor: .black, fontColor: .white, timeRange: 1...6),
-    ]
-    
-    static let simple = TextBox(text: "Test", fontSize: 38, bgColor: .black, fontColor: .white, timeRange: 1...3)
-}

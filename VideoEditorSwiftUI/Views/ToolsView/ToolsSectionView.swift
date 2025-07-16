@@ -102,9 +102,17 @@ struct ToolsSectionView: View {
                         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
                         
                         alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
+
                             let presetName = selectedPreset?.name ?? ""
-                            let isKaraokeStyle = presetName == "Letter Highlight" || presetName == "Word Highlight"
-                            let karaokeType: KaraokeType = presetName == "Letter Highlight" ? .letter : .word
+                            let isKaraokeStyle = presetName == "Highlight by letter" || presetName == "Highlight by word" || presetName == "Background by word"
+                            let karaokeType: KaraokeType = {
+                                switch presetName {
+                                    case "Highlight by letter": return .letter
+                                    case "Highlight by word": return .word 
+                                    case "Background by word": return .wordbg
+                                    default: return .word
+                                }
+                            }()
                             
                             let subs = isKaraokeStyle 
                                 ? Helpers.generateKaraokeSubs(for: video, karaokeType: karaokeType)

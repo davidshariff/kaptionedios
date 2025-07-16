@@ -90,7 +90,7 @@ struct TextPlayerView: View {
     @ViewBuilder
     private func textOverlay(textBox: TextBox, isSelected: Bool) -> some View {
         if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .letter {
-            KaraokeTextByLetterOverlay(
+            KaraokeTextByLetterHighlightOverlay(
                 text: textBox.text,
                 words: karaokeWords,
                 fontSize: textBox.fontSize,
@@ -100,8 +100,9 @@ struct TextPlayerView: View {
             )
             .padding(.horizontal, textBox.backgroundPadding)
             .padding(.vertical, textBox.backgroundPadding / 2)
-        } else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .word {
-            KaraokeTextByWordOverlay(
+        } 
+        else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .word {
+            KaraokeTextByWordHighlightOverlay(
                 text: textBox.text,
                 words: karaokeWords,
                 fontSize: textBox.fontSize,
@@ -111,7 +112,20 @@ struct TextPlayerView: View {
             )
             .padding(.horizontal, textBox.backgroundPadding)
             .padding(.vertical, textBox.backgroundPadding / 2)
-        } else {
+        } 
+        else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .wordbg {
+            KaraokeTextByWordBackgroundOverlay(
+                text: textBox.text,
+                words: karaokeWords,
+                fontSize: textBox.fontSize,
+                fontColor: textBox.fontColor,
+                highlightColor: .yellow,
+                currentTime: currentTime
+            )
+            .padding(.horizontal, textBox.backgroundPadding)
+            .padding(.vertical, textBox.backgroundPadding / 2)
+        } 
+        else {
             AttributedTextOverlay(
                 attributedString: createNSAttr(textBox),
                 offset: .zero,
@@ -309,7 +323,7 @@ struct AttributedTextOverlay: UIViewRepresentable {
 } 
 
 // KaraokeTextOverlay SwiftUI view
-struct KaraokeTextByLetterOverlay: View {
+struct KaraokeTextByLetterHighlightOverlay: View {
     let text: String
     let words: [KaraokeWord]
     let fontSize: CGFloat
@@ -363,7 +377,7 @@ struct KaraokeTextByLetterOverlay: View {
     }
 }
 
-struct KaraokeTextByWordOverlay: View {
+struct KaraokeTextByWordHighlightOverlay: View {
     let text: String
     let words: [KaraokeWord]
     let fontSize: CGFloat
@@ -386,6 +400,48 @@ struct KaraokeTextByWordOverlay: View {
                     Text(word.text)
                         .font(.system(size: fontSize, weight: .bold))
                         .foregroundColor(.green)
+                        .opacity(progress)
+                        .animation(.linear(duration: 0.05), value: progress)
+                }
+            }
+        }
+    }
+} 
+
+struct KaraokeTextByWordBackgroundOverlay: View {
+    let text: String
+    let words: [KaraokeWord]
+    let fontSize: CGFloat
+    let fontColor: Color
+    let highlightColor: Color
+    let currentTime: Double
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(words) { word in
+                let isActive = currentTime >= word.start && currentTime < word.end
+                let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+                
+                ZStack(alignment: .leading) {
+                    // Base text (normal color)
+                    Text(word.text)
+                        .font(.system(size: fontSize, weight: .bold))
+                        .foregroundColor(fontColor)
+                        .padding(.horizontal, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.clear)
+                        )
+                    // Animated green mask text
+                    Text(word.text)
+                        .font(.system(size: fontSize, weight: .bold))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 4)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Color.green.opacity(0.2))
+                                .opacity(progress)
+                        )
                         .opacity(progress)
                         .animation(.linear(duration: 0.05), value: progress)
                 }

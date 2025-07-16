@@ -19,6 +19,7 @@ struct KaraokeWord: Identifiable, Equatable {
 enum KaraokeType: String, CaseIterable {
     case letter = "Letter"
     case word = "Word"
+    case wordbg = "WordBG"
 }
 
 struct TextBox: Identifiable{
@@ -107,8 +108,9 @@ struct SubtitleStyle: Identifiable, Equatable {
     }
 
     static let allPresets: [SubtitleStyle] = [
-        SubtitleStyle(name: "Letter Highlight", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Word Highlight", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
+        SubtitleStyle(name: "Highlight by letter", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
+        SubtitleStyle(name: "Highlight by word", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
+        SubtitleStyle(name: "Background by word", fontSize: 32, bgColor: .black.opacity(0.5), fontColor: .white, strokeColor: .clear, strokeWidth: 0, backgroundPadding: 8, cornerRadius: 8, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
         SubtitleStyle(name: "Classic Yellow", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Modern White", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
         SubtitleStyle(name: "Bold Black", fontSize: 32, bgColor: .clear, fontColor: .black, strokeColor: .white, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .white, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),

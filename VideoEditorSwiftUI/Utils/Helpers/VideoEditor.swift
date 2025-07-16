@@ -418,96 +418,19 @@ extension VideoEditor{
         let calculatedPadding = model.backgroundPadding * ratio
         let calculatedCornerRadius = model.cornerRadius * ratio
 
-        // Karaoke rendering
+        // If karaokeWords is present, render karaoke-style text highlighting
         if let karaokeWords = model.karaokeWords {
-            // Calculate total text width
-            let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
-            let attributes: [NSAttributedString.Key: Any] = [
-                .font: font
-            ]
-            let wordWidths = karaokeWords.map { ($0.text as NSString).size(withAttributes: attributes).width }
-            let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing
-            let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
-            let textLayer = CALayer()
-            let adjustedX = position.width - (paddedSize.width / 2)
-            let adjustedY = position.height - (paddedSize.height / 2)
-            textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
-            textLayer.backgroundColor = UIColor(model.bgColor).cgColor
-            textLayer.cornerRadius = calculatedCornerRadius
-
-            // Animate karaoke highlight
-            let renderer = UIGraphicsImageRenderer(size: paddedSize)
-            let textImage = renderer.image { context in
-                var x: CGFloat = calculatedPadding
-                for (i, word) in karaokeWords.enumerated() {
-                    let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
-                    // Base layer (always visible)​
-                    let baseLayer = CATextLayer()
-                    baseLayer.string = word.text
-                    baseLayer.font = font
-                    baseLayer.fontSize = calculatedFontSize
-                    baseLayer.frame = wordRect
-                    baseLayer.contentsScale = UIScreen.main.scale
-                    baseLayer.alignmentMode = .left
-                    baseLayer.foregroundColor = UIColor(model.fontColor).cgColor // Use original color
-                    
-                    // Render base layer to bitmap
-                    let baseRenderer = UIGraphicsImageRenderer(size: wordRect.size)
-                    let baseImage = baseRenderer.image { _ in
-                        word.text.draw(in: CGRect(origin: .zero, size: wordRect.size), withAttributes: [
-                            .font: font,
-                            .foregroundColor: UIColor(model.fontColor) // Ensure correct color
-                        ])
-                    }
-                    baseLayer.contents = baseImage.cgImage
-                    textLayer.addSublayer(baseLayer)
-
-                    // Highlight layer (fades in with opacity) – this is reliably captured by AVVideoCompositionCoreAnimationTool.​​
-                    let highlightLayer = CATextLayer()
-                    highlightLayer.string = word.text
-                    highlightLayer.font = font
-                    highlightLayer.fontSize = calculatedFontSize
-                    highlightLayer.frame = wordRect
-                    highlightLayer.contentsScale = UIScreen.main.scale
-                    highlightLayer.alignmentMode = .left
-                    highlightLayer.foregroundColor = UIColor.green.cgColor // Change highlight to green
-                    highlightLayer.opacity = 0
-                    
-                    // Render highlight layer to bitmap
-                    let highlightRenderer = UIGraphicsImageRenderer(size: wordRect.size)
-                    let highlightImage = highlightRenderer.image { _ in
-                        word.text.draw(in: CGRect(origin: .zero, size: wordRect.size), withAttributes: [.font: font, .foregroundColor: UIColor.green])
-                    }
-                    highlightLayer.contents = highlightImage.cgImage
-                    textLayer.addSublayer(highlightLayer)
-
-                    // Opacity animation to reveal the highlight - different behavior for letter vs word karaoke
-                    let highlightAnim = CABasicAnimation(keyPath: "opacity")
-                    highlightAnim.fromValue = 0
-                    highlightAnim.toValue = 1
-                    highlightAnim.beginTime = word.start
-                    
-                    // For letter-by-letter: gradual highlight over the word duration
-                    // For word-by-word: instant highlight
-                    if model.karaokeType == .letter {
-                        highlightAnim.duration = word.end - word.start
-                    } else {
-                        highlightAnim.duration = 0.01 // Very short duration to make it appear instantly
-                    }
-                    
-                    highlightAnim.fillMode = .forwards
-                    highlightAnim.isRemovedOnCompletion = false
-                    highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")
-                    x += wordWidths[i] + 8
-                }
-            }
-            // We rely on the live `CATextLayer` sublayers above; a pre-rendered bitmap isn’t needed and
-            // can actually hide the sublayers when AVFoundation flattens the hierarchy during export.
-            // textLayer.contents = nil
-            textLayer.contentsScale = UIScreen.main.scale
-            addAnimation(to: textLayer, with: model.timeRange, duration: duration)
-            return textLayer
+            return createKaraokeTextLayer(
+                karaokeWords: karaokeWords,
+                model: model,
+                position: position,
+                calculatedFontSize: calculatedFontSize,
+                calculatedPadding: calculatedPadding,
+                calculatedCornerRadius: calculatedCornerRadius,
+                duration: duration
+            )
         }
+
         // Create attributed string for reliable text rendering
         var attributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
@@ -552,6 +475,138 @@ extension VideoEditor{
         
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         
+        return textLayer
+    }
+
+    // Karaoke text layer creation
+    private func createKaraokeTextLayer(
+        karaokeWords: [KaraokeWord],
+        model: TextBox,
+        position: CGSize,
+        calculatedFontSize: CGFloat,
+        calculatedPadding: CGFloat,
+        calculatedCornerRadius: CGFloat,
+        duration: Double
+    ) -> CALayer {
+
+        // 1. Set up font and calculate the width of each word (with padding for word-by-word)
+        let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font
+        ]
+        let wordHorizontalPadding: CGFloat = model.karaokeType == .word ? 4 : 0
+
+        // Add horizontal padding to each word for word-by-word
+        let wordWidths = karaokeWords.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
+        let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing
+        let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
+        let textLayer = CALayer()
+        let adjustedX = position.width - (paddedSize.width / 2)
+        let adjustedY = position.height - (paddedSize.height / 2)
+        textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
+        textLayer.backgroundColor = UIColor(model.bgColor).cgColor
+        textLayer.cornerRadius = calculatedCornerRadius
+
+        let renderer = UIGraphicsImageRenderer(size: paddedSize)
+        let textImage = renderer.image { context in
+            var x: CGFloat = calculatedPadding
+            for (i, word) in karaokeWords.enumerated() {
+                // Calculate the frame for this word (with horizontal padding for word-by-word)
+                let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
+
+                // --- Word-by-word: Add rounded green background for active word ---
+                if model.karaokeType == .wordbg {
+                    let bgLayer = CAShapeLayer()
+                    let bgCornerRadius: CGFloat = 4
+                    let bgRect = CGRect(x: wordRect.origin.x, y: wordRect.origin.y, width: wordRect.width, height: wordRect.height)
+                    let bgPath = UIBezierPath(roundedRect: bgRect, cornerRadius: bgCornerRadius)
+                    bgLayer.path = bgPath.cgPath
+                    bgLayer.fillColor = UIColor.green.withAlphaComponent(0.2).cgColor
+                    bgLayer.opacity = 0 // Start invisible
+                    // Animate opacity in sync with highlight
+                    let bgAnim = CABasicAnimation(keyPath: "opacity")
+                    bgAnim.fromValue = 0
+                    bgAnim.toValue = 1
+                    bgAnim.beginTime = word.start
+                    bgAnim.duration = 0.01 // Instant for word-by-word
+                    bgAnim.fillMode = .forwards
+                    bgAnim.isRemovedOnCompletion = false
+                    bgLayer.add(bgAnim, forKey: "bgOpacity")
+                    textLayer.addSublayer(bgLayer)
+                }
+
+                // --- Base layer: always visible, original color ---
+                let baseLayer = CATextLayer()
+                baseLayer.string = word.text
+                baseLayer.font = font
+                baseLayer.fontSize = calculatedFontSize
+                baseLayer.frame = wordRect
+                baseLayer.contentsScale = UIScreen.main.scale
+                baseLayer.alignmentMode = .left
+                baseLayer.foregroundColor = UIColor(model.fontColor).cgColor
+                let baseRenderer = UIGraphicsImageRenderer(size: wordRect.size)
+                let baseImage = baseRenderer.image { _ in
+                    word.text.draw(
+                        in: CGRect(
+                            x: wordHorizontalPadding,
+                            y: 0,
+                            width: wordRect.width - 2 * wordHorizontalPadding,
+                            height: wordRect.height
+                        ),
+                        withAttributes: [
+                            .font: font,
+                            .foregroundColor: UIColor(model.fontColor)
+                        ]
+                    )
+                }
+                baseLayer.contents = baseImage.cgImage
+                textLayer.addSublayer(baseLayer)
+
+                // --- Highlight layer: green, animated opacity ---
+                let highlightLayer = CATextLayer()
+                highlightLayer.string = word.text
+                highlightLayer.font = font
+                highlightLayer.fontSize = calculatedFontSize
+                highlightLayer.frame = wordRect
+                highlightLayer.contentsScale = UIScreen.main.scale
+                highlightLayer.alignmentMode = .left
+                highlightLayer.foregroundColor = UIColor.green.cgColor
+                highlightLayer.opacity = 0
+                let highlightRenderer = UIGraphicsImageRenderer(size: wordRect.size)
+                let highlightImage = highlightRenderer.image { _ in
+                    word.text.draw(
+                        in: CGRect(
+                            x: wordHorizontalPadding,
+                            y: 0,
+                            width: wordRect.width - 2 * wordHorizontalPadding,
+                            height: wordRect.height
+                        ),
+                        withAttributes: [
+                            .font: font,
+                            .foregroundColor: UIColor.green
+                        ]
+                    )
+                }
+                highlightLayer.contents = highlightImage.cgImage
+                textLayer.addSublayer(highlightLayer)
+
+                let highlightAnim = CABasicAnimation(keyPath: "opacity")
+                highlightAnim.fromValue = 0
+                highlightAnim.toValue = 1
+                highlightAnim.beginTime = word.start
+                if model.karaokeType == .letter {
+                    highlightAnim.duration = word.end - word.start
+                } else {
+                    highlightAnim.duration = 0.01
+                }
+                highlightAnim.fillMode = .forwards
+                highlightAnim.isRemovedOnCompletion = false
+                highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")
+                x += wordWidths[i] + 8
+            }
+        }
+        textLayer.contentsScale = UIScreen.main.scale
+        addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         return textLayer
     }
     

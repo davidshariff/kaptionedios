@@ -478,7 +478,7 @@ extension VideoEditor{
         return textLayer
     }
 
-    // Karaoke text layer creation
+    // Creates a karaoke-style text layer with animated highlighting for each word.
     private func createKaraokeTextLayer(
         karaokeWords: [KaraokeWord],
         model: TextBox,
@@ -490,32 +490,40 @@ extension VideoEditor{
     ) -> CALayer {
 
         // 1. Set up font and calculate the width of each word (with padding for word-by-word)
+        //    This is needed to lay out each word precisely and to size the overall text layer.
         let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font
         ]
         
-        // Add horizontal padding to each word for word-by-word
+        // Add horizontal padding to each word for word-by-word background (for visual separation)
         let wordHorizontalPadding: CGFloat = (model.karaokeType == .wordbg) ? 8 : 0
 
+        // Calculate the width of each word, including padding if needed
         let wordWidths = karaokeWords.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
-        let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing
+        // Total width is the sum of all word widths plus spacing between words
+        let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing between words
+        // The padded size includes extra padding around the text for background/border
         let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
         let textLayer = CALayer()
+        // Center the text layer at the given position
         let adjustedX = position.width - (paddedSize.width / 2)
         let adjustedY = position.height - (paddedSize.height / 2)
         textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
         textLayer.backgroundColor = UIColor(model.bgColor).cgColor
         textLayer.cornerRadius = calculatedCornerRadius
 
+        // Render the karaoke text as an image for crisp display, and add animated highlight layers for each word
         let renderer = UIGraphicsImageRenderer(size: paddedSize)
         let textImage = renderer.image { context in
             var x: CGFloat = calculatedPadding
+            // Loop through each word to lay out and animate them individually
             for (i, word) in karaokeWords.enumerated() {
                 // Calculate the frame for this word (with horizontal padding for word-by-word)
                 let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
 
                 // --- Word-by-word: Add rounded green background for active word ---
+                // If karaokeType is wordbg, add a background shape layer that will animate in sync with the word highlight
                 if model.karaokeType == .wordbg {
                     let bgLayer = CAShapeLayer()
                     let bgCornerRadius: CGFloat = 4
@@ -524,7 +532,7 @@ extension VideoEditor{
                     bgLayer.path = bgPath.cgPath
                     bgLayer.fillColor = UIColor.green.withAlphaComponent(0.2).cgColor
                     bgLayer.opacity = 0 // Start invisible
-                    // Animate opacity in sync with highlight
+                    // Animate opacity in sync with highlight (appears instantly at word start)
                     let bgAnim = CABasicAnimation(keyPath: "opacity")
                     bgAnim.fromValue = 0
                     bgAnim.toValue = 1
@@ -537,6 +545,7 @@ extension VideoEditor{
                 }
 
                 // --- Base layer: always visible, original color ---
+                // Draw the word in its normal color as the base layer
                 let baseLayer = CATextLayer()
                 baseLayer.string = word.text
                 baseLayer.font = font
@@ -545,6 +554,8 @@ extension VideoEditor{
                 baseLayer.contentsScale = UIScreen.main.scale
                 baseLayer.alignmentMode = .left
                 baseLayer.foregroundColor = UIColor(model.fontColor).cgColor
+
+                // Render the word as an image for best quality
                 let baseRenderer = UIGraphicsImageRenderer(size: wordRect.size)
                 let baseImage = baseRenderer.image { _ in
                     word.text.draw(
@@ -564,6 +575,7 @@ extension VideoEditor{
                 textLayer.addSublayer(baseLayer)
 
                 // --- Highlight layer: green, animated opacity ---
+                // Draw the word in green as a highlight layer, initially invisible
                 let highlightLayer = CATextLayer()
                 highlightLayer.string = word.text
                 highlightLayer.font = font
@@ -573,6 +585,8 @@ extension VideoEditor{
                 highlightLayer.alignmentMode = .left
                 highlightLayer.foregroundColor = UIColor.green.cgColor
                 highlightLayer.opacity = 0
+
+                // Render the highlighted word as an image
                 let highlightRenderer = UIGraphicsImageRenderer(size: wordRect.size)
                 let highlightImage = highlightRenderer.image { _ in
                     word.text.draw(
@@ -591,10 +605,13 @@ extension VideoEditor{
                 highlightLayer.contents = highlightImage.cgImage
                 textLayer.addSublayer(highlightLayer)
 
+                // Animate the highlight layer's opacity to fade in at the correct time
                 let highlightAnim = CABasicAnimation(keyPath: "opacity")
                 highlightAnim.fromValue = 0
                 highlightAnim.toValue = 1
                 highlightAnim.beginTime = word.start
+
+                // If karaokeType is letter, animate over the word's duration; otherwise, appear instantly
                 if model.karaokeType == .letter {
                     highlightAnim.duration = word.end - word.start
                 } else {
@@ -603,10 +620,13 @@ extension VideoEditor{
                 highlightAnim.fillMode = .forwards
                 highlightAnim.isRemovedOnCompletion = false
                 highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")
+                // Move x to the next word position (add spacing)
                 x += wordWidths[i] + 8
+                
             }
         }
         textLayer.contentsScale = UIScreen.main.scale
+        // Add appearance/disappearance animations for the whole text layer if needed
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         return textLayer
     }

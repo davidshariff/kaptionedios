@@ -494,9 +494,10 @@ extension VideoEditor{
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font
         ]
-        let wordHorizontalPadding: CGFloat = model.karaokeType == .word ? 4 : 0
-
+        
         // Add horizontal padding to each word for word-by-word
+        let wordHorizontalPadding: CGFloat = (model.karaokeType == .wordbg) ? 8 : 0
+
         let wordWidths = karaokeWords.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
         let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing
         let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
@@ -518,7 +519,7 @@ extension VideoEditor{
                 if model.karaokeType == .wordbg {
                     let bgLayer = CAShapeLayer()
                     let bgCornerRadius: CGFloat = 4
-                    let bgRect = CGRect(x: wordRect.origin.x, y: wordRect.origin.y, width: wordRect.width, height: wordRect.height)
+                    let bgRect = wordRect // background matches the padded word rect
                     let bgPath = UIBezierPath(roundedRect: bgRect, cornerRadius: bgCornerRadius)
                     bgLayer.path = bgPath.cgPath
                     bgLayer.fillColor = UIColor.green.withAlphaComponent(0.2).cgColor

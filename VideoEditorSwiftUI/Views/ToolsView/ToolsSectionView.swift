@@ -41,12 +41,14 @@ struct ToolsSectionView: View {
             }
             .confirmationDialog(
                 isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
-                    "Generate karaoke subtitles?" : 
+                    "⚠️ Generate Karaoke Subtitles?" : 
                     "Apply preset to all subtitles?",
                 isPresented: $showPresetConfirm,
                 titleVisibility: .visible
             ) {
-                Button("Apply", role: .destructive) {
+                Button(isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
+                       "🗑️ Clear & Generate" : 
+                       "Apply", role: .destructive) {
                     print("DEBUG: Apply button tapped")
                     if let style = pendingPreset {
                         print("DEBUG: Applying style: \(style.name)")
@@ -79,7 +81,7 @@ struct ToolsSectionView: View {
                 }
             } message: {
                 Text(isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
-                     "This will generate new karaoke subtitles and clear any existing subtitles." :
+                     "🚨 This will DELETE all existing subtitles and generate new karaoke subtitles. This action cannot be undone." :
                      "This will replace the style of all subtitles with the selected preset.")
             }
         .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)

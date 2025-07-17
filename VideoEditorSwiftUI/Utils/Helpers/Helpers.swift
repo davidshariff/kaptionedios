@@ -138,6 +138,18 @@ final class Helpers{
         let shadowYs: [CGFloat] = [2, 0, 0, 4]
         let shadowOpacities: [Double] = [0.7, 0, 0, 0.8]
         let lineDurations: [Double] = [0.7, 0.6, 0.6, 0.7]
+        
+        // Get the correct preset values based on karaokeType
+        let preset: KaraokePreset
+        switch karaokeType {
+        case .letter:
+            preset = KaraokePreset.letter
+        case .word:
+            preset = KaraokePreset.word
+        case .wordbg:
+            preset = KaraokePreset.wordbg
+        }
+        
         var startTime: Double = 0.0
         var boxes: [TextBox] = []
         for (i, line) in lines.enumerated() {
@@ -166,7 +178,9 @@ final class Helpers{
                 shadowY: shadowYs[i],
                 shadowOpacity: shadowOpacities[i],
                 karaokeWords: karaokeWords,
-                karaokeType: karaokeType
+                karaokeType: karaokeType,
+                highlightColor: preset.highlightColor,
+                wordBGColor: preset.wordBGColor
             )
             boxes.append(box)
             startTime += lineDurations[i]

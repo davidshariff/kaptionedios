@@ -46,9 +46,9 @@ struct TextBox: Identifiable{
 
     // Karaoke properties
     var karaokeWords: [KaraokeWord]? = nil
-    var karaokeType: KaraokeType = .letter // default to letter
-    var highlightColor: Color
-    var wordBGColor: Color
+    var karaokeType: KaraokeType = .letter
+    var highlightColor: Color = KaraokePreset.letter.highlightColor
+    var wordBGColor: Color = KaraokePreset.letter.wordBGColor
     
     init(
         text: String = "",
@@ -70,8 +70,8 @@ struct TextBox: Identifiable{
         shadowOpacity: Double = 0.5,
         karaokeWords: [KaraokeWord]? = nil,
         karaokeType: KaraokeType = .word,
-        highlightColor: Color = .green, // default
-        wordBGColor: Color = .red // default
+        highlightColor: Color = KaraokePreset.letter.highlightColor,
+        wordBGColor: Color = KaraokePreset.letter.wordBGColor
     ) {
         self.text = text
         self.fontSize = fontSize
@@ -143,17 +143,171 @@ struct SubtitleStyle: Identifiable, Equatable {
     }
 
     static let allPresets: [SubtitleStyle] = [
-        SubtitleStyle(name: "Highlight by letter", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Highlight by word", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Background by word", fontSize: 32, bgColor: .black.opacity(0.5), fontColor: .white, strokeColor: .clear, strokeWidth: 0, backgroundPadding: 8, cornerRadius: 8, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
-        SubtitleStyle(name: "Classic Yellow", fontSize: 32, bgColor: .clear, fontColor: .yellow, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Modern White", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Bold Black", fontSize: 32, bgColor: .clear, fontColor: .black, strokeColor: .white, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .white, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Shadowed", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .clear, strokeWidth: 0, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 8, shadowX: 2, shadowY: 2, shadowOpacity: 0.8),
-        SubtitleStyle(name: "Large Font", fontSize: 40, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .black, shadowRadius: 6, shadowX: 0, shadowY: 2, shadowOpacity: 0.7),
-        SubtitleStyle(name: "Outlined", fontSize: 32, bgColor: .clear, fontColor: .white, strokeColor: .black, strokeWidth: 4, backgroundPadding: 8, cornerRadius: 8, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
-        SubtitleStyle(name: "Minimalist", fontSize: 28, bgColor: .clear, fontColor: .white, strokeColor: .clear, strokeWidth: 0, backgroundPadding: 4, cornerRadius: 4, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
-        SubtitleStyle(name: "Retro", fontSize: 32, bgColor: .clear, fontColor: .orange, strokeColor: .brown, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .brown, shadowRadius: 6, shadowX: 2, shadowY: 2, shadowOpacity: 0.7)
+        SubtitleStyle(
+            name: "Highlight by letter",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .yellow,
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        SubtitleStyle(
+            name: "Highlight by word",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .yellow,
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        SubtitleStyle(
+            name: "Background by word",
+            fontSize: 32,
+            bgColor: .black.opacity(0.5),
+            fontColor: .white,
+            strokeColor: .clear,
+            strokeWidth: 0,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .clear,
+            shadowRadius: 0,
+            shadowX: 0,
+            shadowY: 0,
+            shadowOpacity: 0
+        ),
+        SubtitleStyle(
+            name: "Classic Yellow",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .yellow,
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        SubtitleStyle(
+            name: "Modern White",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        SubtitleStyle(
+            name: "Bold Black",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .black,
+            strokeColor: .white,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .white,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        SubtitleStyle(
+            name: "Shadowed",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .clear,
+            strokeWidth: 0,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 8,
+            shadowX: 2,
+            shadowY: 2,
+            shadowOpacity: 0.8
+        ),
+        SubtitleStyle(
+            name: "Large Font",
+            fontSize: 40,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        ),
+        SubtitleStyle(
+            name: "Outlined",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .black,
+            strokeWidth: 4,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .clear,
+            shadowRadius: 0,
+            shadowX: 0,
+            shadowY: 0,
+            shadowOpacity: 0
+        ),
+        SubtitleStyle(
+            name: "Minimalist",
+            fontSize: 28,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .clear,
+            strokeWidth: 0,
+            backgroundPadding: 4,
+            cornerRadius: 4,
+            shadowColor: .clear,
+            shadowRadius: 0,
+            shadowX: 0,
+            shadowY: 0,
+            shadowOpacity: 0
+        ),
+        SubtitleStyle(
+            name: "Retro",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .orange,
+            strokeColor: .brown,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .brown,
+            shadowRadius: 6,
+            shadowX: 2,
+            shadowY: 2,
+            shadowOpacity: 0.7
+        )
     ]
 }
 
@@ -164,7 +318,7 @@ struct KaraokePreset {
 
     static let letter = KaraokePreset(
         karaokeType: .letter,
-        highlightColor: .yellow,
+        highlightColor: .blue,
         wordBGColor: .clear
     )
     static let word = KaraokePreset(

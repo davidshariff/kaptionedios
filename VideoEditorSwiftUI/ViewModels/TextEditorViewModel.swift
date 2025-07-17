@@ -55,8 +55,10 @@ class TextEditorViewModel: ObservableObject{
         if let textBox, isEdit{
             isEditMode = true
             currentTextBox = textBox
+            print("DEBUG: Editing existing TextBox - karaokeType: \(textBox.karaokeType), highlightColor: \(textBox.highlightColor), wordBGColor: \(textBox.wordBGColor)")
         }else{
             currentTextBox = TextBox(timeRange: timeRange ?? (1...5))
+            print("DEBUG: Creating new TextBox - karaokeType: \(currentTextBox.karaokeType), highlightColor: \(currentTextBox.highlightColor), wordBGColor: \(currentTextBox.wordBGColor)")
             isEditMode = false
         }
         showEditor = true

@@ -530,7 +530,7 @@ extension VideoEditor{
                     let bgRect = wordRect // background matches the padded word rect
                     let bgPath = UIBezierPath(roundedRect: bgRect, cornerRadius: bgCornerRadius)
                     bgLayer.path = bgPath.cgPath
-                    bgLayer.fillColor = UIColor.green.withAlphaComponent(0.2).cgColor
+                    bgLayer.fillColor = UIColor(model.wordBGColor).withAlphaComponent(0.5).cgColor
                     bgLayer.opacity = 0 // Start invisible
                     // Animate opacity in sync with highlight (appears instantly at word start)
                     let bgAnim = CABasicAnimation(keyPath: "opacity")
@@ -583,7 +583,7 @@ extension VideoEditor{
                 highlightLayer.frame = wordRect
                 highlightLayer.contentsScale = UIScreen.main.scale
                 highlightLayer.alignmentMode = .left
-                highlightLayer.foregroundColor = UIColor.green.cgColor
+                highlightLayer.foregroundColor = UIColor(model.highlightColor).cgColor
                 highlightLayer.opacity = 0
 
                 // Render the highlighted word as an image
@@ -598,7 +598,7 @@ extension VideoEditor{
                         ),
                         withAttributes: [
                             .font: font,
-                            .foregroundColor: UIColor.green
+                            .foregroundColor: UIColor(model.highlightColor)
                         ]
                     )
                 }

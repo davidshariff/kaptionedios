@@ -287,7 +287,7 @@ extension ToolsSectionView {
         case .text:
             return "Add text overlays"
         case .presets:
-            return "Select presets"
+            return selectedPreset?.name ?? "Select presets"
         case .cut:
             return "Trim video"
         }

@@ -105,7 +105,7 @@
 		5A9EDCFF29F03DCD0014A1CF /* VideoSpeedSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSpeedSlider.swift; sourceTree = "<group>"; };
 		5AADA50229F919800064EA7E /* FiltersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewModel.swift; sourceTree = "<group>"; };
 		5AADA50529F9204A0064EA7E /* CorrectionsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectionsToolView.swift; sourceTree = "<group>"; };
-		5ACFF96B29E944FA00827A37 /* VideoEditorSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoEditorSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5ACFF96B29E944FA00827A37 /* KaptionedV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KaptionedV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEditorSwiftUIApp.swift; sourceTree = "<group>"; };
 		5ACFF97029E944FA00827A37 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5ACFF97229E944FC00827A37 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -228,7 +228,7 @@
 		5ACFF96229E944FA00827A37 = {
 			isa = PBXGroup;
 			children = (
-				5ACFF96D29E944FA00827A37 /* VideoEditorSwiftUI */,
+				5ACFF96D29E944FA00827A37 /* KaptionedV2 */,
 				5ACFF96C29E944FA00827A37 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -236,12 +236,12 @@
 		5ACFF96C29E944FA00827A37 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5ACFF96B29E944FA00827A37 /* VideoEditorSwiftUI.app */,
+				5ACFF96B29E944FA00827A37 /* KaptionedV2.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		5ACFF96D29E944FA00827A37 /* VideoEditorSwiftUI */ = {
+		5ACFF96D29E944FA00827A37 /* KaptionedV2 */ = {
 			isa = PBXGroup;
 			children = (
 				5AE2A29D29F4656C003D217F /* Utils */,
@@ -254,7 +254,7 @@
 				5ACFF97229E944FC00827A37 /* Assets.xcassets */,
 				5ACFF97429E944FC00827A37 /* Preview Content */,
 			);
-			path = VideoEditorSwiftUI;
+			path = KaptionedV2;
 			sourceTree = "<group>";
 		};
 		5ACFF97429E944FC00827A37 /* Preview Content */ = {
@@ -477,9 +477,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5ACFF96A29E944FA00827A37 /* VideoEditorSwiftUI */ = {
+		5ACFF96A29E944FA00827A37 /* KaptionedV2 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5ACFF97929E944FC00827A37 /* Build configuration list for PBXNativeTarget "VideoEditorSwiftUI" */;
+			buildConfigurationList = 5ACFF97929E944FC00827A37 /* Build configuration list for PBXNativeTarget "KaptionedV2" */;
 			buildPhases = (
 				5ACFF96729E944FA00827A37 /* Sources */,
 				5ACFF96829E944FA00827A37 /* Frameworks */,
@@ -489,9 +489,9 @@
 			);
 			dependencies = (
 			);
-			name = VideoEditorSwiftUI;
+			name = KaptionedV2;
 			productName = VideoEditorSwiftUI;
-			productReference = 5ACFF96B29E944FA00827A37 /* VideoEditorSwiftUI.app */;
+			productReference = 5ACFF96B29E944FA00827A37 /* KaptionedV2.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -509,7 +509,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5ACFF96629E944FA00827A37 /* Build configuration list for PBXProject "VideoEditorSwiftUI" */;
+			buildConfigurationList = 5ACFF96629E944FA00827A37 /* Build configuration list for PBXProject "KaptionedV2" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -522,7 +522,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5ACFF96A29E944FA00827A37 /* VideoEditorSwiftUI */,
+				5ACFF96A29E944FA00827A37 /* KaptionedV2 */,
 			);
 		};
 /* End PBXProject section */
@@ -734,10 +734,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"VideoEditorSwiftUI/Preview Content\"";
-				DEVELOPMENT_TEAM = 92PU6D6MCQ;
+				DEVELOPMENT_ASSET_PATHS = "\"KaptionedV2/Preview Content\"";
+				DEVELOPMENT_TEAM = AF5MU2YQ5A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kaptioned V2";
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -747,13 +748,13 @@
 				INFOPLIST_KEY_UIStatusBarHidden = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Artem.VideoEditorSwiftUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kaptionedmediallc.kaptioned;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -771,10 +772,11 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"VideoEditorSwiftUI/Preview Content\"";
-				DEVELOPMENT_TEAM = 92PU6D6MCQ;
+				DEVELOPMENT_ASSET_PATHS = "\"KaptionedV2/Preview Content\"";
+				DEVELOPMENT_TEAM = AF5MU2YQ5A;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Kaptioned V2";
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -784,13 +786,13 @@
 				INFOPLIST_KEY_UIStatusBarHidden = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.Artem.VideoEditorSwiftUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kaptionedmediallc.kaptioned;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -804,7 +806,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5ACFF96629E944FA00827A37 /* Build configuration list for PBXProject "VideoEditorSwiftUI" */ = {
+		5ACFF96629E944FA00827A37 /* Build configuration list for PBXProject "KaptionedV2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5ACFF97729E944FC00827A37 /* Debug */,
@@ -813,7 +815,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5ACFF97929E944FC00827A37 /* Build configuration list for PBXNativeTarget "VideoEditorSwiftUI" */ = {
+		5ACFF97929E944FC00827A37 /* Build configuration list for PBXNativeTarget "KaptionedV2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5ACFF97A29E944FC00827A37 /* Debug */,

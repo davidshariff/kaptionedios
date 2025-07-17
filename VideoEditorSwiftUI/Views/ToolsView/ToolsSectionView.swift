@@ -33,32 +33,54 @@ struct ToolsSectionView: View {
         return mainContent
             .sheet(isPresented: $showPresetsSheet) {
                 PresetsListView(showPresetConfirm: $showPresetConfirm, pendingPreset: $pendingPreset, onSelect: { style in
+                    print("DEBUG: Preset selected: \(style.name)")
                     pendingPreset = style
                     showPresetConfirm = true
+                    print("DEBUG: showPresetConfirm set to: \(showPresetConfirm)")
                 })
-                .confirmationDialog(
+            }
+            .confirmationDialog(
+                isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
+                    "Generate karaoke subtitles?" : 
                     "Apply preset to all subtitles?",
-                    isPresented: $showPresetConfirm,
-                    titleVisibility: .visible
-                ) {
-                    Button("Apply", role: .destructive) {
-                        if let style = pendingPreset {
+                isPresented: $showPresetConfirm,
+                titleVisibility: .visible
+            ) {
+                Button("Apply", role: .destructive) {
+                    print("DEBUG: Apply button tapped")
+                    if let style = pendingPreset {
+                        print("DEBUG: Applying style: \(style.name)")
+                        if isKaraokePreset(style) {
+                            print("DEBUG: Generating karaoke subtitles")
+                            // For karaoke presets, generate new subtitles
+                            if let video = editorVM.currentVideo {
+                                let karaokeType = getKaraokeType(for: style)
+                                let subs = Helpers.generateKaraokeSubs(for: video, karaokeType: karaokeType)
+                                textEditor.textBoxes = subs
+                                editorVM.setText(subs)
+                            }
+                        } else {
+                            print("DEBUG: Applying regular preset")
+                            // For regular presets, apply style to existing subtitles
                             textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
                             editorVM.setText(textEditor.textBoxes)
-                            selectedPreset = style // Track the selected preset
                         }
-                        showPresetConfirm = false
-                        pendingPreset = nil
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            showPresetsSheet = false
-                        }
+                        selectedPreset = style // Track the selected preset
                     }
-                    Button("Cancel", role: .cancel) {
-                        pendingPreset = nil
+                    showPresetConfirm = false
+                    pendingPreset = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        showPresetsSheet = false
                     }
-                } message: {
-                    Text("This will replace the style of all subtitles with the selected preset.")
                 }
+                Button("Cancel", role: .cancel) {
+                    print("DEBUG: Cancel button tapped")
+                    pendingPreset = nil
+                }
+            } message: {
+                Text(isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
+                     "This will generate new karaoke subtitles and clear any existing subtitles." :
+                     "This will replace the style of all subtitles with the selected preset.")
             }
         .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
         .onChange(of: editorVM.currentVideo){ newValue in
@@ -266,6 +288,21 @@ extension ToolsSectionView {
             return "Select presets"
         case .cut:
             return "Trim video"
+        }
+    }
+    
+    private func isKaraokePreset(_ style: SubtitleStyle) -> Bool {
+        return style.name == "Highlight by letter" || 
+               style.name == "Highlight by word" || 
+               style.name == "Background by word"
+    }
+    
+    private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
+        switch style.name {
+        case "Highlight by letter": return .letter
+        case "Highlight by word": return .word
+        case "Background by word": return .wordbg
+        default: return .word
         }
     }
 }

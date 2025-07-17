@@ -132,6 +132,13 @@ struct SubtitleStyle: Identifiable, Equatable {
         box.shadowX = shadowX
         box.shadowY = shadowY
         box.shadowOpacity = shadowOpacity
+        
+        // Disable karaoke for regular subtitle styles
+        box.karaokeWords = nil
+        box.karaokeType = KaraokePreset.letter.karaokeType
+        box.highlightColor = KaraokePreset.letter.highlightColor
+        box.wordBGColor = KaraokePreset.letter.wordBGColor
+        
         return box
     }
 
@@ -148,4 +155,26 @@ struct SubtitleStyle: Identifiable, Equatable {
         SubtitleStyle(name: "Minimalist", fontSize: 28, bgColor: .clear, fontColor: .white, strokeColor: .clear, strokeWidth: 0, backgroundPadding: 4, cornerRadius: 4, shadowColor: .clear, shadowRadius: 0, shadowX: 0, shadowY: 0, shadowOpacity: 0),
         SubtitleStyle(name: "Retro", fontSize: 32, bgColor: .clear, fontColor: .orange, strokeColor: .brown, strokeWidth: 2, backgroundPadding: 8, cornerRadius: 8, shadowColor: .brown, shadowRadius: 6, shadowX: 2, shadowY: 2, shadowOpacity: 0.7)
     ]
+}
+
+struct KaraokePreset {
+    let karaokeType: KaraokeType
+    let highlightColor: Color
+    let wordBGColor: Color
+
+    static let letter = KaraokePreset(
+        karaokeType: .letter,
+        highlightColor: .yellow,
+        wordBGColor: .clear
+    )
+    static let word = KaraokePreset(
+        karaokeType: .word,
+        highlightColor: .orange,
+        wordBGColor: .clear
+    )
+    static let wordbg = KaraokePreset(
+        karaokeType: .wordbg,
+        highlightColor: .white,
+        wordBGColor: .blue
+    )
 }

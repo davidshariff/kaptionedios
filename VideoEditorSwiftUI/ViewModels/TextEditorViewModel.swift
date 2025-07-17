@@ -74,3 +74,13 @@ class TextEditorViewModel: ObservableObject{
         cancelTextEditor()
     }
 }
+
+extension TextEditorViewModel {
+    func applyKaraokePreset(_ preset: KaraokePreset) {
+        guard let selectedTextBox = selectedTextBox,
+              let index = textBoxes.firstIndex(where: { $0.id == selectedTextBox.id }) else { return }
+        textBoxes[index].karaokeType = preset.karaokeType
+        textBoxes[index].highlightColor = preset.highlightColor
+        textBoxes[index].wordBGColor = preset.wordBGColor
+    }
+}

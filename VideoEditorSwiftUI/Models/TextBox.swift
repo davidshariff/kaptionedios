@@ -328,7 +328,7 @@ struct KaraokePreset {
     )
     static let wordbg = KaraokePreset(
         karaokeType: .wordbg,
-        highlightColor: .white,
+        highlightColor: .yellow,
         wordBGColor: .blue
     )
 }

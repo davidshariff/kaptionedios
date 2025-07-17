@@ -43,10 +43,36 @@ struct TextBox: Identifiable{
     var shadowX: CGFloat = 0
     var shadowY: CGFloat = 0
     var shadowOpacity: Double = 0.5
+
+    // Karaoke properties
     var karaokeWords: [KaraokeWord]? = nil
     var karaokeType: KaraokeType = .letter // default to letter
+    var highlightColor: Color
+    var wordBGColor: Color
     
-    init(text: String = "", fontSize: CGFloat = 20, lastFontSize: CGFloat = .zero, bgColor: Color = .white, fontColor: Color = .black, strokeColor: Color = .clear, strokeWidth: CGFloat = 0, timeRange: ClosedRange<Double> = 0...3, offset: CGSize = .zero, lastOffset: CGSize = .zero, backgroundPadding: CGFloat = 8, cornerRadius: CGFloat = 0, shadowColor: Color = .black, shadowRadius: CGFloat = 0, shadowX: CGFloat = 0, shadowY: CGFloat = 0, shadowOpacity: Double = 0.5, karaokeWords: [KaraokeWord]? = nil, karaokeType: KaraokeType = .word) {
+    init(
+        text: String = "",
+        fontSize: CGFloat = 20,
+        lastFontSize: CGFloat = .zero,
+        bgColor: Color = .white,
+        fontColor: Color = .black,
+        strokeColor: Color = .clear,
+        strokeWidth: CGFloat = 0,
+        timeRange: ClosedRange<Double> = 0...3,
+        offset: CGSize = .zero,
+        lastOffset: CGSize = .zero,
+        backgroundPadding: CGFloat = 8,
+        cornerRadius: CGFloat = 0,
+        shadowColor: Color = .black,
+        shadowRadius: CGFloat = 0,
+        shadowX: CGFloat = 0,
+        shadowY: CGFloat = 0,
+        shadowOpacity: Double = 0.5,
+        karaokeWords: [KaraokeWord]? = nil,
+        karaokeType: KaraokeType = .word,
+        highlightColor: Color = .green, // default
+        wordBGColor: Color = .red // default
+    ) {
         self.text = text
         self.fontSize = fontSize
         self.lastFontSize = lastFontSize
@@ -66,6 +92,8 @@ struct TextBox: Identifiable{
         self.shadowOpacity = shadowOpacity
         self.karaokeWords = karaokeWords
         self.karaokeType = karaokeType
+        self.highlightColor = highlightColor
+        self.wordBGColor = wordBGColor
     }
     
     

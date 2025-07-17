@@ -95,7 +95,7 @@ struct TextPlayerView: View {
                 words: karaokeWords,
                 fontSize: textBox.fontSize,
                 fontColor: textBox.fontColor,
-                highlightColor: .yellow,
+                highlightColor: textBox.highlightColor,
                 currentTime: currentTime
             )
             .padding(.horizontal, textBox.backgroundPadding)
@@ -107,7 +107,7 @@ struct TextPlayerView: View {
                 words: karaokeWords,
                 fontSize: textBox.fontSize,
                 fontColor: textBox.fontColor,
-                highlightColor: .yellow,
+                highlightColor: textBox.highlightColor,
                 currentTime: currentTime
             )
             .padding(.horizontal, textBox.backgroundPadding)
@@ -119,7 +119,8 @@ struct TextPlayerView: View {
                 words: karaokeWords,
                 fontSize: textBox.fontSize,
                 fontColor: textBox.fontColor,
-                highlightColor: .yellow,
+                highlightColor: textBox.highlightColor,
+                wordBGColor: textBox.wordBGColor,
                 currentTime: currentTime
             )
             .padding(.horizontal, textBox.backgroundPadding)
@@ -324,6 +325,7 @@ struct AttributedTextOverlay: UIViewRepresentable {
 
 // KaraokeTextOverlay SwiftUI view
 struct KaraokeTextByLetterHighlightOverlay: View {
+
     let text: String
     let words: [KaraokeWord]
     let fontSize: CGFloat
@@ -341,14 +343,14 @@ struct KaraokeTextByLetterHighlightOverlay: View {
                 let progress: CGFloat = isActive ? CGFloat((currentTime - letterStart) / (letterEnd - letterStart)) : (currentTime >= letterEnd ? 1 : 0)
                 
                 ZStack(alignment: .leading) {
-                    // Base text (normal color)
+                    // Base text (entire string)
                     Text(String(character))
                         .font(.system(size: fontSize, weight: .bold))
                         .foregroundColor(fontColor)
-                    // Animated green mask text
+                    // Animated text
                     Text(String(character))
                         .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(.green)
+                        .foregroundColor(highlightColor)
                         .mask(
                             GeometryReader { geo in
                                 let width = geo.size.width * progress
@@ -378,6 +380,7 @@ struct KaraokeTextByLetterHighlightOverlay: View {
 }
 
 struct KaraokeTextByWordHighlightOverlay: View {
+
     let text: String
     let words: [KaraokeWord]
     let fontSize: CGFloat
@@ -392,14 +395,14 @@ struct KaraokeTextByWordHighlightOverlay: View {
                 let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
                 
                 ZStack(alignment: .leading) {
-                    // Base text (normal color)
+                    // Base text (entire string)
                     Text(word.text)
                         .font(.system(size: fontSize, weight: .bold))
                         .foregroundColor(fontColor)
-                    // Animated green mask text
+                    // Animated text
                     Text(word.text)
                         .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(.green)
+                        .foregroundColor(highlightColor)
                         .opacity(progress)
                         .animation(.linear(duration: 0.05), value: progress)
                 }
@@ -409,11 +412,13 @@ struct KaraokeTextByWordHighlightOverlay: View {
 } 
 
 struct KaraokeTextByWordBackgroundOverlay: View {
+
     let text: String
     let words: [KaraokeWord]
     let fontSize: CGFloat
     let fontColor: Color
     let highlightColor: Color
+    let wordBGColor: Color
     let currentTime: Double
 
     var body: some View {
@@ -423,7 +428,7 @@ struct KaraokeTextByWordBackgroundOverlay: View {
                 let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
                 
                 ZStack(alignment: .leading) {
-                    // Base text (normal color)
+                    // Base text (entire string)
                     Text(word.text)
                         .font(.system(size: fontSize, weight: .bold))
                         .foregroundColor(fontColor)
@@ -432,14 +437,14 @@ struct KaraokeTextByWordBackgroundOverlay: View {
                             RoundedRectangle(cornerRadius: 4)
                                 .fill(Color.clear)
                         )
-                    // Animated green mask text
+                    // Animated text
                     Text(word.text)
                         .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(.green)
+                        .foregroundColor(highlightColor)
                         .padding(.horizontal, 4)
                         .background(
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.green.opacity(0.2))
+                                .fill(wordBGColor.opacity(0.5))
                                 .opacity(progress)
                         )
                         .opacity(progress)

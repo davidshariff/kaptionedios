@@ -18,6 +18,10 @@ class EditorViewModel: ObservableObject{
     @Published var frames = VideoFrames()
     @Published var isSelectVideo: Bool = true
     
+    @Published var isLoading: Bool = false
+    @Published var showErrorAlert: Bool = false
+    @Published var errorMessage: String = ""
+    
     private var projectEntity: ProjectEntity?
     
 

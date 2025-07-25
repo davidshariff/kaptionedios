@@ -43,6 +43,59 @@ struct MainEditorView: View {
             if showVideoQualitySheet, let video = editorVM.currentVideo{
                 VideoExporterBottomSheetView(isPresented: $showVideoQualitySheet, video: video)
             }
+            // Loading overlay for subtitle generation
+            if editorVM.isLoading {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    ProgressView("Generating subtitles...")
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .foregroundColor(.white)
+                        .padding(32)
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(16)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .ignoresSafeArea()
+            }
+            // Error overlay for subtitle generation
+            if editorVM.showErrorAlert {
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                    VStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.red)
+                        Text("Error")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        Text(editorVM.errorMessage)
+                            .font(.body)
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 16)
+                        Button(action: { editorVM.showErrorAlert = false }) {
+                            Text("Dismiss")
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 10)
+                                .background(Color.red)
+                                .foregroundColor(.white)
+                                .cornerRadius(8)
+                        }
+                    }
+                    .padding(32)
+                    .background(Color(.systemGray6).opacity(0.95))
+                    .cornerRadius(20)
+                    .shadow(radius: 20)
+                    .padding(.horizontal, 32)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                .transition(.opacity)
+                .animation(.easeInOut, value: editorVM.showErrorAlert)
+            }
         }
         .background(Color.black)
         .navigationBarHidden(true)

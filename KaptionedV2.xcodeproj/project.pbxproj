@@ -71,6 +71,8 @@
 		5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C529FA7D9300B820D0 /* Color.swift */; };
 		5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C729FC186F00B820D0 /* TextBox.swift */; };
 		F42230EF2E350495001CCAE5 /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230ED2E350495001CCAE5 /* PresetsListView.swift */; };
+		F42230F22E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */; };
+		F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F32E350697001CCAE5 /* TranscriptionModels.swift */; };
 		F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
@@ -146,6 +148,8 @@
 		5AFA25C529FA7D9300B820D0 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		5AFA25C729FC186F00B820D0 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
 		F42230ED2E350495001CCAE5 /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
+		F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSubslistBottomSheet.swift; sourceTree = "<group>"; };
+		F42230F32E350697001CCAE5 /* TranscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionModels.swift; sourceTree = "<group>"; };
 		F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPlayerView.swift; sourceTree = "<group>"; };
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
@@ -216,6 +220,7 @@
 		5A9EDCFE29F03D800014A1CF /* ToolsView */ = {
 			isa = PBXGroup;
 			children = (
+				F42230F12E3505CB001CCAE5 /* Subslist */,
 				F42230EE2E350495001CCAE5 /* PresetsList */,
 				5A62B4772A0284E400E84093 /* Audio */,
 				5A5F95692A004BBF0041C3F6 /* Text */,
@@ -308,6 +313,7 @@
 				5ACFF98629E949A900827A37 /* VideoItem.swift */,
 				5A8B3FCE29F0360B00FB9858 /* Video.swift */,
 				5AF25B5629F13EC7005E0467 /* ToolModel.swift */,
+				F42230F32E350697001CCAE5 /* TranscriptionModels.swift */,
 				5AE2A2A529F6A949003D217F /* VideoQuality.swift */,
 				5AE2A2AF29F88113003D217F /* FilteredImage.swift */,
 				5AFA25C729FC186F00B820D0 /* TextBox.swift */,
@@ -500,6 +506,14 @@
 			path = PresetsList;
 			sourceTree = "<group>";
 		};
+		F42230F12E3505CB001CCAE5 /* Subslist */ = {
+			isa = PBXGroup;
+			children = (
+				F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */,
+			);
+			path = Subslist;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -575,6 +589,7 @@
 				5ACFF98B29E99A5600827A37 /* CameraPreviewView.swift in Sources */,
 				5A08FC7229EEB65000AB877C /* TimeLineView.swift in Sources */,
 				5A3D13B629F190260027E25E /* Preview.swift in Sources */,
+				F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */,
 				5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */,
 				5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */,
 				5AFA25C429FA727C00B820D0 /* FramesToolView.swift in Sources */,
@@ -612,6 +627,7 @@
 				F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */,
 				F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */,
 				F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */,
+				F42230F22E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift in Sources */,
 				5ACFF9B029EE8C6C00827A37 /* PlayerHolderView.swift in Sources */,
 				5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */,
 				5ACFF9B229EEA93400827A37 /* ToolsSectionView.swift in Sources */,

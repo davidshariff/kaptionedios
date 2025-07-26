@@ -75,6 +75,7 @@
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
 		F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7752E34D32C006E9DD1 /* FilterHelper.swift */; };
 		F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */; };
+		F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -147,6 +148,7 @@
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
 		F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeSubsHelper.swift; sourceTree = "<group>"; };
 		F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionHelper.swift; sourceTree = "<group>"; };
+		F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -425,6 +427,7 @@
 			isa = PBXGroup;
 			children = (
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
+				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
 				F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */,
@@ -584,6 +587,7 @@
 				5A5F956F2A01351B0041C3F6 /* TextEditorView.swift in Sources */,
 				5A5E6FA12A03CCFE00F5EBF8 /* AudioEntity+Ext.swift in Sources */,
 				5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */,
+				F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */,
 				5AADA50629F9204A0064EA7E /* CorrectionsToolView.swift in Sources */,
 				5AE2A2A629F6A949003D217F /* VideoQuality.swift in Sources */,
 				5A3D13AE29F185400027E25E /* FileManager.swift in Sources */,

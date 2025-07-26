@@ -134,7 +134,7 @@ struct CustomSubslistBottomSheet: View {
                                         // Auto-scroll to keep current time in view
                                         let y = CGFloat(newTime) * timelineScale
                                         withAnimation(.easeInOut(duration: 0.3)) {
-                                            scrollProxy.scrollTo(textEditor.textBoxes.firstIndex(where: { newTime >= $0.timeRange.lowerBound && newTime <= $0.timeRange.upperBound }) ?? 0, anchor: .center)
+                                            scrollProxy.scrollTo(y, anchor: .center)
                                         }
                                     }
                                 }

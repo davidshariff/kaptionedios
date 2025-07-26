@@ -74,6 +74,7 @@
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
 		F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7752E34D32C006E9DD1 /* FilterHelper.swift */; };
+		F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -145,6 +146,7 @@
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
 		F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeSubsHelper.swift; sourceTree = "<group>"; };
+		F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -425,6 +427,7 @@
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
+				F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */,
 				5AE2A29F29F465BD003D217F /* VideoEditor.swift */,
 			);
 			path = Helpers;
@@ -558,6 +561,7 @@
 				5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */,
 				5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */,
 				5AFA25C429FA727C00B820D0 /* FramesToolView.swift in Sources */,
+				F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */,
 				5ACFF98729E949A900827A37 /* VideoItem.swift in Sources */,
 				5A17E08129F1495000DB4A47 /* CropperRatio.swift in Sources */,
 				5ACFF98D29E99C7F00827A37 /* RecordVideoView.swift in Sources */,

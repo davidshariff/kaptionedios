@@ -9,12 +9,12 @@ import Foundation
 
 
 enum ToolEnum: Int, CaseIterable{
-    case text, presets, cut
+    case text, presets, subslist
     
     
     var title: String{
         switch self {
-        case .cut: return "Cut"
+        case .subslist: return "Subslist"
         //case .speed: return "Speed"
         //case .crop: return "Crop"
         //case .audio: return "Audio"
@@ -28,7 +28,7 @@ enum ToolEnum: Int, CaseIterable{
     
     var image: String{
         switch self {
-        case .cut: return "scissors"
+        case .subslist: return "list.bullet"
         //case .speed: return "timer"
         //case .crop: return "crop"
         //case .audio: return "waveform"

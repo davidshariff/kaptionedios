@@ -150,7 +150,7 @@ extension EditorViewModel{
        
         switch selectedTools{
             
-        case .cut:
+        case .subslist:
             currentVideo?.resetRangeDuration()
         //case .speed:
         //    currentVideo?.resetRate()

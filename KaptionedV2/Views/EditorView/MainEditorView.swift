@@ -17,6 +17,7 @@ struct MainEditorView: View {
     @State var isFullScreen: Bool = false
     @State var showVideoQualitySheet: Bool = false
     @State var showRecordView: Bool = false
+    @State var showCustomSubslistSheet: Bool = false
     @StateObject var editorVM = EditorViewModel()
     @StateObject var audioRecorder = AudioRecorderManager()
     @StateObject var videoPlayer = VideoPlayerManager()
@@ -31,7 +32,7 @@ struct MainEditorView: View {
                         .frame(height: proxy.size.height / (isFullScreen ?  1.25 : 1.8))
                     PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                     Spacer()
-                    ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor)
+                    ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor, showCustomSubslistSheet: $showCustomSubslistSheet)
                         .opacity(isFullScreen ? 0 : 1)
                         .padding(.bottom, 20)
                 }
@@ -95,6 +96,14 @@ struct MainEditorView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .transition(.opacity)
                 .animation(.easeInOut, value: editorVM.showErrorAlert)
+            }
+            
+            // Custom subslist sheet
+            if showCustomSubslistSheet {
+                CustomSubslistBottomSheet(isPresented: $showCustomSubslistSheet, textEditor: textEditor, videoPlayer: videoPlayer)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1000)
+                    .animation(.easeInOut(duration: 0.5), value: showCustomSubslistSheet)
             }
         }
         .background(Color.black)

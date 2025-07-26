@@ -76,6 +76,7 @@
 		F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7752E34D32C006E9DD1 /* FilterHelper.swift */; };
 		F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */; };
 		F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */; };
+		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -149,6 +150,7 @@
 		F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeSubsHelper.swift; sourceTree = "<group>"; };
 		F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionHelper.swift; sourceTree = "<group>"; };
 		F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
+		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				5A5F956C2A00FA180041C3F6 /* TextToolsView.swift */,
+				F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */,
 				F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */,
 				5A5F956E2A01351B0041C3F6 /* TextEditorView.swift */,
 			);
@@ -580,6 +583,7 @@
 				5ACFF98929E98EE700827A37 /* CameraManager.swift in Sources */,
 				5ACFF99629EC8A2400827A37 /* AVAssets+Ext.swift in Sources */,
 				5ACFF97129E944FA00827A37 /* ContentView.swift in Sources */,
+				F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */,
 				5AE2A2A029F465BD003D217F /* VideoEditor.swift in Sources */,
 				5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */,
 				5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */,

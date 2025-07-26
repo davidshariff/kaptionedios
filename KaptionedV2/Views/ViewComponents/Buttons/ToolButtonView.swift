@@ -38,8 +38,8 @@ struct ToolButtonView: View {
 struct ToolButtonView_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
-            ToolButtonView(label: "Cut", image: "scissors", isChange: false){}
-            ToolButtonView(label: "Cut", image: "scissors", isChange: true){}
+            ToolButtonView(label: "Subslist", image: "list.bullet", isChange: false){}
+            ToolButtonView(label: "Subslist", image: "list.bullet", isChange: true){}
              
         }
         .frame(width: 100)

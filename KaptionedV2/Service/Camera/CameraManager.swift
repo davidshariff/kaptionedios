@@ -247,9 +247,14 @@ extension Double{
     
     func formatterTimeString() -> String{
         let minutes = Int(self / 60)
-          let seconds = Int(self.truncatingRemainder(dividingBy: 60))
-          let milliseconds = Int((self.truncatingRemainder(dividingBy: 1)) * 10)
-          return "\(minutes):\(String(format: "%02d", seconds)).\(milliseconds)"
+        let seconds = Int(self.truncatingRemainder(dividingBy: 60))
+        let milliseconds = Int((self.truncatingRemainder(dividingBy: 1)) * 10)
+        
+        if minutes > 0 {
+            return String(format: "%d:%02d", minutes, seconds)
+        } else {
+            return String(format: "%d.%d", seconds, milliseconds)
+        }
     }
     
 }

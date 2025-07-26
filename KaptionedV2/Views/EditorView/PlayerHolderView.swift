@@ -102,7 +102,7 @@ extension PlayerHolderView{
             HStack{
                 Text((videoPlayer.currentTime - video.rangeDuration.lowerBound)  .formatterTimeString()) +
                 Text(" / ") +
-                Text(Int(video.totalDuration).secondsToTime())
+                Text(video.totalDuration.formatterTimeString())
             }
             .font(.caption2)
             .foregroundColor(.white)

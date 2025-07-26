@@ -114,7 +114,7 @@ class VideoEditor{
     ///Adding filters
     private func applyFiltersOperations(_ video: Video, fromUrl: URL) async throws -> URL {
         
-        let filters = Helpers.createFilters(mainFilter: CIFilter(name: video.filterName ?? ""), video.colorCorrection)
+        let filters = FilterHelper.createFilters(mainFilter: CIFilter(name: video.filterName ?? ""), video.colorCorrection)
 
         if filters.isEmpty{
             return fromUrl

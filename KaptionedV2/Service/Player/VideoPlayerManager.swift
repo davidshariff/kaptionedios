@@ -228,7 +228,7 @@ extension VideoPlayerManager{
 
     func setFilters(mainFilter: CIFilter?, colorCorrection: ColorCorrection?){
        
-        let filters = Helpers.createFilters(mainFilter: mainFilter, colorCorrection)
+        let filters = FilterHelper.createFilters(mainFilter: mainFilter, colorCorrection)
         
         if filters.isEmpty{
             return

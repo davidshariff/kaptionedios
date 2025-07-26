@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVKit
+import Foundation
 
 struct TranscriptionWord: Codable {
     let word: String
@@ -56,15 +57,11 @@ struct ToolsSectionView: View {
                 })
             }
             .confirmationDialog(
-                isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
-                    "⚠️ Generate Karaoke Subtitles?" : 
-                    "Apply preset to all subtitles?",
+                "Apply preset to all subtitles?",
                 isPresented: $showPresetConfirm,
                 titleVisibility: .visible
             ) {
-                Button(isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
-                       "🗑️ Clear & Generate" : 
-                       "Apply", role: .destructive) {
+                Button("Apply", role: .destructive) {
                     print("DEBUG: Apply button tapped")
                     if let style = pendingPreset {
                         print("DEBUG: Applying style: \(style.name)")
@@ -73,7 +70,15 @@ struct ToolsSectionView: View {
                             // For karaoke presets, generate new subtitles
                             if let video = editorVM.currentVideo {
                                 let karaokeType = getKaraokeType(for: style)
-                                let subs = Helpers.generateKaraokeSubs(for: video, karaokeType: karaokeType)
+                                // Convert current textBoxes to lines format
+                                let lines = textEditor.textBoxes.map { textBox in
+                                    (text: textBox.text, start: textBox.timeRange.lowerBound, end: textBox.timeRange.upperBound)
+                                }
+                                let subs = KaraokeSubsHelper.generateKaraokeSubs(
+                                    for: video,
+                                    karaokeType: karaokeType,
+                                    lines: lines
+                                )
                                 textEditor.textBoxes = subs
                                 editorVM.setText(subs)
                             }
@@ -96,9 +101,7 @@ struct ToolsSectionView: View {
                     pendingPreset = nil
                 }
             } message: {
-                Text(isKaraokePreset(pendingPreset ?? SubtitleStyle.allPresets[0]) ? 
-                     "🚨 This will DELETE all existing subtitles and generate new karaoke subtitles. This action cannot be undone." :
-                     "This will replace the style of all subtitles with the selected preset.")
+                Text("This will replace the style of all subtitles with the selected preset.")
             }
         .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
         .onChange(of: editorVM.currentVideo){ newValue in

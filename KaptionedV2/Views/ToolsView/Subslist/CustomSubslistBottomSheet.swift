@@ -121,12 +121,25 @@ struct CustomSubslistBottomSheet: View {
                                                 .id(index)
                                             }
                                             // Current time indicator line
-                                            Rectangle()
-                                                .fill(Color.red)
-                                                .frame(width: geometry.size.width - 40, height: 2)
-                                                .position(x: (geometry.size.width - 40) / 2 + 20, y: CGFloat(videoPlayer.currentTime) * timelineScale)
-                                                .shadow(color: Color.red.opacity(0.8), radius: 2)
-                                                .zIndex(1000)
+                                            ZStack {
+                                                Rectangle()
+                                                    .fill(Color.red)
+                                                    .frame(width: geometry.size.width - 40, height: 2)
+                                                    .shadow(color: Color.red.opacity(0.8), radius: 2)
+                                                
+                                                // Current time text
+                                                Text(videoPlayer.currentTime.formatterTimeString())
+                                                    .font(.caption2)
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(.white)
+                                                    .padding(.horizontal, 6)
+                                                    .padding(.vertical, 2)
+                                                    .background(Color.red)
+                                                    .cornerRadius(4)
+                                                    .offset(y: -12)
+                                            }
+                                            .position(x: (geometry.size.width - 40) / 2 + 20, y: CGFloat(videoPlayer.currentTime) * timelineScale)
+                                            .zIndex(1000)
                                         }
                                         .frame(height: totalContentHeight)
                                     }

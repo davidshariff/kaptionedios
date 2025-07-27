@@ -42,11 +42,6 @@ struct RulerTimelineSlider<T: View, A: View>: View {
                 .opacity(disableOffset ? 0 : 1)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
-            .contentShape(Rectangle())
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.blue.opacity(0.6), lineWidth: 2)
-            )
             
             .gesture(
                 DragGesture(minimumDistance: 1)
@@ -85,7 +80,7 @@ struct RulerTimelineSlider_Previews: PreviewProvider {
     @State static var currentTime = 0.0
     static var previews: some View {
         RulerTimelineSlider(bounds: 0...60, disableOffset: false, value: $currentTime, frameView: {
-            RulerView(duration: 60, currentTime: currentTime)
+            RulerView(duration: 60, currentTime: currentTime, frameWidth: 2400)
         }, actionView: {EmptyView()}, onChange: {})
             .frame(height: 80)
     }
@@ -103,6 +98,7 @@ extension RulerTimelineSlider{
 struct RulerView: View {
     let duration: Double
     let currentTime: Double
+    let frameWidth: CGFloat
     
     var body: some View {
         ZStack {
@@ -136,7 +132,7 @@ struct RulerView: View {
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 1, height: 8)
                     }
-                    .frame(width: 1000 / duration) // Dynamic width based on video duration
+                    .frame(width: frameWidth / duration) // Dynamic width based on actual frame width
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

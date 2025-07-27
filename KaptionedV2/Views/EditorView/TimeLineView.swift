@@ -22,19 +22,22 @@ struct TimeLineView: View {
     private let frameWight: CGFloat = 55
 
     private var calcWight: CGFloat{
-        let width = frameWight * CGFloat(viewState.countImages) + 10
+        let baseWidth = frameWight * CGFloat(viewState.countImages) + 10
+        let dynamicWidth = max(500, video.originalDuration * 40) // 40 points per second, minimum 500
         print("Timeline width calculation:")
         print("  - frameWight: \(frameWight)")
         print("  - viewState: \(viewState)")
         print("  - countImages: \(viewState.countImages)")
-        print("  - calculated width: \(width)")
-        return 1000
+        print("  - video duration: \(video.originalDuration)")
+        print("  - base width: \(baseWidth)")
+        print("  - dynamic width: \(dynamicWidth)")
+        return dynamicWidth
     }
     var body: some View {
         ZStack{
             if !video.thumbnailsImages.isEmpty{
                 RulerTimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
-                    RulerView(duration: video.originalDuration, currentTime: currentTime)
+                    RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: calcWight)
                 } actionView: {
                     recordButton
                 }

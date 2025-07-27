@@ -32,6 +32,33 @@ struct CustomSubslistBottomSheet: View {
                 VStack(spacing: 0) {
                     Spacer()
                     VStack(spacing: 20) {
+                        // Top blur and shadow overlay
+                        VStack(spacing: 0) {
+                            // Blur effect at the top
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .frame(height: 20)
+                                .opacity(0.7)
+                                .overlay(
+                                    // Darker gradient for better visual separation
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.1),
+                                            Color.clear
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
+                            
+                            // Horizontal line with shadow
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.5))
+                                .frame(height: 1)
+                                .shadow(color: Color.black.opacity(0.4), radius: 3, x: 0, y: 2)
+                        }
+                        
                         HStack {
                             Spacer()
                             Button(action: {

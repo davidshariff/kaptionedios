@@ -35,15 +35,32 @@ struct TimeLineView: View {
     }
     var body: some View {
         ZStack{
-            if !video.thumbnailsImages.isEmpty{
-                RulerTimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
-                    RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: calcWight)
-                } actionView: {
-                    recordButton
+            if video.originalDuration > 0{
+                if viewState == .text {
+                    TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
+                        VStack(alignment: .leading, spacing: 5) {
+                            ZStack {
+                                tubneilsImages(video.thumbnailsImages)
+                                textRangeTimeLayer
+                            }
+                            audioLayerSection
+                        }
+                    } actionView: {
+                        recordButton
+                    }
+                onChange: {
+                    onChangeTimeValue()
                 }
-            onChange: {
-                onChangeTimeValue()
-            }
+                } else {
+                    RulerTimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
+                        RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: calcWight)
+                    } actionView: {
+                        recordButton
+                    }
+                onChange: {
+                    onChangeTimeValue()
+                }
+                }
             }
         }
         .frame(height: viewState.height)

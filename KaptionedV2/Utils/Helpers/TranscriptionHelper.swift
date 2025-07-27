@@ -25,7 +25,7 @@ class TranscriptionHelper {
                 return
             }
             print("[TranscriptionHelper] Audio extracted: \(audioURL)")
-            let url = URL(string: "http://127.0.0.1:8000/transcribe")!
+            let url = URL(string: "https://0fd0a6e40777.ngrok-free.app/transcribe")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             let boundary = UUID().uuidString

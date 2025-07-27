@@ -207,7 +207,6 @@ extension MainEditorView{
                     withAnimation(.easeInOut(duration: 0.3)) {
                         controlsHeight = 350 // Reset to default
                     }
-                    logControlsInfo(proxy: proxy, isReset: true)
                 }) {
                     Image(systemName: "arrow.clockwise")
                         .foregroundColor(.gray)
@@ -221,14 +220,12 @@ extension MainEditorView{
                     .onChanged { value in
                         let newHeight = controlsHeight - value.translation.height
                         controlsHeight = max(100, min(400, newHeight)) // Min 100, Max 400
-                        logControlsInfo(proxy: proxy, isReset: false)
                     }
                     .onEnded { _ in
                         // Optional: Add a small animation when drag ends for smooth settling
                         withAnimation(.easeOut(duration: 0.2)) {
                             // This ensures the final position is properly set
                         }
-                        logControlsInfo(proxy: proxy, isReset: false)
                     }
             )
             .zIndex(2000)
@@ -250,17 +247,6 @@ extension MainEditorView{
             .frame(height: controlsHeight - 40) // Account for drag handle and text
         }
         .background(Color.black)
-    }
-    
-    private func logControlsInfo(proxy: GeometryProxy, isReset: Bool) {
-        let screenHeight = proxy.size.height
-        let percentage = (controlsHeight / screenHeight) * 100
-        let remainingPixels = screenHeight - controlsHeight - 100 // Account for header and spacing
-        
-        let prefix = isReset ? "🔄 Reset" : "🎯 Drag"
-        let suffix = isReset ? " (Reset)" : ""
-        
-        //print("\(prefix) Content Height: \(controlsHeight)px, Screen Percentage: \(String(format: "%.1f", percentage))%, Remaining Pixels: \(remainingPixels)px\(suffix)")
     }
     
     private func saveProject(_ phase: ScenePhase){

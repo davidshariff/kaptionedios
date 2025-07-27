@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct CustomSubslistBottomSheet: View {
+struct SubslistView: View {
     @Binding var isPresented: Bool
     @ObservedObject var textEditor: TextEditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager

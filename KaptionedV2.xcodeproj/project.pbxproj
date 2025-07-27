@@ -71,9 +71,9 @@
 		5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C529FA7D9300B820D0 /* Color.swift */; };
 		5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AFA25C729FC186F00B820D0 /* TextBox.swift */; };
 		F42230EF2E350495001CCAE5 /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230ED2E350495001CCAE5 /* PresetsListView.swift */; };
-		F42230F22E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */; };
 		F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F32E350697001CCAE5 /* TranscriptionModels.swift */; };
 		F42364922E36378400057C86 /* RulerTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364912E36378400057C86 /* RulerTimelineSlider.swift */; };
+		F42364942E36567D00057C86 /* SubslistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364932E36567D00057C86 /* SubslistView.swift */; };
 		F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
@@ -149,9 +149,9 @@
 		5AFA25C529FA7D9300B820D0 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		5AFA25C729FC186F00B820D0 /* TextBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBox.swift; sourceTree = "<group>"; };
 		F42230ED2E350495001CCAE5 /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
-		F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSubslistBottomSheet.swift; sourceTree = "<group>"; };
 		F42230F32E350697001CCAE5 /* TranscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionModels.swift; sourceTree = "<group>"; };
 		F42364912E36378400057C86 /* RulerTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerTimelineSlider.swift; sourceTree = "<group>"; };
+		F42364932E36567D00057C86 /* SubslistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubslistView.swift; sourceTree = "<group>"; };
 		F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPlayerView.swift; sourceTree = "<group>"; };
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
@@ -512,7 +512,7 @@
 		F42230F12E3505CB001CCAE5 /* Subslist */ = {
 			isa = PBXGroup;
 			children = (
-				F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */,
+				F42364932E36567D00057C86 /* SubslistView.swift */,
 			);
 			path = Subslist;
 			sourceTree = "<group>";
@@ -631,7 +631,6 @@
 				F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */,
 				F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */,
 				F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */,
-				F42230F22E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift in Sources */,
 				5ACFF9B029EE8C6C00827A37 /* PlayerHolderView.swift in Sources */,
 				5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */,
 				5ACFF9B229EEA93400827A37 /* ToolsSectionView.swift in Sources */,
@@ -653,6 +652,7 @@
 				5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */,
 				5A3D13AC29F184330027E25E /* CoreDataContainer.xcdatamodeld in Sources */,
 				5AE2A2A829F6BA29003D217F /* ExporterViewModel.swift in Sources */,
+				F42364942E36567D00057C86 /* SubslistView.swift in Sources */,
 				5ACFF99D29ED5C4900827A37 /* SliderView.swift in Sources */,
 				5A5E6F9D2A03C88A00F5EBF8 /* AudioSheetView.swift in Sources */,
 				5AE2A2B029F88113003D217F /* FilteredImage.swift in Sources */,

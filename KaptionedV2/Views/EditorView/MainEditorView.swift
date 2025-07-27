@@ -100,7 +100,7 @@ struct MainEditorView: View {
             
             // Custom subslist sheet
             if showCustomSubslistSheet {
-                CustomSubslistBottomSheet(isPresented: $showCustomSubslistSheet, textEditor: textEditor, videoPlayer: videoPlayer)
+                SubslistView(isPresented: $showCustomSubslistSheet, textEditor: textEditor, videoPlayer: videoPlayer)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .zIndex(1000)
                     .animation(.easeInOut(duration: 0.5), value: showCustomSubslistSheet)

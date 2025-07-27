@@ -22,16 +22,7 @@ struct TimeLineView: View {
     private let frameWight: CGFloat = 55
 
     private var calcWight: CGFloat{
-        let baseWidth = frameWight * CGFloat(viewState.countImages) + 10
-        let dynamicWidth = max(500, video.originalDuration * 40) // 40 points per second, minimum 500
-        print("Timeline width calculation:")
-        print("  - frameWight: \(frameWight)")
-        print("  - viewState: \(viewState)")
-        print("  - countImages: \(viewState.countImages)")
-        print("  - video duration: \(video.originalDuration)")
-        print("  - base width: \(baseWidth)")
-        print("  - dynamic width: \(dynamicWidth)")
-        return dynamicWidth
+        return max(500, video.originalDuration * 40) // 40 points per second, minimum 500
     }
     var body: some View {
         ZStack{

@@ -1,5 +1,5 @@
 //
-//  NewTimelineSlider.swift
+//  RulerTimelineSlider.swift
 //  VideoEditorSwiftUI
 //
 //  Created by Bogdan Zykov on 19.04.2023.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TimelineSlider<T: View, A: View>: View {
+struct RulerTimelineSlider<T: View, A: View>: View {
     @State private var lastOffset: CGFloat = 0
     var bounds: ClosedRange<Double>
     var disableOffset: Bool
@@ -45,7 +45,7 @@ struct TimelineSlider<T: View, A: View>: View {
             .contentShape(Rectangle())
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.gray.opacity(0.4), lineWidth: 2)
+                    .stroke(Color.blue.opacity(0.6), lineWidth: 2)
             )
             
             .gesture(
@@ -79,18 +79,17 @@ struct TimelineSlider<T: View, A: View>: View {
     }
 }
 
-struct NewTimelineSlider_Previews: PreviewProvider {
-    @State static var curretTime = 0.0
+struct RulerTimelineSlider_Previews: PreviewProvider {
+    @State static var currentTime = 0.0
     static var previews: some View {
-        TimelineSlider(bounds: 5...34, disableOffset: false, value: $curretTime, frameView: {
-            Rectangle()
-                .fill(Color.secondary)
+        RulerTimelineSlider(bounds: 0...60, disableOffset: false, value: $currentTime, frameView: {
+            RulerView(duration: 60, currentTime: currentTime)
         }, actionView: {EmptyView()}, onChange: {})
             .frame(height: 80)
     }
 }
 
-extension TimelineSlider{
+extension RulerTimelineSlider{
     
     private func setOffset(){
         if !isChange{
@@ -98,3 +97,51 @@ extension TimelineSlider{
         }
     }
 }
+
+struct RulerView: View {
+    let duration: Double
+    let currentTime: Double
+    
+    var body: some View {
+        ZStack {
+            // Background
+            Rectangle()
+                .fill(Color.gray.opacity(0.1))
+            
+            // Ruler ticks - static time scale
+            HStack(spacing: 0) {
+                ForEach(0..<Int(duration) + 1, id: \.self) { second in
+                    VStack(spacing: 0) {
+                        // Major tick (every second)
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.6))
+                            .frame(width: 1, height: 20)
+                        
+                        // Time label (every 5 seconds)
+                        if second % 5 == 0 {
+                            Text("\(second)")
+                                .font(.system(size: 8))
+                                .foregroundColor(.gray)
+                                .frame(height: 12)
+                        } else {
+                            Rectangle()
+                                .fill(Color.clear)
+                                .frame(height: 12)
+                        }
+                        
+                        // Minor tick
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 1, height: 8)
+                    }
+                    .frame(width: 1000 / duration) // Dynamic width based on video duration
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color.blue.opacity(0.7), lineWidth: 2)
+        )
+    }
+} 

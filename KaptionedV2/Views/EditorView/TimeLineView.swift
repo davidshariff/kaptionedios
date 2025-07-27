@@ -22,19 +22,19 @@ struct TimeLineView: View {
     private let frameWight: CGFloat = 55
 
     private var calcWight: CGFloat{
-        frameWight * CGFloat(viewState.countImages) + 10
+        let width = frameWight * CGFloat(viewState.countImages) + 10
+        print("Timeline width calculation:")
+        print("  - frameWight: \(frameWight)")
+        print("  - viewState: \(viewState)")
+        print("  - countImages: \(viewState.countImages)")
+        print("  - calculated width: \(width)")
+        return 1000
     }
     var body: some View {
         ZStack{
             if !video.thumbnailsImages.isEmpty{
-                TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        ZStack {
-                            tubneilsImages(video.thumbnailsImages)
-                            textRangeTimeLayer
-                        }
-                        audioLayerSection
-                    }
+                RulerTimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
+                    RulerView(duration: video.originalDuration, currentTime: currentTime)
                 } actionView: {
                     recordButton
                 }
@@ -44,6 +44,10 @@ struct TimeLineView: View {
             }
         }
         .frame(height: viewState.height)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+        )
         .onChange(of: textTimeInterval.lowerBound) { newValue in
             isActiveTextRangeSlider = true
             currentTime = newValue
@@ -101,6 +105,10 @@ extension TimeLineView{
                 }
             }
         }
+        .overlay(
+            RoundedRectangle(cornerRadius: 6)
+                .stroke(Color.red.opacity(0.7), lineWidth: 2)
+        )
         .overlay {
             if viewState == .audio{
                 if isSelectedTrack{

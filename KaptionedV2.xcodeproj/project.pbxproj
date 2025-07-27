@@ -73,6 +73,7 @@
 		F42230EF2E350495001CCAE5 /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230ED2E350495001CCAE5 /* PresetsListView.swift */; };
 		F42230F22E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */; };
 		F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F32E350697001CCAE5 /* TranscriptionModels.swift */; };
+		F42364922E36378400057C86 /* RulerTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364912E36378400057C86 /* RulerTimelineSlider.swift */; };
 		F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
@@ -150,6 +151,7 @@
 		F42230ED2E350495001CCAE5 /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
 		F42230F02E3505CB001CCAE5 /* CustomSubslistBottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSubslistBottomSheet.swift; sourceTree = "<group>"; };
 		F42230F32E350697001CCAE5 /* TranscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionModels.swift; sourceTree = "<group>"; };
+		F42364912E36378400057C86 /* RulerTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerTimelineSlider.swift; sourceTree = "<group>"; };
 		F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPlayerView.swift; sourceTree = "<group>"; };
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
@@ -389,6 +391,7 @@
 		5ACFF9A729EE876D00827A37 /* Sliders */ = {
 			isa = PBXGroup;
 			children = (
+				F42364912E36378400057C86 /* RulerTimelineSlider.swift */,
 				5ACFF9A029ED9C4000827A37 /* CustomSlider.swift */,
 				5ACFF99E29ED709B00827A37 /* RangeSliderView.swift */,
 				5ACFF99C29ED5C4900827A37 /* SliderView.swift */,
@@ -600,6 +603,7 @@
 				F42230EF2E350495001CCAE5 /* PresetsListView.swift in Sources */,
 				5A3D13B229F187960027E25E /* ProjectEntity+Ext.swift in Sources */,
 				5ACFF9AC29EE8B9400827A37 /* PlayerView.swift in Sources */,
+				F42364922E36378400057C86 /* RulerTimelineSlider.swift in Sources */,
 				5AE2A2AE29F880D0003D217F /* FiltersView.swift in Sources */,
 				5A5E6F9F2A03CA1800F5EBF8 /* AudioModel.swift in Sources */,
 				5ACFF99A29ED57BC00827A37 /* ThumbnailsSliderView.swift in Sources */,

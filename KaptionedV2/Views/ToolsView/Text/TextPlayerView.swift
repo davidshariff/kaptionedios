@@ -1,10 +1,3 @@
-//
-//  TextPlayerView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 01.05.2023.
-//
-
 import SwiftUI
 import UIKit
 
@@ -12,6 +5,8 @@ struct TextPlayerView: View {
     var currentTime: Double
     @ObservedObject var viewModel: TextEditorViewModel
     var disabledMagnification: Bool = false
+    var originalVideoSize: CGSize
+    @Environment(\.videoSize) private var videoSize
     
     var body: some View {
         GeometryReader { geo in
@@ -21,6 +16,9 @@ struct TextPlayerView: View {
             }
             .frame(width: geo.size.width, height: geo.size.height)
             .clipped()
+            .onAppear {
+                print("🎯 TextPlayerView - Geometry size: \(geo.size), Video size: \(videoSize)")
+            }
         }
     }
     
@@ -68,13 +66,43 @@ struct TextPlayerView: View {
                     .offset(x: textBox.offset.width, y: textBox.offset.height - 30)
             }
         }
+        .scaleEffect(calculateScaleFactor())
+        .offset(calculateScaledOffset(textBox))
         .simultaneousGesture(dragGesture(for: textBox, isSelected: isSelected))
+    }
+    
+    private func calculateScaleFactor() -> CGFloat {
+        if videoSize.width > 0 && videoSize.height > 0 && originalVideoSize.width > 0 && originalVideoSize.height > 0 {
+            let scaleX = videoSize.width / originalVideoSize.width
+            let scaleY = videoSize.height / originalVideoSize.height
+            let scale = min(scaleX, scaleY) // Use the smaller scale to maintain aspect ratio
+            print("🎯 TextPlayerView - Current VideoSize: \(videoSize), Original VideoSize: \(originalVideoSize), Scale: \(scale)")
+            return scale
+        }
+        print("🎯 TextPlayerView - Missing video size info, using scale 1.0")
+        return 1.0
+    }
+    
+    private func calculateScaledOffset(_ textBox: TextBox) -> CGSize {
+        let scaleFactor = calculateScaleFactor()
+        return CGSize(
+            width: textBox.offset.width * scaleFactor,
+            height: textBox.offset.height * scaleFactor
+        )
+    }
+    
+    private func getScaledFontSize(_ originalFontSize: CGFloat) -> CGFloat {
+        return originalFontSize * calculateScaleFactor()
+    }
+    
+    private func getScaledPadding(_ originalPadding: CGFloat) -> CGFloat {
+        return originalPadding * calculateScaleFactor()
     }
     
     @ViewBuilder
     private func textContent(textBox: TextBox, isSelected: Bool) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: textBox.cornerRadius)
+            RoundedRectangle(cornerRadius: textBox.cornerRadius * calculateScaleFactor())
                 .fill(textBox.bgColor)
             
             textOverlay(textBox: textBox, isSelected: isSelected)
@@ -84,7 +112,6 @@ struct TextPlayerView: View {
         .onTapGesture {
             editOrSelectTextBox(textBox, isSelected)
         }
-        .offset(textBox.offset)
     }
     
     @ViewBuilder
@@ -93,38 +120,38 @@ struct TextPlayerView: View {
             KaraokeTextByLetterHighlightOverlay(
                 text: textBox.text,
                 words: karaokeWords,
-                fontSize: textBox.fontSize,
+                fontSize: getScaledFontSize(textBox.fontSize),
                 fontColor: textBox.fontColor,
                 highlightColor: textBox.highlightColor,
                 currentTime: currentTime
             )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
+            .padding(.horizontal, getScaledPadding(textBox.backgroundPadding))
+            .padding(.vertical, getScaledPadding(textBox.backgroundPadding) / 2)
         } 
         else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .word {
             KaraokeTextByWordHighlightOverlay(
                 text: textBox.text,
                 words: karaokeWords,
-                fontSize: textBox.fontSize,
+                fontSize: getScaledFontSize(textBox.fontSize),
                 fontColor: textBox.fontColor,
                 highlightColor: textBox.highlightColor,
                 currentTime: currentTime
             )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
+            .padding(.horizontal, getScaledPadding(textBox.backgroundPadding))
+            .padding(.vertical, getScaledPadding(textBox.backgroundPadding) / 2)
         } 
         else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .wordbg {
             KaraokeTextByWordBackgroundOverlay(
                 text: textBox.text,
                 words: karaokeWords,
-                fontSize: textBox.fontSize,
+                fontSize: getScaledFontSize(textBox.fontSize),
                 fontColor: textBox.fontColor,
                 highlightColor: textBox.highlightColor,
                 wordBGColor: textBox.wordBGColor,
                 currentTime: currentTime
             )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
+            .padding(.horizontal, getScaledPadding(textBox.backgroundPadding))
+            .padding(.vertical, getScaledPadding(textBox.backgroundPadding) / 2)
         } 
         else {
             AttributedTextOverlay(
@@ -132,14 +159,14 @@ struct TextPlayerView: View {
                 offset: .zero,
                 isSelected: isSelected,
                 bgColor: .clear,
-                cornerRadius: textBox.cornerRadius,
+                cornerRadius: textBox.cornerRadius * calculateScaleFactor(),
                 shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
-                shadowRadius: textBox.shadowRadius,
-                shadowX: textBox.shadowX,
-                shadowY: textBox.shadowY
+                shadowRadius: textBox.shadowRadius * calculateScaleFactor(),
+                shadowX: textBox.shadowX * calculateScaleFactor(),
+                shadowY: textBox.shadowY * calculateScaleFactor()
             )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
+            .padding(.horizontal, getScaledPadding(textBox.backgroundPadding))
+            .padding(.vertical, getScaledPadding(textBox.backgroundPadding) / 2)
         }
     }
     

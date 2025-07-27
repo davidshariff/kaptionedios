@@ -18,6 +18,8 @@ struct MainEditorView: View {
     @State var showVideoQualitySheet: Bool = false
     @State var showRecordView: Bool = false
     @State var showCustomSubslistSheet: Bool = false
+    @State var controlsHeight: CGFloat = 350 // New state for draggable height
+    
     @StateObject var editorVM = EditorViewModel()
     @StateObject var audioRecorder = AudioRecorderManager()
     @StateObject var videoPlayer = VideoPlayerManager()
@@ -29,15 +31,16 @@ struct MainEditorView: View {
                 VStack(spacing: 0){
                     headerView(safeAreaTop: proxy.safeAreaInsets.top)
                     // video player
-                    PlayerHolderView(isFullScreen: $isFullScreen, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
-                        .frame(height: proxy.size.height / (isFullScreen ?  1.25 : 1.8))
-                    // player control
-                    PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
-                    Spacer()
-                    // tools section
-                    ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor, showCustomSubslistSheet: $showCustomSubslistSheet)
-                        .opacity(isFullScreen ? 0 : 1)
-                        .padding(.bottom, 20)
+                    PlayerHolderView(
+                        isFullScreen: $isFullScreen, 
+                        availableHeight: .constant(proxy.size.height - controlsHeight - 100),
+                        editorVM: editorVM, 
+                        videoPlayer: videoPlayer, 
+                        textEditor: textEditor
+                    )
+                    .frame(height: proxy.size.height - controlsHeight - 100) // Dynamic height based on controls
+                    // Draggable controls section
+                    draggableControlsSection(proxy: proxy)
                 }
                 .onAppear{
                     setVideo(proxy)
@@ -176,6 +179,80 @@ extension MainEditorView{
         .frame(height: 50)
         .padding(.top, safeAreaTop + 40)
         .padding(.bottom)
+    }
+    
+    private func draggableControlsSection(proxy: GeometryProxy) -> some View {
+        VStack(spacing: 0) {
+            // Drag handle
+            HStack {
+                VStack(spacing: 4) {
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.5))
+                        .frame(height: 4)
+                        .frame(maxWidth: 60)
+                        .cornerRadius(2)
+                    
+                    Text("Drag to resize")
+                        .font(.caption2)
+                        .foregroundColor(.gray)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        controlsHeight = 350 // Reset to default
+                    }
+                    logControlsInfo(proxy: proxy, isReset: true)
+                }) {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                }
+            }
+            .padding(.top, 8)
+            .padding(.horizontal, 16)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in
+                        let newHeight = controlsHeight - value.translation.height
+                        controlsHeight = max(100, min(400, newHeight)) // Min 100, Max 400
+                        logControlsInfo(proxy: proxy, isReset: false)
+                    }
+                    .onEnded { _ in
+                        // Optional: Add a small animation when drag ends for smooth settling
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            // This ensures the final position is properly set
+                        }
+                        logControlsInfo(proxy: proxy, isReset: false)
+                    }
+            )
+            .zIndex(2000)
+            
+            // Controls content
+            VStack(spacing: 0) {
+                // Player control
+                PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+                
+                // Tools section
+                ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor, showCustomSubslistSheet: $showCustomSubslistSheet)
+                    .opacity(isFullScreen ? 0 : 1)
+                    .padding(.bottom, 20)
+            }
+            .frame(height: controlsHeight - 40) // Account for drag handle and text
+        }
+        .background(Color.black)
+    }
+    
+    private func logControlsInfo(proxy: GeometryProxy, isReset: Bool) {
+        let screenHeight = proxy.size.height
+        let percentage = (controlsHeight / screenHeight) * 100
+        let remainingPixels = screenHeight - controlsHeight - 100 // Account for header and spacing
+        
+        let prefix = isReset ? "🔄 Reset" : "🎯 Drag"
+        let suffix = isReset ? " (Reset)" : ""
+        
+        print("\(prefix) Content Height: \(controlsHeight)px, Screen Percentage: \(String(format: "%.1f", percentage))%, Remaining Pixels: \(remainingPixels)px\(suffix)")
     }
     
     private func saveProject(_ phase: ScenePhase){

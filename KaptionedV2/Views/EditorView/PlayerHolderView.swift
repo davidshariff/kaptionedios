@@ -7,11 +7,27 @@
 
 import SwiftUI
 
+// Custom environment key for video size
+private struct VideoSizeKey: EnvironmentKey {
+    static let defaultValue: CGSize = .zero
+}
+
+extension EnvironmentValues {
+    var videoSize: CGSize {
+        get { self[VideoSizeKey.self] }
+        set { self[VideoSizeKey.self] = newValue }
+    }
+}
+
 struct PlayerHolderView: View{
+
     @Binding var isFullScreen: Bool
+    @Binding var availableHeight: CGFloat
+
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var textEditor: TextEditorViewModel
+
     var scale: CGFloat{
         isFullScreen ? 1.4 : 1
     }
@@ -27,7 +43,13 @@ struct PlayerHolderView: View{
                 case .failed:
                     Text("Failed to open video")
                 case .loaded:
-                    playerCropView
+                    ZStack(alignment: .top) {
+                        playerStandardView
+                        Rectangle()
+                            .foregroundColor(.clear)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .border(Color.red, width: 2)
+                    }
                 }
             }
             .allFrame()
@@ -40,7 +62,7 @@ struct PlayerHolderView: View{
     
     private func debugPlayerInfo(video: Video) {
         print("[DEBUG] isFullScreen: \(isFullScreen), scale: \(scale)")
-        print("[DEBUG] frameSize: \(video.frameSize), geometrySize: \(video.geometrySize ?? .zero)")
+        print("[DEBUG] frameSize: \(video.frameSize), geometrySize: \(video.geometrySize)")
         print("[DEBUG] currentTime: \(videoPlayer.currentTime)")
     }
 }
@@ -54,44 +76,58 @@ struct PlayerHolderView_Previews: PreviewProvider {
 
 extension PlayerHolderView{
 
-    private var playerCropView: some View{
-        Group{
-            if let video = editorVM.currentVideo{
+    private var playerStandardView: some View {
+        Group {
+            if let video = editorVM.currentVideo {
                 GeometryReader { proxy in
-                    CropView(
-                        originalSize: .init(width: video.frameSize.width * scale, height: video.frameSize.height * scale),
-                        rotation: editorVM.currentVideo?.rotation,
-                        isMirror: editorVM.currentVideo?.isMirror ?? false,
-                        isActiveCrop: false) {
-                            ZStack{
-                                editorVM.frames.frameColor
-                                ZStack{
-                                    PlayerView(player: videoPlayer.videoPlayer)
-                                    TextPlayerView(currentTime: videoPlayer.currentTime, viewModel: textEditor,  disabledMagnification: isFullScreen)
-                                        .scaleEffect(scale)
-                                        .disabled(isFullScreen)
+                                            ZStack {
+                            editorVM.frames.frameColor
+                            ZStack {
+                                // this is the video player
+                                PlayerView(player: videoPlayer.videoPlayer)
+                                // this is the text overlay player
+                                ZStack {
+                                    TextPlayerView(
+                                        currentTime: videoPlayer.currentTime,
+                                        viewModel: textEditor,
+                                        disabledMagnification: isFullScreen,
+                                        originalVideoSize: video.frameSize
+                                    )
+                                    .environment(\.videoSize, CGSize(
+                                        width: min(proxy.size.width, proxy.size.height * (video.frameSize.width / video.frameSize.height)),
+                                        height: min(proxy.size.height, proxy.size.width * (video.frameSize.height / video.frameSize.width))
+                                    ))
+                                    Rectangle()
+                                        .foregroundColor(.clear)
+                                        .border(Color.orange, width: 2)
                                 }
-                                .contentShape(Rectangle())
-                                .onTapGesture {
-                                    // Deselect text when tapping outside
-                                    textEditor.deselectTextBox()
-                                }
-                                .scaleEffect(editorVM.frames.scale)
+                                .scaleEffect(scale)
+                                .disabled(isFullScreen)
                             }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                textEditor.deselectTextBox()
+                            }
+                            .scaleEffect(editorVM.frames.scale)
                         }
-                        .allFrame()
-                        .onAppear{
-                            Task{
-                                guard let size = await editorVM.currentVideo?.asset.adjustVideoSize(to: proxy.size) else {return}
-                             editorVM.currentVideo?.frameSize = size
-                                editorVM.currentVideo?.geometrySize = proxy.size
-                         }
-                     }
+                        .frame(
+                            width: min(proxy.size.width, proxy.size.height * (video.frameSize.width / video.frameSize.height)),
+                            height: min(proxy.size.height, proxy.size.width * (video.frameSize.height / video.frameSize.width))
+                        )
+                        .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+                    .onAppear {
+                        Task {
+                            guard let size = await video.asset.adjustVideoSize(to: proxy.size) else { return }
+                            editorVM.currentVideo?.frameSize = size
+                            editorVM.currentVideo?.geometrySize = proxy.size
+                        }
+                    }
                 }
+                timelineLabel
             }
-            timelineLabel
         }
     }
+
 }
 
 extension PlayerHolderView{

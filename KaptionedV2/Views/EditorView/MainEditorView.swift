@@ -28,10 +28,13 @@ struct MainEditorView: View {
             GeometryReader { proxy in
                 VStack(spacing: 0){
                     headerView(safeAreaTop: proxy.safeAreaInsets.top)
+                    // video player
                     PlayerHolderView(isFullScreen: $isFullScreen, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                         .frame(height: proxy.size.height / (isFullScreen ?  1.25 : 1.8))
+                    // player control
                     PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                     Spacer()
+                    // tools section
                     ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor, showCustomSubslistSheet: $showCustomSubslistSheet)
                         .opacity(isFullScreen ? 0 : 1)
                         .padding(.bottom, 20)

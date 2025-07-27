@@ -156,11 +156,12 @@ struct PlayerControl: View{
             }
         } label: {
             Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
-                .imageScale(.medium)
+                .imageScale(.large)
+                .font(.title2)
         }
         .buttonStyle(.plain)
         .hCenter()
-        .frame(height: 30)
+        .frame(height: 50)
         .overlay(alignment: .trailing) {
             Button {
                 videoPlayer.pause()
@@ -169,7 +170,8 @@ struct PlayerControl: View{
                 }
             } label: {
                 Image(systemName: isFullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                    .imageScale(.medium)
+                    .imageScale(.large)
+                    .font(.title2)
             }
             .buttonStyle(.plain)
         }

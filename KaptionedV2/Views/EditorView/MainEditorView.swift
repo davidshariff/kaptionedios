@@ -136,7 +136,7 @@ struct RootView_Previews: PreviewProvider {
 }
 
 extension MainEditorView{
-    private func headerView(safeAreaTop: CGFloat) -> some View{
+        private func headerView(safeAreaTop: CGFloat) -> some View{
         HStack{
             Button {
                 editorVM.updateProject()
@@ -164,14 +164,14 @@ extension MainEditorView{
                 VStack(spacing: 4) {
                     Image(systemName: "square.and.arrow.up.fill")
                     Text("Export")
-                        .font(.caption2)
+                    .font(.caption2)
                 }
             }
         }
         .foregroundColor(.white)
         .padding(.horizontal, 20)
         .frame(height: 50)
-        .padding(.top, safeAreaTop)
+        .padding(.top, safeAreaTop + 40)
         .padding(.bottom)
     }
     

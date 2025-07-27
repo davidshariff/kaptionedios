@@ -237,11 +237,8 @@ extension TextPlayerView{
     }
     
     private func editOrSelectTextBox(_ textBox: TextBox, _ isSelected: Bool){
-        if isSelected{
-            viewModel.openTextEditor(isEdit: true, textBox)
-        }else{
-            viewModel.selectTextBox(textBox)
-        }
+        // Always open text editor directly when tapping text
+        viewModel.openTextEditor(isEdit: true, textBox)
     }
     
     private func getIndex(_ id: UUID) -> Int{

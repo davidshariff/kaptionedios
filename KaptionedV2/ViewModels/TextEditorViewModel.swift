@@ -14,7 +14,7 @@ class TextEditorViewModel: ObservableObject{
     @Published var showEditor: Bool = false
     @Published var currentTextBox: TextBox = TextBox()
     @Published var selectedTextBox: TextBox?
-    private var isEditMode: Bool = false
+    @Published var isEditMode: Bool = false
     
     func cancelTextEditor(){
         showEditor = false
@@ -73,6 +73,16 @@ class TextEditorViewModel: ObservableObject{
             textBoxes.append(currentTextBox)
         }
         selectedTextBox = currentTextBox
+        cancelTextEditor()
+    }
+    
+    func deleteCurrentTextBox(){
+        if isEditMode{
+            // Remove the current text box from the array
+            textBoxes.removeAll(where: {$0.id == currentTextBox.id})
+            // Deselect the text box
+            selectedTextBox = nil
+        }
         cancelTextEditor()
     }
 }

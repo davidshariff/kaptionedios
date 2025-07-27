@@ -12,7 +12,8 @@ struct TextEditorView: View{
     @State private var textHeight: CGFloat = 100
     @FocusState private var isTextFieldFocused: Bool
     @State private var activeSheet: SheetType? = nil
-    @State private var sheetOffset: CGFloat = UIScreen.main.bounds.height * 0.7
+    @State private var sheetOffset: CGFloat = 600 // Default screen height * 0.7
+    @State private var showDeleteConfirmation: Bool = false
     let onSave: ([TextBox]) -> Void
     
     // MARK: - Sheet Types
@@ -27,14 +28,15 @@ struct TextEditorView: View{
                 HStack {
                     Button{
                         closeKeyboard()
-                        viewModel.cancelTextEditor()
+                        showDeleteConfirmation = true
                     } label: {
-                        Text("Cancel")
+                        Image(systemName: "trash")
                             .foregroundColor(.white)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 12)
-                            .background(Color.secondary, in: RoundedRectangle(cornerRadius: 20))
+                            .background(Color.red, in: Circle())
                     }
+                    .disabled(!viewModel.isEditMode)
 
                 Spacer()
                 
@@ -43,16 +45,25 @@ struct TextEditorView: View{
                     viewModel.saveTapped()
                     onSave(viewModel.textBoxes)
                 } label: {
-                    Text("Save")
+                    Image(systemName: "checkmark")
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                             .foregroundColor(.white)
-                            .background(Color.green, in: RoundedRectangle(cornerRadius: 20))
+                            .background(Color.green, in: Circle())
                         .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
                     }
                         .disabled(viewModel.currentTextBox.text.isEmpty)
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 0)
+                .alert("Delete Subtitle", isPresented: $showDeleteConfirmation) {
+                    Button("Delete", role: .destructive) {
+                        viewModel.deleteCurrentTextBox()
+                        onSave(viewModel.textBoxes)
+                    }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("Are you sure you want to delete this subtitle? This action cannot be undone.")
+                }
 
                 Spacer()
                 TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
@@ -270,7 +281,7 @@ struct AnimatedSheetOverlay<Content: View>: View {
     
     private func dismissSheet() {
                             withAnimation(.spring()) {
-                                sheetOffset = UIScreen.main.bounds.height * 0.7
+                                sheetOffset = 600
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             withAnimation(.easeInOut(duration: 0.2)) {
@@ -285,7 +296,7 @@ struct SheetStyleModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .frame(maxWidth: 420)
-            .frame(maxHeight: UIScreen.main.bounds.height * 0.7)
+            .frame(maxHeight: 600) // Changed from UIScreen.main.bounds.height * 0.7
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }

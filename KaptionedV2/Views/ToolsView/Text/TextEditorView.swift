@@ -10,7 +10,7 @@ import SwiftUI
 struct TextEditorView: View{
     @ObservedObject var viewModel: TextEditorViewModel
     @State private var textHeight: CGFloat = 100
-    @State private var isFocused: Bool = true
+    @FocusState private var isTextFieldFocused: Bool
     @State private var activeSheet: SheetType? = nil
     @State private var sheetOffset: CGFloat = UIScreen.main.bounds.height * 0.7
     let onSave: ([TextBox]) -> Void
@@ -21,7 +21,7 @@ struct TextEditorView: View{
     }
     var body: some View{
         ZStack {
-            Color.black.opacity(0.35)
+            viewModel.currentTextBox.bgColor.opacity(0.35)
                 .ignoresSafeArea()
             VStack{
                 HStack {
@@ -55,14 +55,17 @@ struct TextEditorView: View{
                 .padding(.horizontal)
 
                 Spacer()
-                TextView(textBox: $viewModel.currentTextBox, isFirstResponder: $isFocused, minHeight: textHeight, calculatedHeight: $textHeight)
-                    .frame(maxHeight: textHeight)
+                TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
+                    .font(.system(size: viewModel.currentTextBox.fontSize, weight: .medium))
+                    .foregroundColor(viewModel.currentTextBox.fontColor)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .focused($isTextFieldFocused)
+                    .onAppear {
+                        isTextFieldFocused = true
+                    }
                     .padding(.horizontal, viewModel.currentTextBox.backgroundPadding)
                     .padding(.vertical, viewModel.currentTextBox.backgroundPadding / 2)
-                    .background(
-                        RoundedRectangle(cornerRadius: viewModel.currentTextBox.cornerRadius)
-                            .fill(viewModel.currentTextBox.bgColor)
-                    )
                 Spacer()
                 HStack(spacing: 20) {
                     VStack {
@@ -146,7 +149,7 @@ struct TextEditorView: View{
                         
     
     private func closeKeyboard(){
-        isFocused = false
+        isTextFieldFocused = false
     }
     
     // MARK: - Helper Functions
@@ -391,11 +394,19 @@ struct TextView: UIViewRepresentable {
         textView.textAlignment = .center
         textView.isUserInteractionEnabled = true
         textView.backgroundColor = UIColor.clear
+        
+        // Remove internal padding
+        textView.textContainerInset = UIEdgeInsets.zero
+        textView.textContainer.lineFragmentPadding = 0
 
         return textView
     }
 
     func updateUIView(_ textView: UITextView, context: Context) {
+        
+        // Ensure padding is removed
+        textView.textContainerInset = UIEdgeInsets.zero
+        textView.textContainer.lineFragmentPadding = 0
         
         focused(textView)
         recalculateHeight(view: textView)
@@ -430,14 +441,27 @@ struct TextView: UIViewRepresentable {
     }
 
    private func recalculateHeight(view: UIView) {
-        let newSize = view.sizeThatFits(CGSize(width: view.frame.size.width, height: CGFloat.greatestFiniteMagnitude))
-        if minHeight < newSize.height && $calculatedHeight.wrappedValue != newSize.height {
+        guard let textView = view as? UITextView else { return }
+        
+        // Calculate the actual text content height without UITextView's internal padding
+        let textContainer = NSTextContainer(size: CGSize(width: textView.frame.width, height: CGFloat.greatestFiniteMagnitude))
+        let layoutManager = NSLayoutManager()
+        let textStorage = NSTextStorage(attributedString: textView.attributedText)
+        
+        layoutManager.addTextContainer(textContainer)
+        textStorage.addLayoutManager(layoutManager)
+        
+        textContainer.lineFragmentPadding = 0
+        textContainer.maximumNumberOfLines = 0
+        
+        let textRect = layoutManager.usedRect(for: textContainer)
+        let actualTextHeight = textRect.height
+        
+        let newHeight = max(minHeight, actualTextHeight)
+        
+        if $calculatedHeight.wrappedValue != newHeight {
             DispatchQueue.main.async {
-                self.$calculatedHeight.wrappedValue = newSize.height // !! must be called asynchronously
-            }
-        } else if minHeight >= newSize.height && $calculatedHeight.wrappedValue != minHeight {
-            DispatchQueue.main.async {
-                self.$calculatedHeight.wrappedValue = self.minHeight // !! must be called asynchronously
+                self.$calculatedHeight.wrappedValue = newHeight
             }
         }
     }

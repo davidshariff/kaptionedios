@@ -46,7 +46,7 @@ struct RootView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Text("Video editor")
+                    Text("Kaptioned")
                         .font(.title2.bold())
                 }
             }

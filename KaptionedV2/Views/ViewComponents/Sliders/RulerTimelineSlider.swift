@@ -137,9 +137,5 @@ struct RulerView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .overlay(
-            RoundedRectangle(cornerRadius: 6)
-                .stroke(Color.blue.opacity(0.7), lineWidth: 2)
-        )
     }
 } 

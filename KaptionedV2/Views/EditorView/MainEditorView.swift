@@ -187,9 +187,8 @@ extension MainEditorView{
                 VStack(spacing: 4) {
                     Rectangle()
                         .fill(Color.gray.opacity(0.5))
-                        .frame(height: 4)
-                        .frame(maxWidth: 60)
-                        .cornerRadius(2)
+                        .frame(width: 20, height: 20)
+                        .cornerRadius(4)
                     
                     Text("Drag to resize")
                         .font(.caption2)

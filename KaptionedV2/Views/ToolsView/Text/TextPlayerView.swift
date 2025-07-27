@@ -2,9 +2,9 @@ import SwiftUI
 import UIKit
 
 struct TextPlayerView: View {
+    
     var currentTime: Double
     @ObservedObject var viewModel: TextEditorViewModel
-    var disabledMagnification: Bool = false
     var originalVideoSize: CGSize
     var videoScale: CGFloat = 1.0
     @Environment(\.videoSize) private var videoSize
@@ -23,10 +23,8 @@ struct TextPlayerView: View {
     
     @ViewBuilder
     private var magnificationGestureView: some View {
-        if !disabledMagnification {
-            Color.secondary.opacity(0.001)
-                .simultaneousGesture(magnificationGesture)
-        }
+        Color.secondary.opacity(0.001)
+            .simultaneousGesture(magnificationGesture)
     }
     
     private var magnificationGesture: some Gesture {

@@ -158,14 +158,8 @@ extension MainEditorView{
 
             Spacer()
             
-            // Scale label in the middle
-            Text("Scale: \(String(format: "%.2f", calculateCurrentScale()))")
-                .font(.caption)
-                .foregroundColor(.white)
-                .background(Color.black.opacity(0.7))
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .cornerRadius(6)
+            // Empty space in the middle
+            Spacer()
             
             Spacer()
             
@@ -278,17 +272,7 @@ extension MainEditorView{
         }
     }
     
-    private func calculateCurrentScale() -> CGFloat {
-        // Calculate scale based on available height vs original video height
-        if let video = editorVM.currentVideo {
-            let availableHeight = UIScreen.main.bounds.height - controlsHeight - 150 // Approximate available height
-            let originalHeight = video.frameSize.height
-            if originalHeight > 0 {
-                return availableHeight / originalHeight
-            }
-        }
-        return 1.0
-    }
+
     
     private func setVideo(_ proxy: GeometryProxy){
         if let selectedVideoURl{

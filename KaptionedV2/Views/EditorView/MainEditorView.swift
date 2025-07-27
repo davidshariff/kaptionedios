@@ -14,7 +14,7 @@ struct MainEditorView: View {
     @Environment(\.dismiss) private var dismiss
     var project: ProjectEntity?
     var selectedVideoURl: URL?
-    @State var isFullScreen: Bool = false
+
     @State var showVideoQualitySheet: Bool = false
     @State var showRecordView: Bool = false
     @State var showCustomSubslistSheet: Bool = false
@@ -32,7 +32,6 @@ struct MainEditorView: View {
                     headerView(safeAreaTop: proxy.safeAreaInsets.top)
                     // video player
                     PlayerHolderView(
-                        isFullScreen: $isFullScreen, 
                         availableHeight: .constant(proxy.size.height - controlsHeight - 100),
                         editorVM: editorVM, 
                         videoPlayer: videoPlayer, 
@@ -243,11 +242,15 @@ extension MainEditorView{
             // Controls content
             VStack(spacing: 0) {
                 // Player control
-                PlayerControl(isFullScreen: $isFullScreen, recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+                PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                 
                 // Tools section
-                ToolsSectionView(videoPlayer: videoPlayer, editorVM: editorVM, textEditor: textEditor, showCustomSubslistSheet: $showCustomSubslistSheet)
-                    .opacity(isFullScreen ? 0 : 1)
+                ToolsSectionView(
+                    videoPlayer: videoPlayer, 
+                    editorVM: editorVM, 
+                    textEditor: textEditor, 
+                    showCustomSubslistSheet: $showCustomSubslistSheet
+                )
                     .padding(.bottom, 20)
             }
             .frame(height: controlsHeight - 40) // Account for drag handle and text

@@ -21,16 +21,11 @@ extension EnvironmentValues {
 
 struct PlayerHolderView: View{
 
-    @Binding var isFullScreen: Bool
     @Binding var availableHeight: CGFloat
 
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var textEditor: TextEditorViewModel
-
-    var scale: CGFloat{
-        isFullScreen ? 1.4 : 1
-    }
 
     var body: some View{
         VStack(spacing: 6) {
@@ -102,9 +97,7 @@ extension PlayerHolderView{
                                 TextPlayerView(
                                     currentTime: videoPlayer.currentTime,
                                     viewModel: textEditor,
-                                    disabledMagnification: isFullScreen,
-                                    originalVideoSize: video.frameSize,
-                                    videoScale: scale
+                                    originalVideoSize: video.frameSize
                                 )
                                 .environment(\.videoSize, CGSize(
                                     width: proxy.size.width,
@@ -114,8 +107,6 @@ extension PlayerHolderView{
                                     .foregroundColor(.clear)
                                     .border(Color.orange, width: 2)
                             }
-                            .scaleEffect(scale)
-                            .disabled(isFullScreen)
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -165,7 +156,6 @@ extension PlayerHolderView{
 
 
 struct PlayerControl: View{
-    @Binding var isFullScreen: Bool
     @ObservedObject var recorderManager: AudioRecorderManager
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager
@@ -198,7 +188,6 @@ struct PlayerControl: View{
     }
     
     private var playSection: some View{
-        
         Button {
             if let video = editorVM.currentVideo{
                 videoPlayer.action(video)
@@ -211,19 +200,6 @@ struct PlayerControl: View{
         .buttonStyle(.plain)
         .hCenter()
         .frame(height: 50)
-        .overlay(alignment: .trailing) {
-            Button {
-                videoPlayer.pause()
-                withAnimation {
-                    isFullScreen.toggle()
-                }
-            } label: {
-                Image(systemName: isFullScreen ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                    .imageScale(.large)
-                    .font(.title2)
-            }
-            .buttonStyle(.plain)
-        }
         .padding(.horizontal)
     }
 }

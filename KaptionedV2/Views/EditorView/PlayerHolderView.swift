@@ -61,9 +61,21 @@ struct PlayerHolderView: View{
     }
     
     private func debugPlayerInfo(video: Video) {
-        print("[DEBUG] isFullScreen: \(isFullScreen), scale: \(scale)")
-        print("[DEBUG] frameSize: \(video.frameSize), geometrySize: \(video.geometrySize)")
-        print("[DEBUG] currentTime: \(videoPlayer.currentTime)")
+        
+        // Debug text boxes currently on screen
+        let currentTextBoxes = textEditor.textBoxes.filter { textBox in
+            textBox.timeRange.contains(videoPlayer.currentTime)
+        }
+        
+        print("[DEBUG] TextBoxes on screen: \(currentTextBoxes.count)")
+        for (index, textBox) in currentTextBoxes.enumerated() {
+            print("  [DEBUG] TextBox \(index + 1):")
+            print("    - Text: '\(textBox.text)'")
+            print("    - Font Size: \(textBox.fontSize)")
+            print("    - Position: \(textBox.offset)")
+            print("    - Time Range: \(textBox.timeRange.lowerBound) - \(textBox.timeRange.upperBound)")
+            print("    - Is Selected: \(textEditor.isSelected(textBox.id))")
+        }
     }
 }
 
@@ -80,41 +92,42 @@ extension PlayerHolderView{
         Group {
             if let video = editorVM.currentVideo {
                 GeometryReader { proxy in
-                                            ZStack {
-                            editorVM.frames.frameColor
+                    ZStack {
+                        editorVM.frames.frameColor
+                        ZStack {
+                            // this is the video player
+                            PlayerView(player: videoPlayer.videoPlayer)
+                            // this is the text overlay player
                             ZStack {
-                                // this is the video player
-                                PlayerView(player: videoPlayer.videoPlayer)
-                                // this is the text overlay player
-                                ZStack {
-                                    TextPlayerView(
-                                        currentTime: videoPlayer.currentTime,
-                                        viewModel: textEditor,
-                                        disabledMagnification: isFullScreen,
-                                        originalVideoSize: video.frameSize
-                                    )
-                                    .environment(\.videoSize, CGSize(
-                                        width: min(proxy.size.width, proxy.size.height * (video.frameSize.width / video.frameSize.height)),
-                                        height: min(proxy.size.height, proxy.size.width * (video.frameSize.height / video.frameSize.width))
-                                    ))
-                                    Rectangle()
-                                        .foregroundColor(.clear)
-                                        .border(Color.orange, width: 2)
-                                }
-                                .scaleEffect(scale)
-                                .disabled(isFullScreen)
+                                TextPlayerView(
+                                    currentTime: videoPlayer.currentTime,
+                                    viewModel: textEditor,
+                                    disabledMagnification: isFullScreen,
+                                    originalVideoSize: video.frameSize,
+                                    videoScale: scale
+                                )
+                                .environment(\.videoSize, CGSize(
+                                    width: proxy.size.width,
+                                    height: proxy.size.height
+                                ))
+                                Rectangle()
+                                    .foregroundColor(.clear)
+                                    .border(Color.orange, width: 2)
                             }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                textEditor.deselectTextBox()
-                            }
-                            .scaleEffect(editorVM.frames.scale)
+                            .scaleEffect(scale)
+                            .disabled(isFullScreen)
                         }
-                        .frame(
-                            width: min(proxy.size.width, proxy.size.height * (video.frameSize.width / video.frameSize.height)),
-                            height: min(proxy.size.height, proxy.size.width * (video.frameSize.height / video.frameSize.width))
-                        )
-                        .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            textEditor.deselectTextBox()
+                        }
+                        .scaleEffect(editorVM.frames.scale)
+                    }
+                    .frame(
+                        width: min(proxy.size.width, proxy.size.height * (video.frameSize.width / video.frameSize.height)),
+                        height: min(proxy.size.height, proxy.size.width * (video.frameSize.height / video.frameSize.width))
+                    )
+                    .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                     .onAppear {
                         Task {
                             guard let size = await video.asset.adjustVideoSize(to: proxy.size) else { return }

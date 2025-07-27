@@ -74,6 +74,7 @@
 		F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F32E350697001CCAE5 /* TranscriptionModels.swift */; };
 		F42364922E36378400057C86 /* RulerTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364912E36378400057C86 /* RulerTimelineSlider.swift */; };
 		F42364942E36567D00057C86 /* SubslistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364932E36567D00057C86 /* SubslistView.swift */; };
+		F42364982E3698A100057C86 /* GridTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364972E3698A100057C86 /* GridTestView.swift */; };
 		F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
@@ -152,6 +153,7 @@
 		F42230F32E350697001CCAE5 /* TranscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionModels.swift; sourceTree = "<group>"; };
 		F42364912E36378400057C86 /* RulerTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerTimelineSlider.swift; sourceTree = "<group>"; };
 		F42364932E36567D00057C86 /* SubslistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubslistView.swift; sourceTree = "<group>"; };
+		F42364972E3698A100057C86 /* GridTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridTestView.swift; sourceTree = "<group>"; };
 		F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPlayerView.swift; sourceTree = "<group>"; };
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 			isa = PBXGroup;
 			children = (
 				5A08FC7129EEB65000AB877C /* TimeLineView.swift */,
+				F42364972E3698A100057C86 /* GridTestView.swift */,
 				5ACFF98229E945C300827A37 /* MainEditorView.swift */,
 				5ACFF9AF29EE8C6C00827A37 /* PlayerHolderView.swift */,
 				5AE2A2A129F66EE9003D217F /* VideoExporterBottomSheetView.swift */,
@@ -596,6 +599,7 @@
 				5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */,
 				5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */,
 				5AFA25C429FA727C00B820D0 /* FramesToolView.swift in Sources */,
+				F42364982E3698A100057C86 /* GridTestView.swift in Sources */,
 				F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */,
 				5ACFF98729E949A900827A37 /* VideoItem.swift in Sources */,
 				5A17E08129F1495000DB4A47 /* CropperRatio.swift in Sources */,

@@ -90,10 +90,14 @@ extension PlayerHolderView{
                     ZStack {
                         editorVM.frames.frameColor
                         ZStack {
-                            // this is the video player
-                            PlayerView(player: videoPlayer.videoPlayer)
-                            // this is the text overlay player
+                            // this is the video player with grid
+                            PlayerViewWithGrid(
+                                player: videoPlayer.videoPlayer,
+                                showGrid: true,
+                                originalVideoSize: video.frameSize
+                            )
                             ZStack {
+                                // this is the text overlay player
                                 TextPlayerView(
                                     currentTime: videoPlayer.currentTime,
                                     viewModel: textEditor,
@@ -103,6 +107,7 @@ extension PlayerHolderView{
                                     width: proxy.size.width,
                                     height: proxy.size.height
                                 ))
+                                
                                 Rectangle()
                                     .foregroundColor(.clear)
                                     .border(Color.orange, width: 2)

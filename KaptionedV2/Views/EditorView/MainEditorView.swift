@@ -158,11 +158,6 @@ extension MainEditorView{
 
             Spacer()
             
-            // Empty space in the middle
-            Spacer()
-            
-            Spacer()
-            
             Button {
                 // Ensure text boxes are synced before export
                 editorVM.setText(textEditor.textBoxes)

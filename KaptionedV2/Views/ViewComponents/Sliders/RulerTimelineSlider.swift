@@ -16,6 +16,7 @@ struct RulerTimelineSlider<T: View, A: View>: View {
     @State var offset: CGFloat = 0
     @State var gestureW: CGFloat = 0
     var frameWight: CGFloat = 65
+    // width of the capsule container
     let actionWidth: CGFloat = 30
     @ViewBuilder
     var frameView: () -> T
@@ -34,9 +35,8 @@ struct RulerTimelineSlider<T: View, A: View>: View {
                 HStack(spacing: 0) {
                     Capsule()
                         .fill(Color.white)
+                        // width of the vertical line
                         .frame(width: 4, height: proxy.size.height)
-                    actionView()
-                        .frame(width: actionWidth)
                 }
                 .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 0)
                 .opacity(disableOffset ? 0 : 1)

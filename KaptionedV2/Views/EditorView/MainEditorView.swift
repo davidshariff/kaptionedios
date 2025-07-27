@@ -291,6 +291,8 @@ extension MainEditorView{
         if let selectedVideoURl{
             videoPlayer.loadState = .loaded(selectedVideoURl)
             editorVM.setNewVideo(selectedVideoURl, geo: proxy)
+            // Log video information when loading new video
+            logVideoInfo(url: selectedVideoURl, isNewVideo: true)
         }
         
         if let project, let url = project.videoURL{
@@ -299,7 +301,98 @@ extension MainEditorView{
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
                 videoPlayer.setFilters(mainFilter: CIFilter(name: project.filterName ?? ""), colorCorrection: editorVM.currentVideo?.colorCorrection)
             }
+            // Log video information when loading project
+            logVideoInfo(url: url, isNewVideo: false)
         }
+    }
+    
+    private func logVideoInfo(url: URL, isNewVideo: Bool) {
+        Task {
+            do {
+                let asset = AVAsset(url: url)
+                
+                // Get basic video information
+                let duration = asset.videoDuration()
+                let naturalSize = await asset.naturalSize()
+                let fileName = url.lastPathComponent
+                let fileSize = getFileSize(url: url)
+                
+                // Get video track information
+                let videoTracks = try await asset.loadTracks(withMediaType: .video)
+                let audioTracks = try await asset.loadTracks(withMediaType: .audio)
+                
+                let videoTrack = videoTracks.first
+                let frameRate: Float = videoTrack?.nominalFrameRate ?? 0
+                let bitrate: Float = videoTrack?.estimatedDataRate ?? 0
+                
+                // Get additional video properties
+                let preferredTransform = try? await videoTrack?.load(.preferredTransform)
+                let isPlayable = try? await asset.load(.isPlayable)
+                let isExportable = try? await asset.load(.isExportable)
+                let hasProtectedContent = try? await asset.load(.hasProtectedContent)
+                
+                // Calculate aspect ratio
+                let aspectRatio = naturalSize?.width ?? 0 > 0 ? (naturalSize?.height ?? 0) / (naturalSize?.width ?? 1) : 0
+                let orientation = getVideoOrientation(preferredTransform: preferredTransform)
+                
+                // Format the log message
+                let videoType = isNewVideo ? "NEW VIDEO" : "PROJECT VIDEO"
+                let logMessage = """
+                🎬 [\(videoType)] Video Loaded Successfully
+                📁 File: \(fileName)
+                📏 Size: \(fileSize)
+                ⏱️ Duration: \(String(format: "%.2f", duration))s (\(duration.formatterTimeString()))
+                📐 Resolution: \(Int(naturalSize?.width ?? 0)) x \(Int(naturalSize?.height ?? 0))
+                📐 Aspect Ratio: \(String(format: "%.2f", aspectRatio))
+                📐 Orientation: \(orientation)
+                🎞️ Frame Rate: \(String(format: "%.1f", frameRate)) fps
+                📊 Bitrate: \(String(format: "%.0f", bitrate)) bps
+                🎵 Audio Tracks: \(audioTracks.count)
+                🎬 Video Tracks: \(videoTracks.count)
+                ✅ Playable: \(isPlayable ?? false)
+                ✅ Exportable: \(isExportable ?? false)
+                🔒 Protected: \(hasProtectedContent ?? false)
+                🔗 URL: \(url.absoluteString)
+                """
+                
+                print(logMessage)
+            } catch {
+                print("❌ [VIDEO LOGGING] Error logging video info: \(error.localizedDescription)")
+                print("📁 File: \(url.lastPathComponent)")
+                print("🔗 URL: \(url.absoluteString)")
+            }
+        }
+    }
+    
+    private func getVideoOrientation(preferredTransform: CGAffineTransform?) -> String {
+        guard let transform = preferredTransform else { return "Unknown" }
+        
+        if transform.a == 0 && transform.b == 1.0 && transform.c == -1.0 && transform.d == 0 {
+            return "Portrait (90°)"
+        } else if transform.a == 0 && transform.b == -1.0 && transform.c == 1.0 && transform.d == 0 {
+            return "Portrait (270°)"
+        } else if transform.a == 1.0 && transform.b == 0 && transform.c == 0 && transform.d == 1.0 {
+            return "Landscape (0°)"
+        } else if transform.a == -1.0 && transform.b == 0 && transform.c == 0 && transform.d == -1.0 {
+            return "Landscape (180°)"
+        } else {
+            return "Custom"
+        }
+    }
+    
+    private func getFileSize(url: URL) -> String {
+        do {
+            let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
+            if let fileSize = attributes[.size] as? Int64 {
+                let formatter = ByteCountFormatter()
+                formatter.allowedUnits = [.useMB, .useGB]
+                formatter.countStyle = .file
+                return formatter.string(fromByteCount: fileSize)
+            }
+        } catch {
+            print("Error getting file size: \(error)")
+        }
+        return "Unknown"
     }
 }
 

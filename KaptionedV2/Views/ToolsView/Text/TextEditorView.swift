@@ -25,20 +25,31 @@ struct TextEditorView: View{
             viewModel.currentTextBox.bgColor.opacity(0.35)
                 .ignoresSafeArea()
             VStack{
-                HStack {
+                HStack(alignment: .center) {
                     Button{
                         closeKeyboard()
-                        showDeleteConfirmation = true
+                        viewModel.cancelTextEditor()
                     } label: {
-                        Image(systemName: "trash")
+                        Image(systemName: "chevron.down")
                             .foregroundColor(.white)
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, 16)
                             .padding(.vertical, 12)
-                            .background(Color.red, in: Circle())
+                            .background(Color.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
                     }
-                    .disabled(!viewModel.isEditMode)
 
                 Spacer()
+                
+                Button{
+                    closeKeyboard()
+                    showDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .background(Color.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+                }
+                .disabled(!viewModel.isEditMode)
                 
                 Button {
                     closeKeyboard()
@@ -49,7 +60,7 @@ struct TextEditorView: View{
                         .padding(.horizontal, 20)
                         .padding(.vertical, 12)
                             .foregroundColor(.white)
-                            .background(Color.green, in: Circle())
+                            .background(Color.green.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
                         .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
                     }
                         .disabled(viewModel.currentTextBox.text.isEmpty)

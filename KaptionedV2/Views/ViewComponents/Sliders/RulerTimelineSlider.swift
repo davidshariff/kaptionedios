@@ -72,7 +72,9 @@ struct RulerTimelineSlider<T: View, A: View>: View {
             )
             .onChange(of: value) { _ in
                 if !disableOffset{
-                    setOffset()
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        setOffset()
+                    }
                 }
             }
         }

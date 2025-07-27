@@ -134,17 +134,22 @@ struct CustomSubslistBottomSheet: View {
                                                 SubtitleRowView(
                                                     index: index,
                                                     textBox: textBox,
-                                                    isSelected: textEditor.selectedTextBox == textBox
-                                                ) {
-                                                    textEditor.selectTextBox(textBox)
-                                                    withAnimation {
-                                                        scrollProxy.scrollTo(index, anchor: .center)
+                                                    isSelected: false, // Always false since we don't want selection styling
+                                                    onTap: {
+                                                        // Update video player to start time of subtitle
+                                                        videoPlayer.currentTime = textBox.timeRange.lowerBound
+                                                        // Open text editor directly on tap
+                                                        textEditor.openTextEditor(isEdit: true, textBox)
+                                                    },
+                                                    onEdit: {
+                                                        // Open text editor for editing
+                                                        textEditor.openTextEditor(isEdit: true, textBox)
                                                     }
-                                                }
+                                                )
                                                 .frame(height: rowHeight)
-                                                .frame(maxWidth: .infinity)
+                                                .frame(maxWidth: geometry.size.width - 80) // Give space for edit button
                                                 .background(Color.clear)
-                                                .position(x: geometry.size.width / 2 + 4, y: startY + rowHeight / 2)
+                                                .position(x: (geometry.size.width - 80) / 2 + 40, y: startY + rowHeight / 2)
                                                 .id(index)
                                             }
                                             // Current time indicator line
@@ -208,25 +213,42 @@ struct SubtitleRowView: View {
     let textBox: TextBox
     let isSelected: Bool
     let onTap: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? Color.blue.opacity(0.1) : Color(.systemGray6))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 1)
-                    )
-                    .offset(x: -4) // Move left to hide left side rounding
-                Text(textBox.text)
-                    .font(.body)
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
+        HStack(spacing: 8) {
+            // Main content area
+            Button(action: onTap) {
+                // align the text to the center
+                ZStack(alignment: .center) {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isSelected ? Color.blue.opacity(0.1) : Color(uiColor: .systemGray6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 1)
+                        )
+                        .offset(x: -4) // Move left to hide left side rounding
+                    Text(textBox.text)
+                        .font(.body)
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.leading)
+                        .padding(.leading, 12) // Add left padding
+                        .padding(.trailing, 8) // Add padding to prevent text overlap with edit button
+                }
             }
+            .buttonStyle(PlainButtonStyle())
+            .clipped() // Clip the left side
+            
+            // Edit button
+            Button(action: onEdit) {
+                Image(systemName: "pencil")
+                    .font(.title3)
+                    .foregroundColor(.gray)
+                    .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .buttonStyle(PlainButtonStyle())
-        .clipped() // Clip the left side
+        .frame(maxWidth: .infinity)
         // No vertical padding or internal height constraints
     }
 }

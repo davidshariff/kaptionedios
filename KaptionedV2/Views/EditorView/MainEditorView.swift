@@ -19,6 +19,7 @@ struct MainEditorView: View {
     @State var showRecordView: Bool = false
     @State var showCustomSubslistSheet: Bool = false
     @State var controlsHeight: CGFloat = 350 // New state for draggable height
+    @State var showCrossOverlay: Bool = false // New state for cross overlay
     
     @StateObject var editorVM = EditorViewModel()
     @StateObject var audioRecorder = AudioRecorderManager()
@@ -110,6 +111,12 @@ struct MainEditorView: View {
                     .zIndex(1000)
                     .animation(.easeInOut(duration: 0.5), value: showCustomSubslistSheet)
             }
+            
+            // Centered cross overlay
+            if showCrossOverlay {
+                CrossOverlayView()
+                    .zIndex(1500)
+            }
         }
         .background(Color.black)
         .navigationBarHidden(true)
@@ -131,6 +138,28 @@ struct MainEditorView: View {
                 TextEditorView(viewModel: textEditor, onSave: editorVM.setText)
             }
         }
+    }
+}
+
+// MARK: - Cross Overlay View
+struct CrossOverlayView: View {
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                // Horizontal line - full width
+                Rectangle()
+                    .fill(Color.white.opacity(0.5))
+                    .frame(width: geometry.size.width, height: 1)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                
+                // Vertical line - full height
+                Rectangle()
+                    .fill(Color.white.opacity(0.5))
+                    .frame(width: 1, height: geometry.size.height)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+            }
+        }
+        .allowsHitTesting(false) // Allow touches to pass through
     }
 }
 
@@ -156,6 +185,20 @@ extension MainEditorView{
                 .padding(.leading, 8)
             }
 
+            Spacer()
+            
+            // Cross overlay toggle button
+            Button {
+                showCrossOverlay.toggle()
+            } label: {
+                VStack(spacing: 4) {
+                    Image(systemName: showCrossOverlay ? "plus.circle.fill" : "plus.circle")
+                    Text("Cross")
+                        .font(.caption2)
+                }
+            }
+            .foregroundColor(showCrossOverlay ? .yellow : .white)
+            
             Spacer()
             
             Button {

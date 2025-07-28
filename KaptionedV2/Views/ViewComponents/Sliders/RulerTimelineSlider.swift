@@ -47,6 +47,11 @@ struct RulerTimelineSlider<T: View, A: View>: View {
                 frameView()
                     .frame(width: frameWidth, height: proxy.size.height - 5)
                     .position(x: sliderPositionX - actionWidth/2, y: sliderViewYCenter)
+                
+                // Playhead indicator
+                PlayheadView(height: proxy.size.height * 0.3)
+                    .opacity(disableOffset ? 0 : 1)
+                    .position(x: proxy.size.width / 2, y: (proxy.size.height * 0.3) / 2)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .gesture(
@@ -101,13 +106,21 @@ struct RulerView: View {
     let currentTime: Double
     let frameWidth: CGFloat
     let showMinorTicks: Bool
+    let showPlayhead: Bool
     
-    init(duration: Double, currentTime: Double, frameWidth: CGFloat, showMinorTicks: Bool = false) {
+    init(
+        duration: Double, 
+        currentTime: Double, 
+        frameWidth: CGFloat, 
+        showMinorTicks: Bool = false,
+        showPlayhead: Bool = false
+    ) {
         self.duration = duration
         self.currentTime = currentTime
         self.frameWidth = frameWidth
         self.showMinorTicks = showMinorTicks
-        print("📏 RulerView - frameWidth: \(frameWidth)")
+        self.showPlayhead = showPlayhead
+        print("📏 RulerView - frameWidth: \(frameWidth), showPlayhead: \(showPlayhead)")
     }
     
     var body: some View {
@@ -163,6 +176,12 @@ struct RulerView: View {
                 //.border(.yellow, width: 1)
                 .offset(x: 20)
                 
+                // Playhead indicator (optional)
+                if showPlayhead {
+                    PlayheadView(height: geometry.size.height)
+                        .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                }
+                
                 // // Pixel count markers (every 50 pixels)
                 // HStack(spacing: 0) {
                 //     ForEach(0..<Int(frameWidth / 50) + 1, id: \.self) { pixelIndex in
@@ -171,7 +190,7 @@ struct RulerView: View {
                 //             Text("\(pixelPosition)")
                 //                 .font(.system(size: 8))
                 //                 .foregroundColor(.red)
-                //                 .frame(height: 12)
+                //                 .frame(height: 0)
                 //         }
                 //         .frame(width: 50, alignment: .leading)
                 //     }

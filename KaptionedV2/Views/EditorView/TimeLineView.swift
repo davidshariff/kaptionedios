@@ -52,7 +52,7 @@ struct TimeLineView: View {
                             value: $currentTime,
                             frameWidth: timelineWidth
                         ) {
-                            RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth)
+                            RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth, showPlayhead: false)
                                 .frame(maxHeight: .infinity)
                         } actionView: {
                             recordButton
@@ -71,7 +71,7 @@ struct TimeLineView: View {
                             textBoxes: video.textBoxes,
                             duration: video.originalDuration,
                             frameView: {
-                                RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth)
+                                RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth, showPlayhead: false)
                                     .frame(maxHeight: .infinity)
                             },
                             actionView: {

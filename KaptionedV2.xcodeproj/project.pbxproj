@@ -83,6 +83,7 @@
 		F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */; };
 		F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */; };
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
+		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +164,7 @@
 		F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionHelper.swift; sourceTree = "<group>"; };
 		F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
+		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -408,6 +410,7 @@
 		5ACFF9AA29EE8B8500827A37 /* Player */ = {
 			isa = PBXGroup;
 			children = (
+				F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */,
 				5ACFF9AB29EE8B9400827A37 /* PlayerView.swift */,
 			);
 			path = Player;
@@ -650,6 +653,7 @@
 				5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */,
 				5A17E08929F1744100DB4A47 /* RootView.swift in Sources */,
 				5A5E6F992A03A11D00F5EBF8 /* TimeInterval+Ext.swift in Sources */,
+				F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */,
 				5A5E6F9B2A03A24B00F5EBF8 /* AudioButtonView.swift in Sources */,
 				5ACFF99F29ED709B00827A37 /* RangeSliderView.swift in Sources */,
 				5AE2A2A429F67B96003D217F /* SheetView.swift in Sources */,

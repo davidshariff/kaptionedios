@@ -49,11 +49,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
                         .position(x: sliderPositionX - frameWidth/2, y: sliderViewYCenter)
                     
                     // Playhead indicator
-                    Capsule()
-                        .fill(Color.white)
-                        // width of the vertical line
-                        .frame(width: 2, height: proxy.size.height * 0.3)
-                        .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 0)
+                    PlayheadView(height: proxy.size.height * 0.3)
                         .opacity(disableOffset ? 0 : 1)
                         .position(x: (proxy.size.width / 2), y: (proxy.size.height * 0.3) / 2)
                 }

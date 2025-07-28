@@ -32,13 +32,10 @@ struct TimelineSlider<T: View, A: View>: View {
                     .frame(width: frameWidth, height: proxy.size.height - 5)
                     .position(x: sliderPositionX - actionWidth/2, y: sliderViewYCenter)
                 HStack(spacing: 0) {
-                    Capsule()
-                        .fill(Color.white)
-                        .frame(width: 4, height: proxy.size.height)
+                    PlayheadView(height: proxy.size.height, width: 4)
                     actionView()
                         .frame(width: actionWidth)
                 }
-                .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 0)
                 .opacity(disableOffset ? 0 : 1)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)

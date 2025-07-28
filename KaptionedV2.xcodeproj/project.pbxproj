@@ -75,6 +75,7 @@
 		F42364922E36378400057C86 /* RulerTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364912E36378400057C86 /* RulerTimelineSlider.swift */; };
 		F42364942E36567D00057C86 /* SubslistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364932E36567D00057C86 /* SubslistView.swift */; };
 		F42364982E3698A100057C86 /* GridTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364972E3698A100057C86 /* GridTestView.swift */; };
+		F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364992E373F0500057C86 /* WordTimelineSlider.swift */; };
 		F456B6D82E266E7400BF39E7 /* TextPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
@@ -154,6 +155,7 @@
 		F42364912E36378400057C86 /* RulerTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerTimelineSlider.swift; sourceTree = "<group>"; };
 		F42364932E36567D00057C86 /* SubslistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubslistView.swift; sourceTree = "<group>"; };
 		F42364972E3698A100057C86 /* GridTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridTestView.swift; sourceTree = "<group>"; };
+		F42364992E373F0500057C86 /* WordTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTimelineSlider.swift; sourceTree = "<group>"; };
 		F456B6D72E266E7400BF39E7 /* TextPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPlayerView.swift; sourceTree = "<group>"; };
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
@@ -394,6 +396,7 @@
 			isa = PBXGroup;
 			children = (
 				F42364912E36378400057C86 /* RulerTimelineSlider.swift */,
+				F42364992E373F0500057C86 /* WordTimelineSlider.swift */,
 				5ACFF9A029ED9C4000827A37 /* CustomSlider.swift */,
 				5ACFF99E29ED709B00827A37 /* RangeSliderView.swift */,
 				5ACFF99C29ED5C4900827A37 /* SliderView.swift */,
@@ -609,6 +612,7 @@
 				5ACFF9AC29EE8B9400827A37 /* PlayerView.swift in Sources */,
 				F42364922E36378400057C86 /* RulerTimelineSlider.swift in Sources */,
 				5AE2A2AE29F880D0003D217F /* FiltersView.swift in Sources */,
+				F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */,
 				5A5E6F9F2A03CA1800F5EBF8 /* AudioModel.swift in Sources */,
 				5ACFF99A29ED57BC00827A37 /* ThumbnailsSliderView.swift in Sources */,
 				5ACFF98529E945E000827A37 /* EditorViewModel.swift in Sources */,

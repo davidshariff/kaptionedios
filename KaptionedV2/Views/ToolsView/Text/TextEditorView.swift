@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TextEditorView: View{
+    
     @ObservedObject var viewModel: TextEditorViewModel
     @State private var textHeight: CGFloat = 100
     @FocusState private var isTextFieldFocused: Bool

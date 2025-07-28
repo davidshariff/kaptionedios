@@ -15,7 +15,7 @@ struct TimelineSlider<T: View, A: View>: View {
     @State var isChange: Bool = false
     @State var offset: CGFloat = 0
     @State var gestureW: CGFloat = 0
-    var frameWight: CGFloat = 65
+    var frameWidth: CGFloat = 65
     let actionWidth: CGFloat = 30
     @ViewBuilder
     var frameView: () -> T
@@ -26,10 +26,10 @@ struct TimelineSlider<T: View, A: View>: View {
     var body: some View {
         GeometryReader { proxy in
             let sliderViewYCenter = proxy.size.height / 2
-            let sliderPositionX = proxy.size.width / 2 + frameWight / 2 + (disableOffset ? 0 : offset)
+            let sliderPositionX = proxy.size.width / 2 + frameWidth / 2 + (disableOffset ? 0 : offset)
             ZStack{
                 frameView()
-                    .frame(width: frameWight, height: proxy.size.height - 5)
+                    .frame(width: frameWidth, height: proxy.size.height - 5)
                     .position(x: sliderPositionX - actionWidth/2, y: sliderViewYCenter)
                 HStack(spacing: 0) {
                     Capsule()
@@ -56,9 +56,9 @@ struct TimelineSlider<T: View, A: View>: View {
                         let translationWidth = gesture.translation.width
                         let newOffset = lastOffset + translationWidth
                         
-                        offset = min(0, max(newOffset, -frameWight))
+                        offset = min(0, max(newOffset, -frameWidth))
                         
-                        let newValue = (bounds.upperBound - bounds.lowerBound) * (offset / frameWight) - bounds.lowerBound
+                        let newValue = (bounds.upperBound - bounds.lowerBound) * (offset / frameWidth) - bounds.lowerBound
                         
                         value = abs(newValue)
                         
@@ -96,7 +96,7 @@ extension TimelineSlider{
     
     private func setOffset(){
         if !isChange{
-            offset = ((-value + bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)) * frameWight
+            offset = ((-value + bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)) * frameWidth
         }
     }
 }

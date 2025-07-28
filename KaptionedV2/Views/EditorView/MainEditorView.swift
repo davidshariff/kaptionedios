@@ -226,6 +226,7 @@ extension MainEditorView{
             
             // Controls content
             VStack(spacing: 0) {
+
                 // Player control
                 PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                 
@@ -236,7 +237,8 @@ extension MainEditorView{
                     textEditor: textEditor, 
                     showCustomSubslistSheet: $showCustomSubslistSheet
                 )
-                    .padding(.bottom, 20)
+                .padding(.bottom, 20)
+
             }
             .frame(height: controlsHeight - 40) // Account for drag handle and text
         }

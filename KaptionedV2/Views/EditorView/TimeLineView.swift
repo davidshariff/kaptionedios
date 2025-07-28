@@ -19,16 +19,16 @@ struct TimeLineView: View {
     let onChangeTimeValue: () -> Void
     let onChangeTextTime: (ClosedRange<Double>) -> Void
     let onSetAudio: (Audio) -> Void
-    private let frameWight: CGFloat = 55
+    private let frameWidth: CGFloat = 55
 
-    private var calcWight: CGFloat{
+    private var timelineWidth: CGFloat{
         return max(500, video.originalDuration * 40) // 40 points per second, minimum 500
     }
     var body: some View {
         ZStack{
             if video.originalDuration > 0{
                 if viewState == .text {
-                    TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
+                    TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWidth: timelineWidth) {
                         VStack(alignment: .leading, spacing: 5) {
                             ZStack {
                                 tubneilsImages(video.thumbnailsImages)
@@ -43,18 +43,53 @@ struct TimeLineView: View {
                     onChangeTimeValue()
                 }
                 } else {
-                    RulerTimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWight: calcWight) {
-                        RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: calcWight)
-                    } actionView: {
-                        recordButton
+
+                    VStack(spacing: 4) {
+
+                        RulerTimelineSlider(
+                            bounds: video.rangeDuration,
+                            disableOffset: isActiveTextRangeSlider,
+                            value: $currentTime,
+                            frameWidth: timelineWidth
+                        ) {
+                            RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth)
+                                .frame(maxHeight: .infinity)
+                        } actionView: {
+                            recordButton
+                        }
+                        onChange: {
+                            onChangeTimeValue()
+                        }
+                        .frame(height: 60)
+                        .border(Color.purple, width: 2)
+
+                        WordTimelineSlider(
+                            bounds: video.rangeDuration,
+                            disableOffset: isActiveTextRangeSlider,
+                            value: $currentTime,
+                            timelineWidth: timelineWidth,
+                            textBoxes: video.textBoxes,
+                            duration: video.originalDuration,
+                            frameView: {
+                                RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth)
+                                    .frame(maxHeight: .infinity)
+                            },
+                            actionView: {
+                                recordButton
+                            },
+                            onChange: {
+                                onChangeTimeValue()
+                            }
+                        )
+                        .frame(height: 100)
+                        .border(Color.blue, width: 2)
+
                     }
-                onChange: {
-                    onChangeTimeValue()
-                }
+                    
                 }
             }
         }
-        .frame(height: viewState.height)
+        .frame(minHeight: viewState.height)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.gray.opacity(0.3), lineWidth: 1)
@@ -111,7 +146,7 @@ extension TimeLineView{
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(height: frameWight)
+                        .frame(height: frameWidth)
                         .clipped()
                 }
             }
@@ -170,7 +205,7 @@ extension TimeLineView{
                 }) {
                     Rectangle().blendMode(.destinationOut)
                 }
-                .frame(width: calcWight)
+                .frame(width: timelineWidth)
                 .onAppear{
                     textTimeInterval = textInterval
                 }

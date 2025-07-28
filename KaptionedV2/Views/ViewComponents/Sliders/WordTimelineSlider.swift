@@ -29,12 +29,18 @@ struct WordTimelineSlider<T: View, A: View>: View {
     
     var body: some View {
         GeometryReader { proxy in
+
             let sliderViewYCenter = proxy.size.height / 2
             let sliderPositionX = proxy.size.width / 2 + timelineWidth / 2 + (disableOffset ? 0 : offset)
 
             // Timeline container, contains the playhead and the text boxes
             // everything is aligned to the left
             ZStack(alignment: .leading) {
+
+                // Background gesture area that covers the full width
+                Rectangle()
+                    .fill(Color.black.opacity(0.001)) // Nearly transparent but still captures gestures as SwiftUI does not capture gestures on transparent views
+                    .frame(width: proxy.size.width, height: proxy.size.height)
                 
                 ZStack(alignment: .leading) {
                     // Playhead indicator
@@ -92,10 +98,10 @@ struct WordTimelineSlider<T: View, A: View>: View {
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
             .border(Color.red, width: 1)
-            
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
+                        print("📝 WordTimelineSlider gesture triggered")
                         isChange = true
                         
                         let translationWidth = gesture.translation.width
@@ -105,17 +111,21 @@ struct WordTimelineSlider<T: View, A: View>: View {
                         
                         let newValue = (bounds.upperBound - bounds.lowerBound) * (offset / timelineWidth) - bounds.lowerBound
                         
+                        print("📝 Translation: \(translationWidth), Offset: \(offset), NewValue: \(newValue)")
+                        
                         value = abs(newValue)
                         
                         onChange()
                         
                     }
                     .onEnded { gesture in
+                        print("📝 WordTimelineSlider gesture ended")
                         isChange = false
                         lastOffset = offset
                     }
             )
-            .onChange(of: value) { _ in
+            .onChange(of: value) { newValue in
+                print("📝 WordTimelineSlider value changed to: \(newValue)")
                 if !disableOffset{
                     withAnimation(.easeInOut(duration: 0.15)) {
                         setOffset()
@@ -136,7 +146,9 @@ extension WordTimelineSlider{
     
     private func setOffset(){
         if !isChange{
-            offset = ((-value + bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)) * timelineWidth
+            let progress = (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)
+            offset = -progress * timelineWidth
+            print("📝 WordTimelineSlider setOffset - value: \(value), progress: \(progress), offset: \(offset)")
         }
     }
     

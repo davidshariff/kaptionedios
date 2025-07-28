@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RulerTimelineSlider<T: View, A: View>: View {
     @State private var lastOffset: CGFloat = 0
+    @State private var viewWidth: CGFloat = 0
     var bounds: ClosedRange<Double>
     var disableOffset: Bool
     @Binding var value: Double
@@ -30,25 +31,28 @@ struct RulerTimelineSlider<T: View, A: View>: View {
 
             let sliderViewYCenter = proxy.size.height / 2
             let sliderPositionX = proxy.size.width / 2 + frameWidth / 2 + (disableOffset ? 0 : offset)
+            
+            // Store the view width for use in setOffset
+            let _ = DispatchQueue.main.async {
+                viewWidth = proxy.size.width
+            }
 
             ZStack{
+
+                // Background gesture area that covers the full width
+                Rectangle()
+                    .fill(Color.black.opacity(0.001)) // Nearly transparent but still captures gestures as SwiftUI does not capture gestures on transparent views
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                
                 frameView()
                     .frame(width: frameWidth, height: proxy.size.height - 5)
                     .position(x: sliderPositionX - actionWidth/2, y: sliderViewYCenter)
-                // HStack(spacing: 0) {
-                //     Capsule()
-                //         .fill(Color.white)
-                //         // width of the vertical line
-                //         .frame(width: 4, height: proxy.size.height)
-                // }
-                // .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 0)
-                // .opacity(disableOffset ? 0 : 1)
             }
-            .frame(width: proxy.size.width, height: proxy.size.height) // fills the whole width of the parent view
-            
+            .frame(width: proxy.size.width, height: proxy.size.height)
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
+                        print("🎯 RulerTimelineSlider gesture triggered")
                         isChange = true
                         
                         let translationWidth = gesture.translation.width
@@ -58,12 +62,14 @@ struct RulerTimelineSlider<T: View, A: View>: View {
                         
                         let newValue = (bounds.upperBound - bounds.lowerBound) * (offset / frameWidth) - bounds.lowerBound
                         
-                        value = abs(newValue)
+                        print("🎯 Translation: \(translationWidth), Offset: \(offset), NewValue: \(newValue)")
                         
+                        value = abs(newValue)
                         onChange()
                         
                     }
                     .onEnded { gesture in
+                        print("🎯 RulerTimelineSlider gesture ended")
                         isChange = false
                         lastOffset = offset
                     }
@@ -83,7 +89,9 @@ extension RulerTimelineSlider{
     
     private func setOffset(){
         if !isChange{
-            offset = ((-value + bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)) * frameWidth
+            let progress = (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)
+            offset = -progress * frameWidth
+            print("🎯 setOffset - value: \(value), progress: \(progress), offset: \(offset)")
         }
     }
 }

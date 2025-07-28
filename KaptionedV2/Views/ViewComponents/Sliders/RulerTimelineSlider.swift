@@ -99,52 +99,79 @@ struct RulerView: View {
         self.currentTime = currentTime
         self.frameWidth = frameWidth
         self.showMinorTicks = showMinorTicks
+        print("📏 RulerView - frameWidth: \(frameWidth)")
     }
     
     var body: some View {
-        ZStack {
-            // Background
-            Rectangle()
-                .fill(Color.green.opacity(0.1))
-            
-            // Ruler ticks - static time scale
-            HStack(spacing: 0) {
-                ForEach(0..<Int(duration) + 1, id: \.self) { second in
-                    VStack(spacing: 0) {
-                        // Major tick (every second) - fills top portion
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.6))
-                            .frame(width: 1)
-                            .frame(maxHeight: showMinorTicks ? .infinity : .infinity, alignment: .top)
-                            .padding(.top, 4)
-                            .frame(height: showMinorTicks ? nil : 20) // Half height when minor ticks are disabled
-                            .frame(maxHeight: .infinity, alignment: .top) // Align to top
-                        
-                        // Time label (every 5 seconds)
-                        if second % 5 == 0 {
-                            Text("\(second)")
-                                .font(.system(size: 8))
-                                .foregroundColor(.gray)
-                                .frame(height: 12)
-                        } else {
-                            Rectangle()
-                                .fill(Color.clear)
-                                .frame(height: 12)
+        GeometryReader { geometry in
+            ZStack {
+                
+                // Ruler ticks - static time scale
+                HStack(spacing: 0) {
+                    ForEach(0..<Int(duration) + 1, id: \.self) { second in
+                        VStack(spacing: 0) {
+
+
+
+                            // // Major tick (every second)
+                            // Rectangle()
+                            //     .fill(Color.gray.opacity(0.6))
+                            //     .frame(width: 1, height: showMinorTicks ? 12 : 20)
+                            //     .padding(.top, 4)
+                            
+                            // Time label (every 5 seconds)
+                            //if second % 5 == 0 {
+
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.6))
+                                    .frame(width: 1, height: showMinorTicks ? 12 : 20)
+                                    .padding(.top, 4)
+                            
+                                Text("\(second)")
+                                    .font(.system(size: 8))
+                                    .foregroundColor(.gray)
+                                    .frame(height: 12)
+                                    .padding(.top, 4)
+                                    
+                            // } else {
+                            //     // Rectangle()
+                            //     //     .fill(Color.clear)
+                            //     //     .frame(height: 12)
+                            // }
+                            
+                            // Minor tick - fills bottom portion (optional)
+                            if showMinorTicks {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 1, height: 12)
+                                    .padding(.bottom, 4)
+                            }
                         }
-                        
-                        // Minor tick - fills bottom portion (optional)
-                        if showMinorTicks {
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(width: 1)
-                                .frame(maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, 4)
-                        }
+                        .frame(width: geometry.size.width / duration, alignment: .leading) // Use full available width
+                        //.border(.red, width: 1)
                     }
-                    .frame(width: frameWidth / duration) // Dynamic width based on actual frame width
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                //.border(.yellow, width: 1)
+                .offset(x: 20)
+                
+                // // Pixel count markers (every 50 pixels)
+                // HStack(spacing: 0) {
+                //     ForEach(0..<Int(frameWidth / 50) + 1, id: \.self) { pixelIndex in
+                //         let pixelPosition = pixelIndex * 50
+                //         VStack(spacing: 0) {
+                //             Text("\(pixelPosition)")
+                //                 .font(.system(size: 8))
+                //                 .foregroundColor(.red)
+                //                 .frame(height: 12)
+                //         }
+                //         .frame(width: 50, alignment: .leading)
+                //     }
+                // }
+                // .frame(maxWidth: .infinity, alignment: .leading)
+                // .offset(x: 20)
+                // .offset(y: 20) // Move down to avoid overlapping with time labels
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 } 

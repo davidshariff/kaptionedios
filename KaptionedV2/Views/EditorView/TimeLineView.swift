@@ -82,7 +82,7 @@ struct TimeLineView: View {
                             }
                         )
                         .frame(height: 100)
-                        .border(Color.blue, width: 2)
+                        //.border(Color.blue, width: 2)
 
                     }
                     

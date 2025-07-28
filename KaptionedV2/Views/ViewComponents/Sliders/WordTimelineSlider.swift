@@ -55,8 +55,16 @@ struct WordTimelineSlider<T: View, A: View>: View {
                     let pixelsPerSecond = timelineWidth / duration
                     let boxDuration = textBoxEnd - textBoxStart
                     let boxWidth = boxDuration * pixelsPerSecond
-                    let absoluteTextPosition = getAbsoluteWordPosition(start: textBoxStart, end: textBoxEnd, timelineWidth: timelineWidth, duration: duration, sliderPositionX: sliderPositionX, frameWidth: frameWidth, textBoxText: textBox.text, boxWidth: boxWidth)
-                    let isVisible = absoluteTextPosition >= -100 && absoluteTextPosition <= proxy.size.width + 100
+                    let wordPosition = textBoxStart * pixelsPerSecond
+                    
+                    // wordPosition is the position of the word within the timeline
+                    // offset is to move it as the slider moves
+                    // boxWidth/2 is to shift it left of center
+                    let absoluteTextPosition = (wordPosition - abs(offset)) + boxWidth/2
+
+                    // TODO: fix this, esppecially if a lot of text boxes are present and performance is an issue
+                    // let isVisible = wordPosition > 0
+                    let isVisible = true
                     
                     if isVisible {
                         Text(textBox.text)
@@ -134,46 +142,5 @@ extension WordTimelineSlider{
     
 
     
-    private func getAbsoluteWordPosition(start: Double, end: Double, timelineWidth: CGFloat, duration: Double, sliderPositionX: CGFloat, frameWidth: CGFloat, textBoxText: String? = nil, boxWidth: CGFloat) -> CGFloat {
 
-        // The timeline is positioned at sliderPositionX, which is 475.0
-        // The timeline content starts at sliderPositionX - timelineWidth/2
-        let timelineStartPosition = sliderPositionX - timelineWidth/2
-        
-        // The ruler content inside the frame view has an offset of 20 pixels
-        let rulerOffset: CGFloat = 20
-        
-        // The actual timeline content starts at the timeline start position plus the ruler offset
-        let actualTimelineStart = timelineStartPosition + rulerOffset
-        
-        // Calculate pixels per second based on the actual ruler width
-        let pixelsPerSecond = timelineWidth / duration
-        
-        // Calculate the word position within the timeline (from the start of the timeline)
-        let wordPosition = start * pixelsPerSecond
-        
-        // Calculate the absolute position by adding the word position to the actual timeline start
-        let textBoxStartPosition = actualTimelineStart + wordPosition
-        let finalPosition = textBoxStartPosition + boxWidth/2
-        
-        // Debug info (can be removed in production)
-        print("🔤 Text box: \(textBoxText ?? "nil") at \(start)s")
-        print("   - Timeline start position: \(timelineStartPosition)")
-        print("   - Ruler offset: \(rulerOffset)")
-        print("   - Offset: \( abs(offset))")
-        print("   - Actual timeline start: \(actualTimelineStart)")
-        print("   - Word position within timeline: \(wordPosition)")
-        print("   - Text box start position: \(textBoxStartPosition)")
-        print("   - Box width: \(boxWidth)")
-        print("   - Final center position: \(finalPosition)")
-        print("   - Slider position X: \(sliderPositionX)")
-        print("   - Timeline width: \(timelineWidth)")
-        print("   - Frame width: \(frameWidth)")
-        print("   - Pixels per second: \(pixelsPerSecond)")
-
-        // wordPosition is the position of the word within the timeline
-        // offset is to move it as the slider moves
-        // boxWidth/2 is to shift it left of center
-        return (wordPosition - abs(offset)) + boxWidth/2
-    }
 } 

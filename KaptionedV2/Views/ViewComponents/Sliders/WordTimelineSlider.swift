@@ -43,6 +43,11 @@ struct WordTimelineSlider<T: View, A: View>: View {
                     .frame(width: proxy.size.width, height: proxy.size.height)
                 
                 ZStack(alignment: .leading) {
+                    // Ruler view (frameView) - this displays the ticks
+                    frameView()
+                        .frame(width: timelineWidth, height: proxy.size.height - 5)
+                        .position(x: sliderPositionX - frameWidth/2, y: sliderViewYCenter)
+                    
                     // Playhead indicator
                     Capsule()
                         .fill(Color.white)
@@ -90,9 +95,8 @@ struct WordTimelineSlider<T: View, A: View>: View {
                             .truncationMode(.tail)
                     }
                 }
-                // Half-width container view
+                // Half-width container view, needed to place the text boxes from the middle of the screen
                 .frame(width: proxy.size.width / 2)
-                .background(Color.green.opacity(0.1))
                 // move it to the middle of the screen
                 .offset(x: proxy.size.width / 2, y: 0)
             }

@@ -81,8 +81,8 @@ struct TimeLineView: View {
                                 onChangeTimeValue()
                             }
                         )
-                        .frame(height: 100)
-                        //.border(Color.blue, width: 2)
+                        .frame(height: 60)
+                        .border(Color.blue, width: 2)
 
                     }
                     

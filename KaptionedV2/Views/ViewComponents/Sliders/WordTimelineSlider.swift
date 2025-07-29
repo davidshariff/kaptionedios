@@ -7,8 +7,59 @@
 
 import SwiftUI
 
+struct TimelineTextBox: View {
+    let textBox: TextBox
+    let timelineWidth: CGFloat
+    let duration: Double
+    let offset: CGFloat
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        let textBoxStart = textBox.timeRange.lowerBound
+        let textBoxEnd = textBox.timeRange.upperBound
+        let pixelsPerSecond = timelineWidth / duration
+        let boxDuration = textBoxEnd - textBoxStart
+        let boxWidth = boxDuration * pixelsPerSecond
+        let wordPosition = textBoxStart * pixelsPerSecond
+        
+        // wordPosition is the position of the word within the timeline
+        // offset is to move it as the slider moves
+        // boxWidth/2 is to shift it left of center
+        let absoluteTextPosition = (wordPosition - abs(offset)) + boxWidth/2
+
+        // TODO: fix this, especially if a lot of text boxes are present and performance is an issue
+        // let isVisible = wordPosition > 0
+        let isVisible = true
+        
+        if isVisible {
+            Text(textBox.text)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .frame(width: boxWidth, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 0)
+                        .fill(Color.orange.opacity(0.8))
+                )
+                .border(isSelected ? .green : .clear, width: 1)
+                .position(x: absoluteTextPosition, y: 20)
+                .opacity(0.9)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .onTapGesture {
+                    onTap()
+                    print("📝 TimelineTextBox tapped - Text: '\(textBox.text)', Time Range: \(textBox.timeRange.lowerBound)...\(textBox.timeRange.upperBound)")
+                }
+        }
+    }
+}
+
+//  Main Word Timeline Slider
 struct WordTimelineSlider<T: View, A: View>: View {
     @State private var lastOffset: CGFloat = 0
+    @State private var selectedTextBoxId: UUID?
     var bounds: ClosedRange<Double>
     var disableOffset: Bool
     @Binding var value: Double
@@ -56,40 +107,16 @@ struct WordTimelineSlider<T: View, A: View>: View {
                 
                 // Text box overlays with absolute positioning
                 ForEach(textBoxes, id: \.id) { textBox in
-
-                    let textBoxStart = textBox.timeRange.lowerBound
-                    let textBoxEnd = textBox.timeRange.upperBound
-                    let pixelsPerSecond = timelineWidth / duration
-                    let boxDuration = textBoxEnd - textBoxStart
-                    let boxWidth = boxDuration * pixelsPerSecond
-                    let wordPosition = textBoxStart * pixelsPerSecond
-                    
-                    // wordPosition is the position of the word within the timeline
-                    // offset is to move it as the slider moves
-                    // boxWidth/2 is to shift it left of center
-                    let absoluteTextPosition = (wordPosition - abs(offset)) + boxWidth/2
-
-                    // TODO: fix this, esppecially if a lot of text boxes are present and performance is an issue
-                    // let isVisible = wordPosition > 0
-                    let isVisible = true
-                    
-                    if isVisible {
-                        Text(textBox.text)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .frame(width: boxWidth, alignment: .leading)
-                            .background(
-                                RoundedRectangle(cornerRadius: 0)
-                                    .fill(Color.orange.opacity(0.8))
-                            )
-                            .border(.red, width: 1)
-                            .position(x: absoluteTextPosition, y: 20)
-                            .opacity(0.9)
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                    }
+                    TimelineTextBox(
+                        textBox: textBox,
+                        timelineWidth: timelineWidth,
+                        duration: duration,
+                        offset: offset,
+                        isSelected: selectedTextBoxId == textBox.id,
+                        onTap: {
+                            selectedTextBoxId = textBox.id
+                        }
+                    )
                 }
                 // Half-width container view, needed to place the text boxes from the middle of the screen
                 .frame(width: proxy.size.width / 2)
@@ -152,7 +179,4 @@ extension WordTimelineSlider{
         }
     }
     
-
-    
-
 } 

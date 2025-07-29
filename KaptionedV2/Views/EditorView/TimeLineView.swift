@@ -71,7 +71,7 @@ struct TimeLineView: View {
                             textBoxes: video.textBoxes,
                             duration: video.originalDuration,
                             frameView: {
-                                RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth, showPlayhead: false)
+                                RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth, showPlayhead: false, showTimelabel: false)
                                     .frame(maxHeight: .infinity)
                             },
                             actionView: {

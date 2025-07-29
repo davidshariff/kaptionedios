@@ -102,24 +102,31 @@ extension RulerTimelineSlider{
 }
 
 struct RulerView: View {
+
     let duration: Double
     let currentTime: Double
     let frameWidth: CGFloat
     let showMinorTicks: Bool
     let showPlayhead: Bool
+    let showMajorTicks: Bool
+    let showTimelabel: Bool
     
     init(
         duration: Double, 
         currentTime: Double, 
         frameWidth: CGFloat, 
         showMinorTicks: Bool = false,
-        showPlayhead: Bool = false
+        showPlayhead: Bool = false,
+        showMajorTicks: Bool = true,
+        showTimelabel: Bool = true
     ) {
         self.duration = duration
         self.currentTime = currentTime
         self.frameWidth = frameWidth
         self.showMinorTicks = showMinorTicks
         self.showPlayhead = showPlayhead
+        self.showMajorTicks = showMajorTicks
+        self.showTimelabel = showTimelabel
         print("📏 RulerView - frameWidth: \(frameWidth), showPlayhead: \(showPlayhead)")
     }
     
@@ -132,34 +139,20 @@ struct RulerView: View {
                     ForEach(0..<Int(duration) + 1, id: \.self) { second in
                         VStack(spacing: 0) {
 
-
-
-                            // // Major tick (every second)
-                            // Rectangle()
-                            //     .fill(Color.gray.opacity(0.6))
-                            //     .frame(width: 1, height: showMinorTicks ? 12 : 20)
-                            //     .padding(.top, 4)
+                            if showMajorTicks {
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.6))
+                                .frame(width: 1, height: showMinorTicks ? 12 : 20)
+                                .padding(.top, 4)
+                            }
                             
-                            // Time label (every 5 seconds)
-                            //if second % 5 == 0 {
-
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.6))
-                                    .frame(width: 1, height: showMinorTicks ? 12 : 20)
-                                    .padding(.top, 4)
-                            
+                            if showTimelabel {
                                 Text("\(second)")
                                     .font(.system(size: 8))
                                     .foregroundColor(.gray)
                                     .frame(height: 12)
                                     .padding(.top, 4)
-                                    
-                            // } else {
-                            //     // Rectangle()
-                            //     //     .fill(Color.clear)
-                            //     //     .frame(height: 12)
-                            // }
-                            
+                            }
                             // Minor tick - fills bottom portion (optional)
                             if showMinorTicks {
                                 Rectangle()

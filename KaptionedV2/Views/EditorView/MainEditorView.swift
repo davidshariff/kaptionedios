@@ -39,8 +39,7 @@ struct MainEditorView: View {
                         textEditor: textEditor
                     )
                     .frame(height: proxy.size.height - controlsHeight - 100) // Dynamic height based on controls
-                    // Draggable controls section
-                    draggableControlsSection(proxy: proxy)
+                    draggableSection(proxy: proxy)
                 }
                 .onAppear{
                     setVideo(proxy)
@@ -223,69 +222,41 @@ extension MainEditorView{
         .padding(.bottom)
     }
     
-    private func draggableControlsSection(proxy: GeometryProxy) -> some View {
+    private func draggableSection(proxy: GeometryProxy) -> some View {
         VStack(spacing: 0) {
-            // Drag handle
-            HStack {
-                VStack(spacing: 4) {
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.5))
-                        .frame(width: 20, height: 20)
-                        .cornerRadius(4)
-                    
-                    Text("Drag to resize")
-                        .font(.caption2)
-                        .foregroundColor(.gray)
+
+            PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+
+            if let video = editorVM.currentVideo {
+                TimeLineView(
+                    recorderManager: audioRecorder,
+                    currentTime: $videoPlayer.currentTime,
+                    isSelectedTrack: $editorVM.isSelectVideo,
+                    viewState: editorVM.selectedTools?.timeState ?? .empty,
+                    video: video,
+                    textInterval: textEditor.selectedTextBox?.timeRange
+                ) {
+                    videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                } onChangeTextTime: { textTime in
+                    textEditor.setTime(textTime)
+                } onSetAudio: { audio in
+                    editorVM.setAudio(audio)
+                    videoPlayer.setAudio(audio.url)
                 }
-                
-                Spacer()
-                
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        controlsHeight = 350 // Reset to default
-                    }
-                }) {
-                    Image(systemName: "arrow.clockwise")
-                        .foregroundColor(.gray)
-                        .font(.caption)
-                }
+                .frame(height: 80)
+                .border(Color.orange, width: 2)
             }
-            .padding(.top, 8)
-            .padding(.horizontal, 16)
-            .gesture(
-                DragGesture()
-                    .onChanged { value in
-                        let newHeight = controlsHeight - value.translation.height
-                        controlsHeight = max(100, min(400, newHeight)) // Min 100, Max 400
-                    }
-                    .onEnded { _ in
-                        // Optional: Add a small animation when drag ends for smooth settling
-                        withAnimation(.easeOut(duration: 0.2)) {
-                            // This ensures the final position is properly set
-                        }
-                    }
+            ToolsSectionView(
+                videoPlayer: videoPlayer, 
+                editorVM: editorVM, 
+                textEditor: textEditor, 
+                showCustomSubslistSheet: $showCustomSubslistSheet
             )
-            .zIndex(2000)
-            
-            // Controls content
-            VStack(spacing: 0) {
-
-                // Player control
-                PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
-                
-                // Tools section
-                ToolsSectionView(
-                    videoPlayer: videoPlayer, 
-                    editorVM: editorVM, 
-                    textEditor: textEditor, 
-                    showCustomSubslistSheet: $showCustomSubslistSheet
-                )
-                .padding(.bottom, 20)
-
-            }
-            .frame(height: controlsHeight - 40) // Account for drag handle and text
+            .padding(.bottom, 20)
         }
-        .background(Color.black)
+        .frame(height: controlsHeight)
+        .border(Color.red, width: 1)
+        .background(Color.green.opacity(0.5))
     }
     
     private func saveProject(_ phase: ScenePhase){

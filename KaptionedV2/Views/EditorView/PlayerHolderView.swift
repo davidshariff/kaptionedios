@@ -43,7 +43,7 @@ struct PlayerHolderView: View{
                         Rectangle()
                             .foregroundColor(.clear)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .border(Color.red, width: 2)
+                            .border(Color.red, width: 1)
                     }
                 }
             }
@@ -166,33 +166,43 @@ struct PlayerControl: View{
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var textEditor: TextEditorViewModel
     var body: some View{
-        VStack(spacing: 6) {
-            playSection
+        VStack(spacing: 0) {
+            controlsSection
             timeLineControlSection
+            Spacer(minLength: 0)
         }
+        .padding(0)
+        .background(Color.red.opacity(0.3))
     }
-    
     
     @ViewBuilder
     private var timeLineControlSection: some View{
         if let video = editorVM.currentVideo{
-            TimeLineView(
-                recorderManager: recorderManager,
-                currentTime: $videoPlayer.currentTime,
-                isSelectedTrack: $editorVM.isSelectVideo,
-                viewState: editorVM.selectedTools?.timeState ?? .empty,
-                video: video, textInterval: textEditor.selectedTextBox?.timeRange) {
-                    videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
-                } onChangeTextTime: { textTime in
-                    textEditor.setTime(textTime)
-                } onSetAudio: { audio in
-                    editorVM.setAudio(audio)
-                    videoPlayer.setAudio(audio.url)
-                }
+            RulerTimelineSlider(
+                bounds: video.rangeDuration,
+                disableOffset: false,
+                value: $videoPlayer.currentTime,
+                frameWidth: 300
+            ) {
+                RulerView(duration: video.originalDuration, currentTime: videoPlayer.currentTime, frameWidth: 300, showPlayhead: false)
+                    .frame(maxHeight: .infinity)
+            } actionView: {
+                recordButton
+            }
+            onChange: {
+                videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+            }
+            .frame(height: 60)
+            .border(Color.purple, width: 2)
         }
     }
     
-    private var playSection: some View{
+    private var recordButton: some View{
+        Rectangle()
+            .opacity(0)
+    }
+    
+    private var controlsSection: some View{
         Button {
             if let video = editorVM.currentVideo{
                 videoPlayer.action(video)
@@ -205,6 +215,7 @@ struct PlayerControl: View{
         .buttonStyle(.plain)
         .hCenter()
         .frame(height: 50)
-        .padding(.horizontal)
+        .padding(0)
+        //.background(Color.red.opacity(0.5))
     }
 }

@@ -46,23 +46,6 @@ struct TimeLineView: View {
 
                     VStack(spacing: 4) {
 
-                        RulerTimelineSlider(
-                            bounds: video.rangeDuration,
-                            disableOffset: isActiveTextRangeSlider,
-                            value: $currentTime,
-                            frameWidth: timelineWidth
-                        ) {
-                            RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth, showPlayhead: false)
-                                .frame(maxHeight: .infinity)
-                        } actionView: {
-                            recordButton
-                        }
-                        onChange: {
-                            onChangeTimeValue()
-                        }
-                        .frame(height: 60)
-                        .border(Color.purple, width: 2)
-
                         WordTimelineSlider(
                             bounds: video.rangeDuration,
                             disableOffset: isActiveTextRangeSlider,

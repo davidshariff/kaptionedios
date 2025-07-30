@@ -244,11 +244,9 @@ extension MainEditorView{
                             toolbarOffset = 100
                             textEditor.selectedTextBox = nil
                         } label: {
-                                Image(systemName: "xmark.circle.fill")
+                                Image(systemName: "xmark")
                                     .font(.title2)
                                     .foregroundColor(.white)
-                                    .background(Color.black.opacity(0.6))
-                                    .clipShape(Circle())
                             }
                             .padding(.top, 8)
                             .padding(.trailing, 8)

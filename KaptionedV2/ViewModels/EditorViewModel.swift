@@ -152,19 +152,8 @@ extension EditorViewModel{
             
         case .subslist:
             currentVideo?.resetRangeDuration()
-        //case .speed:
-        //    currentVideo?.resetRate()
-        case .text:/*, .crop:*/
-            break
         case .presets:
             break
-        // case .filters:
-        //     currentVideo?.setFilter(nil)
-        // case .corrections:
-        //     currentVideo?.colorCorrection = ColorCorrection()
-        //case .frames:
-        //    frames.reset()
-        //    currentVideo?.videoFrames = nil
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
             self.removeTool()

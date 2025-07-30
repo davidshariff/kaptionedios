@@ -20,6 +20,7 @@ struct MainEditorView: View {
     @State var showCustomSubslistSheet: Bool = false
     @State var controlsHeight: CGFloat = 350 // New state for draggable height
     @State var showCrossOverlay: Bool = false // New state for cross overlay
+    @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
     
     @StateObject var editorVM = EditorViewModel()
     @StateObject var audioRecorder = AudioRecorderManager()
@@ -224,35 +225,69 @@ extension MainEditorView{
     
     private func draggableSection(proxy: GeometryProxy) -> some View {
         VStack(spacing: 0) {
-
-            PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
-
-            if let video = editorVM.currentVideo {
-                TimeLineView(
-                    recorderManager: audioRecorder,
-                    currentTime: $videoPlayer.currentTime,
-                    isSelectedTrack: $editorVM.isSelectVideo,
-                    viewState: editorVM.selectedTools?.timeState ?? .empty,
-                    video: video,
-                    textInterval: textEditor.selectedTextBox?.timeRange
-                ) {
-                    videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
-                } onChangeTextTime: { textTime in
-                    textEditor.setTime(textTime)
-                } onSetAudio: { audio in
-                    editorVM.setAudio(audio)
-                    videoPlayer.setAudio(audio.url)
-                }
-                .frame(height: 80)
-                .border(Color.orange, width: 2)
+            if !showEditSubtitlesMode {
+                PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
             }
-            ToolsSectionView(
-                videoPlayer: videoPlayer, 
-                editorVM: editorVM, 
-                textEditor: textEditor, 
-                showCustomSubslistSheet: $showCustomSubslistSheet
-            )
-            .padding(.bottom, 20)
+
+            if let video = editorVM.currentVideo, showEditSubtitlesMode {
+                // Show word timeline only when in edit subtitles mode
+                VStack(spacing: 0) {
+                    // Top row with close button at the right
+                    HStack {
+                        Spacer()
+                        Button {
+                            showEditSubtitlesMode = false
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .background(Color.black.opacity(0.6))
+                                .clipShape(Circle())
+                        }
+                        .padding(.top, 8)
+                        .padding(.trailing, 8)
+                    }
+                    .frame(height: 40)
+                    
+                    // Center the word timeline in the remaining space
+                    Spacer()
+                    
+                    WordTimelineSlider(
+                        bounds: video.rangeDuration,
+                        disableOffset: false,
+                        value: $videoPlayer.currentTime,
+                        timelineWidth: 300,
+                        textBoxes: video.textBoxes,
+                        duration: video.originalDuration,
+                        frameView: {
+                            RulerView(duration: video.originalDuration, currentTime: videoPlayer.currentTime, frameWidth: 300, showPlayhead: false)
+                                .frame(maxHeight: .infinity)
+                        },
+                        actionView: {
+                            Rectangle()
+                                .opacity(0)
+                        },
+                        onChange: {
+                            videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                        }
+                    )
+                    .frame(height: 80)
+                    .border(Color.blue, width: 2)
+                    
+                    Spacer()
+                }
+            }
+            
+            if !showEditSubtitlesMode {
+                ToolsSectionView(
+                    videoPlayer: videoPlayer, 
+                    editorVM: editorVM, 
+                    textEditor: textEditor, 
+                    showCustomSubslistSheet: $showCustomSubslistSheet,
+                    showEditSubtitlesMode: $showEditSubtitlesMode
+                )
+                .padding(.bottom, 20)
+            }
         }
         .frame(height: controlsHeight)
         .border(Color.red, width: 1)

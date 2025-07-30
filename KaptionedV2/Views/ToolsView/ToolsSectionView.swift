@@ -17,6 +17,7 @@ struct ToolsSectionView: View {
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var textEditor: TextEditorViewModel
     @Binding var showCustomSubslistSheet: Bool
+    @Binding var showEditSubtitlesMode: Bool
     private let columns = Array(repeating: GridItem(.flexible()), count: 4)
     @State private var showPresetAlert = false
     @State private var selectedPresetName: String? = nil
@@ -100,18 +101,12 @@ struct ToolsSectionView: View {
         }
         .onChange(of: textEditor.selectedTextBox) { box in
             if box != nil{
-                if editorVM.selectedTools != .text{
-                    editorVM.selectedTools = .text
-                }
+                // Text selection is no longer handled through tools
             }else{
                 editorVM.selectedTools = nil
             }
         }
         .onChange(of: editorVM.selectedTools) { newValue in
-            
-            if newValue == .text, textEditor.textBoxes.isEmpty{
-                textEditor.openTextEditor(isEdit: false, timeRange: editorVM.currentVideo?.rangeDuration)
-            }
             
             if newValue == nil{
                 editorVM.setText(textEditor.textBoxes)
@@ -151,6 +146,20 @@ struct ToolsSectionView: View {
                         UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
                     }
                     Text("Generate Subs")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
+                        .frame(height: 32)
+                        .multilineTextAlignment(.center)
+                }
+                
+                // Edit Subtitles button
+                VStack(spacing: 4) {
+                    ToolButtonView(label: "Edit", image: "list.bullet", isChange: false) {
+                        // Handle edit subtitles action
+                        showEditSubtitlesMode = true
+                    }
+                    Text("Edit Subtitles")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.top, 4)
@@ -202,33 +211,6 @@ extension ToolsSectionView{
                         editorVM.selectedTools = nil
                     }
                 }
-            //case .speed:
-            //    VideoSpeedSlider(value: Double(video.rate), isChangeState: isAppliedTool) {rate in
-            //        videoPlayer.pause()
-            //        editorVM.updateRate(rate: rate)
-            //    }
-            //case .crop:
-            //    CropSheetView(editorVM: editorVM)
-            //case .audio:
-            //    AudioSheetView(videoPlayer: videoPlayer, editorVM: editorVM)
-            case .text:
-                TextToolsView(video: video, editor: textEditor)
-            // case .filters:
-            //     FiltersView(selectedFilterName: video.filterName, viewModel: filtersVM) { filterName in
-            //         if let filterName{
-            //             videoPlayer.setFilters(mainFilter: CIFilter(name: filterName), colorCorrection: filtersVM.colorCorrection)
-            //         }else{
-            //             videoPlayer.removeFilter()
-            //         }
-            //         editorVM.setFilter(filterName)
-            //     }
-            // case .corrections:
-            //     CorrectionsToolView(correction: $filtersVM.colorCorrection) { corrections in
-            //         videoPlayer.setFilters(mainFilter: CIFilter(name: video.filterName ?? ""), colorCorrection: corrections)
-            //         editorVM.setCorrections(corrections)
-            //     }
-            //case .frames:
-            //    FramesToolView(selectedColor: $editorVM.frames.frameColor, scaleValue: $editorVM.frames.scaleValue, onChange: editorVM.setFrames)
             case .presets:
                 // Open the custom sheet and close the bottom sheet
                 Color.clear.onAppear {
@@ -260,24 +242,13 @@ extension ToolsSectionView{
                     .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 5))
             }
             Spacer()
-            if tool != .text{
-                Button {
-                    editorVM.reset()
-                } label: {
-                    Text("Reset")
-                        .font(.subheadline)
-                }
-                .buttonStyle(.plain)
+            Button {
+                editorVM.reset()
+            } label: {
+                Text("Reset")
+                    .font(.subheadline)
             }
-            else if !editorVM.isSelectVideo{
-                Button {
-                    videoPlayer.pause()
-                    editorVM.removeAudio()
-                } label: {
-                    Image(systemName: "trash.fill")
-                        .foregroundColor(.white)
-                }
-            }
+            .buttonStyle(.plain)
         }
         .overlay {
             Text(tool.title)
@@ -290,8 +261,6 @@ extension ToolsSectionView{
 extension ToolsSectionView {
     private func toolLabel(for tool: ToolEnum) -> String {
         switch tool {
-        case .text:
-            return "Add text overlays"
         case .presets:
             return selectedPreset?.name ?? "Select presets"
         case .subslist:

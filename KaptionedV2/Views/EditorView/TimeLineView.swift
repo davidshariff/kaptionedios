@@ -16,6 +16,7 @@ struct TimeLineView: View {
     var viewState: TimeLineViewState = .empty
     var video: Video
     var textInterval: ClosedRange<Double>?
+    var showWordTimeline: Bool = false // New parameter to control word timeline visibility
     let onChangeTimeValue: () -> Void
     let onChangeTextTime: (ClosedRange<Double>) -> Void
     let onSetAudio: (Audio) -> Void
@@ -27,25 +28,9 @@ struct TimeLineView: View {
     var body: some View {
         ZStack{
             if video.originalDuration > 0{
-                if viewState == .text {
-                    TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWidth: timelineWidth) {
-                        VStack(alignment: .leading, spacing: 5) {
-                            ZStack {
-                                tubneilsImages(video.thumbnailsImages)
-                                textRangeTimeLayer
-                            }
-                            audioLayerSection
-                        }
-                    } actionView: {
-                        recordButton
-                    }
-                onChange: {
-                    onChangeTimeValue()
-                }
-                } else {
-
-                    VStack(spacing: 4) {
-
+                if viewState == .text || showWordTimeline {
+                    if showWordTimeline {
+                        // Show word timeline when explicitly requested
                         WordTimelineSlider(
                             bounds: video.rangeDuration,
                             disableOffset: isActiveTextRangeSlider,
@@ -66,9 +51,39 @@ struct TimeLineView: View {
                         )
                         .frame(height: 60)
                         .border(Color.blue, width: 2)
-
+                    } else {
+                        // Show regular timeline for text state
+                        TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWidth: timelineWidth) {
+                            VStack(alignment: .leading, spacing: 5) {
+                                ZStack {
+                                    tubneilsImages(video.thumbnailsImages)
+                                    textRangeTimeLayer
+                                }
+                                audioLayerSection
+                            }
+                        } actionView: {
+                            recordButton
+                        }
+                        onChange: {
+                            onChangeTimeValue()
+                        }
                     }
-                    
+                } else {
+                    // Show regular timeline for other states (no word timeline)
+                    TimelineSlider(bounds: video.rangeDuration, disableOffset: isActiveTextRangeSlider, value: $currentTime, frameWidth: timelineWidth) {
+                        VStack(alignment: .leading, spacing: 5) {
+                            ZStack {
+                                tubneilsImages(video.thumbnailsImages)
+                                textRangeTimeLayer
+                            }
+                            audioLayerSection
+                        }
+                    } actionView: {
+                        recordButton
+                    }
+                    onChange: {
+                        onChangeTimeValue()
+                    }
                 }
             }
         }

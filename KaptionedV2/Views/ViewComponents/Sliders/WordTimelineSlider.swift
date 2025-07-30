@@ -71,6 +71,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
     let frameWidth: CGFloat = 30
     let textBoxes: [TextBox]
     let duration: Double
+    @Binding var selectedTextBox: TextBox? // New binding for selected text box
     
     @ViewBuilder
     var frameView: () -> T
@@ -115,6 +116,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
                         isSelected: selectedTextBoxId == textBox.id,
                         onTap: {
                             selectedTextBoxId = textBox.id
+                            selectedTextBox = textBox // Set the selected text box
                         }
                     )
                 }

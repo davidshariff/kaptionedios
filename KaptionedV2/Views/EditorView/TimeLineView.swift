@@ -17,6 +17,7 @@ struct TimeLineView: View {
     var video: Video
     var textInterval: ClosedRange<Double>?
     var showWordTimeline: Bool = false // New parameter to control word timeline visibility
+    @Binding var selectedTextBox: TextBox? // New parameter for selected text box
     let onChangeTimeValue: () -> Void
     let onChangeTextTime: (ClosedRange<Double>) -> Void
     let onSetAudio: (Audio) -> Void
@@ -38,6 +39,7 @@ struct TimeLineView: View {
                             timelineWidth: timelineWidth,
                             textBoxes: video.textBoxes,
                             duration: video.originalDuration,
+                            selectedTextBox: $selectedTextBox,
                             frameView: {
                                 RulerView(duration: video.originalDuration, currentTime: currentTime, frameWidth: timelineWidth, showPlayhead: false, showTimelabel: false)
                                     .frame(maxHeight: .infinity)
@@ -127,7 +129,7 @@ struct TimeLineView_Previews: PreviewProvider {
     static var previews: some View {
         ZStack{
             Color.secondary
-            TimeLineView(recorderManager: AudioRecorderManager(), currentTime: .constant(0), isSelectedTrack: .constant(true), viewState: .audio, video: video, onChangeTimeValue: {}, onChangeTextTime: {_ in}, onSetAudio: {_ in})
+            TimeLineView(recorderManager: AudioRecorderManager(), currentTime: .constant(0), isSelectedTrack: .constant(true), viewState: .audio, video: video, selectedTextBox: .constant(nil), onChangeTimeValue: {}, onChangeTextTime: {_ in}, onSetAudio: {_ in})
         }
     }
 }

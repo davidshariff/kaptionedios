@@ -133,22 +133,18 @@ struct WordTimelineSlider<T: View, A: View>: View {
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
-                        print("📝 WordTimelineSlider gesture triggered")
                         isChange = true
-                        
-                        let translationWidth = gesture.translation.width
-                        let newOffset = lastOffset + translationWidth
-                        
+
+                        let translation = gesture.translation.width
+                        let newOffset = lastOffset + translation
                         offset = min(0, max(newOffset, -timelineWidth))
-                        
-                        let newValue = (bounds.upperBound - bounds.lowerBound) * (offset / timelineWidth) - bounds.lowerBound
-                        
-                        print("📝 Translation: \(translationWidth), Offset: \(offset), NewValue: \(newValue)")
-                        
+
+                        let range = bounds.upperBound - bounds.lowerBound
+                        let normalizedOffset = offset / timelineWidth
+                        let newValue = range * normalizedOffset - bounds.lowerBound
+
                         value = abs(newValue)
-                        
                         onChange()
-                        
                     }
                     .onEnded { gesture in
                         print("📝 WordTimelineSlider gesture ended")

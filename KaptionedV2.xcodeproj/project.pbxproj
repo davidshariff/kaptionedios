@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5A08FC7229EEB65000AB877C /* TimeLineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A08FC7129EEB65000AB877C /* TimeLineView.swift */; };
 		5A08FC7429EFD5E400AB877C /* NewTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A08FC7329EFD5E400AB877C /* NewTimelineSlider.swift */; };
 		5A17E08129F1495000DB4A47 /* CropperRatio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A17E08029F1495000DB4A47 /* CropperRatio.swift */; };
 		5A17E08629F15BEF00DB4A47 /* CropSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A17E08529F15BEF00DB4A47 /* CropSheetView.swift */; };
@@ -87,7 +86,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		5A08FC7129EEB65000AB877C /* TimeLineView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLineView.swift; sourceTree = "<group>"; };
 		5A08FC7329EFD5E400AB877C /* NewTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTimelineSlider.swift; sourceTree = "<group>"; };
 		5A17E08029F1495000DB4A47 /* CropperRatio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropperRatio.swift; sourceTree = "<group>"; };
 		5A17E08529F15BEF00DB4A47 /* CropSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropSheetView.swift; sourceTree = "<group>"; };
@@ -419,7 +417,6 @@
 		5ACFF9AD29EE8C1D00827A37 /* EditorView */ = {
 			isa = PBXGroup;
 			children = (
-				5A08FC7129EEB65000AB877C /* TimeLineView.swift */,
 				F42364972E3698A100057C86 /* GridTestView.swift */,
 				5ACFF98229E945C300827A37 /* MainEditorView.swift */,
 				5ACFF9AF29EE8C6C00827A37 /* PlayerHolderView.swift */,
@@ -599,7 +596,6 @@
 				5A17E08629F15BEF00DB4A47 /* CropSheetView.swift in Sources */,
 				5A3D13B429F18E4D0027E25E /* RootViewModel.swift in Sources */,
 				5ACFF98B29E99A5600827A37 /* CameraPreviewView.swift in Sources */,
-				5A08FC7229EEB65000AB877C /* TimeLineView.swift in Sources */,
 				5A3D13B629F190260027E25E /* Preview.swift in Sources */,
 				F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */,
 				5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */,

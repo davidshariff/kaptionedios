@@ -26,14 +26,7 @@ enum ToolEnum: Int, CaseIterable{
         }
     }
     
-    var timeState: TimeLineViewState{
-        return .empty
-        // switch self{
-        // //case .audio: return .audio
-        // case .text: return .text
-        // default: return .empty
-        // }
-    }
+    // Removed timeState property as TimeLineView is no longer used
 }
     
 

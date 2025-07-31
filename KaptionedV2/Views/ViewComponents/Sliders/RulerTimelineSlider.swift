@@ -57,21 +57,18 @@ struct RulerTimelineSlider<T: View, A: View>: View {
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
-                        print("🎯 RulerTimelineSlider gesture triggered")
                         isChange = true
-                        
-                        let translationWidth = gesture.translation.width
-                        let newOffset = lastOffset + translationWidth
-                        
+
+                        let translation = gesture.translation.width
+                        let newOffset = lastOffset + translation
                         offset = min(0, max(newOffset, -frameWidth))
-                        
-                        let newValue = (bounds.upperBound - bounds.lowerBound) * (offset / frameWidth) - bounds.lowerBound
-                        
-                        print("🎯 Translation: \(translationWidth), Offset: \(offset), NewValue: \(newValue)")
-                        
+
+                        let range = bounds.upperBound - bounds.lowerBound
+                        let normalizedOffset = offset / frameWidth
+                        let newValue = range * normalizedOffset - bounds.lowerBound
+
                         value = abs(newValue)
                         onChange()
-                        
                     }
                     .onEnded { gesture in
                         print("🎯 RulerTimelineSlider gesture ended")
@@ -130,7 +127,6 @@ struct RulerView: View {
         self.showMajorTicks = showMajorTicks
         self.showTimelabel = showTimelabel
         self.tickHeight = tickHeight
-        print("📏 RulerView - frameWidth: \(frameWidth), showPlayhead: \(showPlayhead), tickHeight: \(tickHeight)")
     }
     
     var body: some View {

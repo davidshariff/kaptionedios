@@ -110,6 +110,7 @@ struct RulerView: View {
     let showPlayhead: Bool
     let showMajorTicks: Bool
     let showTimelabel: Bool
+    let tickHeight: CGFloat
     
     init(
         duration: Double, 
@@ -118,7 +119,8 @@ struct RulerView: View {
         showMinorTicks: Bool = false,
         showPlayhead: Bool = false,
         showMajorTicks: Bool = true,
-        showTimelabel: Bool = true
+        showTimelabel: Bool = true,
+        tickHeight: CGFloat = 20
     ) {
         self.duration = duration
         self.currentTime = currentTime
@@ -127,7 +129,8 @@ struct RulerView: View {
         self.showPlayhead = showPlayhead
         self.showMajorTicks = showMajorTicks
         self.showTimelabel = showTimelabel
-        print("📏 RulerView - frameWidth: \(frameWidth), showPlayhead: \(showPlayhead)")
+        self.tickHeight = tickHeight
+        print("📏 RulerView - frameWidth: \(frameWidth), showPlayhead: \(showPlayhead), tickHeight: \(tickHeight)")
     }
     
     var body: some View {
@@ -142,8 +145,7 @@ struct RulerView: View {
                             if showMajorTicks {
                             Rectangle()
                                 .fill(Color.gray.opacity(0.6))
-                                .frame(width: 1, height: showMinorTicks ? 12 : 20)
-                                .padding(.top, 4)
+                                .frame(width: 1, height: showMinorTicks ? 12 : tickHeight)
                             }
                             
                             if showTimelabel {
@@ -158,14 +160,13 @@ struct RulerView: View {
                                 Rectangle()
                                     .fill(Color.gray.opacity(0.3))
                                     .frame(width: 1, height: 12)
-                                    .padding(.bottom, 4)
                             }
                         }
                         .frame(width: geometry.size.width / duration, alignment: .leading) // Use full available width
                         //.border(.red, width: 1)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 //.border(.yellow, width: 1)
                 .offset(x: 20)
                 

@@ -16,42 +16,45 @@ struct TimelineTextBox: View {
     let onTap: () -> Void
     
     var body: some View {
-        let textBoxStart = textBox.timeRange.lowerBound
-        let textBoxEnd = textBox.timeRange.upperBound
-        let pixelsPerSecond = timelineWidth / duration
-        let boxDuration = textBoxEnd - textBoxStart
-        let boxWidth = boxDuration * pixelsPerSecond
-        let wordPosition = textBoxStart * pixelsPerSecond
-        
-        // wordPosition is the position of the word within the timeline
-        // offset is to move it as the slider moves
-        // boxWidth/2 is to shift it left of center
-        let absoluteTextPosition = (wordPosition - abs(offset)) + boxWidth/2
+        GeometryReader { geometry in
+            let textBoxStart = textBox.timeRange.lowerBound
+            let textBoxEnd = textBox.timeRange.upperBound
+            let pixelsPerSecond = timelineWidth / duration
+            let boxDuration = textBoxEnd - textBoxStart
+            let boxWidth = boxDuration * pixelsPerSecond
+            let wordPosition = textBoxStart * pixelsPerSecond
+            
+            // wordPosition is the position of the word within the timeline
+            // offset is to move it as the slider moves
+            // boxWidth/2 is to shift it left of center
+            let absoluteTextPosition = (wordPosition - abs(offset)) + boxWidth/2
 
-        // TODO: fix this, especially if a lot of text boxes are present and performance is an issue
-        // let isVisible = wordPosition > 0
-        let isVisible = true
-        
-        if isVisible {
-            Text(textBox.text)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundColor(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .frame(width: boxWidth, alignment: .leading)
-                .background(
-                    RoundedRectangle(cornerRadius: 0)
-                        .fill(Color.orange.opacity(0.8))
-                )
-                .border(isSelected ? .green : .clear, width: 1)
-                .position(x: absoluteTextPosition, y: 20)
-                .opacity(0.9)
-                .lineLimit(1)
-                .truncationMode(.tail)
-                .onTapGesture {
-                    onTap()
-                    print("📝 TimelineTextBox tapped - Text: '\(textBox.text)', Time Range: \(textBox.timeRange.lowerBound)...\(textBox.timeRange.upperBound)")
-                }
+            // TODO: fix this, especially if a lot of text boxes are present and performance is an issue
+            // let isVisible = wordPosition > 0
+            let isVisible = true
+            
+            if isVisible {
+                Text(textBox.text)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .frame(width: boxWidth, height: 50, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.black.opacity(0.7))
+                            
+                    )
+                    .border(isSelected ? .white : .clear, width: 1)
+                    .position(x: absoluteTextPosition, y: geometry.size.height / 2)
+                    .opacity(0.9)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .onTapGesture {
+                        onTap()
+                        print("📝 TimelineTextBox tapped - Text: '\(textBox.text)', Time Range: \(textBox.timeRange.lowerBound)...\(textBox.timeRange.upperBound)")
+                    }
+            }
         }
     }
 }
@@ -97,7 +100,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
                 ZStack(alignment: .leading) {
                     // Ruler view (frameView) - this displays the ticks
                     frameView()
-                        .frame(width: timelineWidth, height: proxy.size.height - 5)
+                        .frame(width: timelineWidth, height: proxy.size.height)
                         .position(x: sliderPositionX - frameWidth/2, y: sliderViewYCenter)
                     
                     // Playhead indicator

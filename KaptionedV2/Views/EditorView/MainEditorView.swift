@@ -235,6 +235,7 @@ extension MainEditorView{
                 // Show word timeline only when in edit subtitles mode
                 ZStack {
                     VStack(spacing: 0) {
+
                         // Top row with close button at the right
                         HStack {
                             Spacer()
@@ -252,9 +253,8 @@ extension MainEditorView{
                             .padding(.trailing, 8)
                         }
                         .frame(height: 40)
-                        
-                        // Center the word timeline in the remaining space
-                        Spacer()
+                        .padding(.bottom, 8)
+                
                         
                         WordTimelineSlider(
                             bounds: video.rangeDuration,
@@ -265,7 +265,7 @@ extension MainEditorView{
                             duration: video.originalDuration,
                             selectedTextBox: $textEditor.selectedTextBox,
                             frameView: {
-                                RulerView(duration: video.originalDuration, currentTime: videoPlayer.currentTime, frameWidth: 300, showPlayhead: false)
+                                RulerView(duration: video.originalDuration, currentTime: videoPlayer.currentTime, frameWidth: 300, showPlayhead: false, tickHeight: 60)
                                     .frame(maxHeight: .infinity)
                             },
                             actionView: {
@@ -276,8 +276,7 @@ extension MainEditorView{
                                 videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                             }
                         )
-                        .frame(height: 80)
-                        .border(Color.blue, width: 2)
+                        .frame(height: 120)
                         
                         Spacer()
                     }

@@ -87,6 +87,8 @@ struct WordTimelineSlider<T: View, A: View>: View {
 
             let sliderViewYCenter = proxy.size.height / 2
             let sliderPositionX = proxy.size.width / 2 + timelineWidth / 2 + (disableOffset ? 0 : offset)
+            
+
 
             // Timeline container, contains the playhead and the text boxes
             // everything is aligned to the left
@@ -133,36 +135,50 @@ struct WordTimelineSlider<T: View, A: View>: View {
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
-                        isChange = true
-
-                        let translation = gesture.translation.width
-                        let newOffset = lastOffset + translation
-                        offset = min(0, max(newOffset, -timelineWidth))
-
-                        let range = bounds.upperBound - bounds.lowerBound
-                        let normalizedOffset = offset / timelineWidth
-                        let newValue = range * normalizedOffset - bounds.lowerBound
-
-                        value = abs(newValue)
-                        onChange()
+                        TimelineSliderUtils.handleDragChanged(
+                            gesture: gesture,
+                            isChange: $isChange,
+                            lastOffset: $lastOffset,
+                            offset: $offset,
+                            timelineWidth: timelineWidth,
+                            bounds: bounds,
+                            value: $value,
+                            onChange: onChange
+                        )
                     }
                     .onEnded { gesture in
                         print("📝 WordTimelineSlider gesture ended")
-                        isChange = false
-                        lastOffset = offset
+                        TimelineSliderUtils.handleDragEnded(
+                            gesture: gesture,
+                            isChange: $isChange,
+                            lastOffset: $lastOffset,
+                            offset: $offset
+                        )
                     }
             )
             .onChange(of: value) { newValue in
                 print("📝 WordTimelineSlider value changed to: \(newValue)")
                 if !disableOffset{
                     withAnimation(.easeInOut(duration: 0.15)) {
-                        setOffset()
+                        TimelineSliderUtils.setOffset(
+                            value: value,
+                            offset: $offset,
+                            isChange: isChange,
+                            bounds: bounds,
+                            timelineWidth: timelineWidth
+                        )
                     }
                 }
             }
             .onAppear {
                 // Set initial offset based on current value
-                setOffset()
+                TimelineSliderUtils.setOffset(
+                    value: value,
+                    offset: $offset,
+                    isChange: isChange,
+                    bounds: bounds,
+                    timelineWidth: timelineWidth
+                )
                 lastOffset = offset
                 print("📏 WordTimelineSlider - frameWidth: \(frameWidth), timelineWidth: \(timelineWidth)")
             }
@@ -170,14 +186,4 @@ struct WordTimelineSlider<T: View, A: View>: View {
     }
 }
 
-extension WordTimelineSlider{
-    
-    private func setOffset(){
-        if !isChange{
-            let progress = (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)
-            offset = -progress * timelineWidth
-            print("📝 WordTimelineSlider setOffset - value: \(value), progress: \(progress), offset: \(offset)")
-        }
-    }
-    
-} 
+// setOffset method moved to TimelineSliderUtils 

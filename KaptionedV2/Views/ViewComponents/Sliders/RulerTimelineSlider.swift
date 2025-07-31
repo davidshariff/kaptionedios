@@ -57,29 +57,37 @@ struct RulerTimelineSlider<T: View, A: View>: View {
             .gesture(
                 DragGesture(minimumDistance: 1)
                     .onChanged { gesture in
-                        isChange = true
-
-                        let translation = gesture.translation.width
-                        let newOffset = lastOffset + translation
-                        offset = min(0, max(newOffset, -frameWidth))
-
-                        let range = bounds.upperBound - bounds.lowerBound
-                        let normalizedOffset = offset / frameWidth
-                        let newValue = range * normalizedOffset - bounds.lowerBound
-
-                        value = abs(newValue)
-                        onChange()
+                        TimelineSliderUtils.handleDragChanged(
+                            gesture: gesture,
+                            isChange: $isChange,
+                            lastOffset: $lastOffset,
+                            offset: $offset,
+                            timelineWidth: frameWidth,
+                            bounds: bounds,
+                            value: $value,
+                            onChange: onChange
+                        )
                     }
                     .onEnded { gesture in
                         print("🎯 RulerTimelineSlider gesture ended")
-                        isChange = false
-                        lastOffset = offset
+                        TimelineSliderUtils.handleDragEnded(
+                            gesture: gesture,
+                            isChange: $isChange,
+                            lastOffset: $lastOffset,
+                            offset: $offset
+                        )
                     }
             )
             .onChange(of: value) { _ in
                 if !disableOffset{
                     withAnimation(.easeInOut(duration: 0.15)) {
-                        setOffset()
+                        TimelineSliderUtils.setOffset(
+                            value: value,
+                            offset: $offset,
+                            isChange: isChange,
+                            bounds: bounds,
+                            timelineWidth: frameWidth
+                        )
                     }
                 }
             }
@@ -87,16 +95,7 @@ struct RulerTimelineSlider<T: View, A: View>: View {
     }
 }
 
-extension RulerTimelineSlider{
-    
-    private func setOffset(){
-        if !isChange{
-            let progress = (value - bounds.lowerBound) / (bounds.upperBound - bounds.lowerBound)
-            offset = -progress * frameWidth
-            print("🎯 setOffset - value: \(value), progress: \(progress), offset: \(offset)")
-        }
-    }
-}
+// setOffset method moved to TimelineSliderUtils
 
 struct RulerView: View {
 

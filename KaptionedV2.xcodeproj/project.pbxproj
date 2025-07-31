@@ -83,6 +83,7 @@
 		F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */; };
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
+		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +164,7 @@
 		F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
+		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -395,6 +397,7 @@
 		5ACFF9A729EE876D00827A37 /* Sliders */ = {
 			isa = PBXGroup;
 			children = (
+				F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */,
 				F42364912E36378400057C86 /* RulerTimelineSlider.swift */,
 				F42364992E373F0500057C86 /* WordTimelineSlider.swift */,
 				5ACFF9A029ED9C4000827A37 /* CustomSlider.swift */,
@@ -627,6 +630,7 @@
 				5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */,
 				5ACFF99829ED53FB00827A37 /* View+Ext.swift in Sources */,
 				5A5F956F2A01351B0041C3F6 /* TextEditorView.swift in Sources */,
+				F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */,
 				5A5E6FA12A03CCFE00F5EBF8 /* AudioEntity+Ext.swift in Sources */,
 				5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */,
 				F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */,

@@ -163,7 +163,7 @@ struct RulerView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 //.border(.yellow, width: 1)
-                .offset(x: 20)
+                .offset(x: geometry.size.width / duration / 2) // Center the 0-second tick with the playhead
                 
                 // Playhead indicator (optional)
                 if showPlayhead {

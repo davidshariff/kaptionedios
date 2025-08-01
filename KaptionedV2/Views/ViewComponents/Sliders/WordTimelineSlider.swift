@@ -42,7 +42,7 @@ struct TimelineTextBox: View {
                     .frame(width: boxWidth, height: 50, alignment: .leading)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.black.opacity(0.7))
+                            .fill(Color.gray.opacity(0.7))
                             
                     )
                     .border(isSelected ? .white : .clear, width: 1)
@@ -87,8 +87,6 @@ struct WordTimelineSlider<T: View, A: View>: View {
 
             let sliderViewYCenter = proxy.size.height / 2
             let sliderPositionX = proxy.size.width / 2 + timelineWidth / 2 + (disableOffset ? 0 : offset)
-            
-
 
             // Timeline container, contains the playhead and the text boxes
             // everything is aligned to the left

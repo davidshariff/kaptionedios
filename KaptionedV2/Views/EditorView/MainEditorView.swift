@@ -32,6 +32,7 @@ struct MainEditorView: View {
     var body: some View {
         ZStack{
             GeometryReader { proxy in
+                // main editor view
                 VStack(spacing: 0){
                     headerView(safeAreaTop: proxy.safeAreaInsets.top)
                     // video player
@@ -52,6 +53,7 @@ struct MainEditorView: View {
             if showVideoQualitySheet, let video = editorVM.currentVideo{
                 VideoExporterBottomSheetView(isPresented: $showVideoQualitySheet, video: video)
             }
+
             // Loading overlay for subtitle generation
             if editorVM.isLoading {
                 ZStack {
@@ -226,9 +228,11 @@ extension MainEditorView{
     }
     
     private func draggableSection(proxy: GeometryProxy) -> some View {
+
         VStack(spacing: 0) {
             if !showEditSubtitlesMode {
                 PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+                Spacer()
             }
 
             if let video = editorVM.currentVideo, showEditSubtitlesMode {
@@ -381,8 +385,6 @@ extension MainEditorView{
             }
         }
         .frame(height: controlsHeight)
-        .border(Color.red, width: 1)
-        .background(Color.green.opacity(0.5))
     }
     
     private func saveProject(_ phase: ScenePhase){
@@ -393,8 +395,6 @@ extension MainEditorView{
             break
         }
     }
-    
-
     
     private func setVideo(_ proxy: GeometryProxy){
         if let selectedVideoURl{

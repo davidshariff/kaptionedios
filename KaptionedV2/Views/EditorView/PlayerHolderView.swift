@@ -1,11 +1,28 @@
-//
-//  PlayerHolderView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 18.04.2023.
-//
-
 import SwiftUI
+
+struct CheckeredBackground: View {
+    let squareSize: CGFloat = 20
+    
+    var body: some View {
+        Canvas { context, size in
+            let rows = Int(size.height / squareSize) + 1
+            let cols = Int(size.width / squareSize) + 1
+            
+            for row in 0..<rows {
+                for col in 0..<cols {
+                    let x = CGFloat(col) * squareSize
+                    let y = CGFloat(row) * squareSize
+                    
+                    // Create dark squares in a checkered pattern
+                    if (row + col) % 2 == 0 {
+                        let rect = CGRect(x: x, y: y, width: squareSize, height: squareSize)
+                        context.fill(Path(rect), with: .color(.gray.opacity(0.2)))
+                    }
+                }
+            }
+        }
+    }
+}
 
 // Custom environment key for video size
 private struct VideoSizeKey: EnvironmentKey {
@@ -39,11 +56,9 @@ struct PlayerHolderView: View{
                     Text("Failed to open video")
                 case .loaded:
                     ZStack(alignment: .top) {
-                        playerStandardView
-                        Rectangle()
-                            .foregroundColor(.clear)
+                        CheckeredBackground()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .border(Color.red, width: 1)
+                        playerStandardView
                     }
                 }
             }
@@ -108,9 +123,9 @@ extension PlayerHolderView{
                                     height: proxy.size.height
                                 ))
                                 
-                                Rectangle()
-                                    .foregroundColor(.clear)
-                                    .border(Color.orange, width: 2)
+                                // Rectangle()
+                                //     .foregroundColor(.clear)
+                                //     .border(Color.orange, width: 2)
                             }
                         }
                         .contentShape(Rectangle())
@@ -132,47 +147,28 @@ extension PlayerHolderView{
                         }
                     }
                 }
-                timelineLabel
             }
         }
     }
 
-}
-
-extension PlayerHolderView{
-    
-    @ViewBuilder
-    private var timelineLabel: some View{
-        if let video = editorVM.currentVideo{
-            HStack{
-                Text((videoPlayer.currentTime - video.rangeDuration.lowerBound)  .formatterTimeString()) +
-                Text(" / ") +
-                Text(video.totalDuration.formatterTimeString())
-            }
-            .font(.caption2)
-            .foregroundColor(.white)
-            .frame(width: 80)
-            .padding(5)
-            .background(Color(.black).opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
-            .padding()
-        }
-    }
 }
 
 
 struct PlayerControl: View{
+
     @ObservedObject var recorderManager: AudioRecorderManager
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var textEditor: TextEditorViewModel
+
     var body: some View{
         VStack(spacing: 0) {
-            controlsSection
             timeLineControlSection
-            Spacer(minLength: 0)
+            controlsSection
         }
-        .padding(0)
-        .background(Color.red.opacity(0.3))
+        .border(Color.red.opacity(0.3), width: 1)
+        .padding(.horizontal, 20)
+        .padding(.top, 5)
     }
     
     @ViewBuilder
@@ -193,7 +189,6 @@ struct PlayerControl: View{
                 videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
             }
             .frame(height: 60)
-            .border(Color.purple, width: 2)
         }
     }
     
@@ -203,19 +198,43 @@ struct PlayerControl: View{
     }
     
     private var controlsSection: some View{
-        Button {
-            if let video = editorVM.currentVideo{
-                videoPlayer.action(video)
+        
+        HStack(spacing: 0) {
+            // Current time on the left
+            if let video = editorVM.currentVideo {
+                Text((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString())
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-        } label: {
-            Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
-                .imageScale(.large)
-                .font(.title2)
+            
+            // Play button in the center
+            Button {
+                if let video = editorVM.currentVideo{
+                    videoPlayer.action(video)
+                }
+            } label: {
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 60, height: 60)
+                    .overlay(
+                        Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
+                            .font(.title)
+                            .foregroundColor(.black)
+                    )
+            }
+            .buttonStyle(.plain)
+            
+            // Total duration on the right
+            if let video = editorVM.currentVideo {
+                Text(video.totalDuration.formatterTimeString())
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
         }
-        .buttonStyle(.plain)
-        .hCenter()
-        .frame(height: 50)
-        .padding(0)
-        //.background(Color.red.opacity(0.5))
+        .frame(height: 70)
     }
 }

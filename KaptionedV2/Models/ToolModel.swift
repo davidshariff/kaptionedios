@@ -15,7 +15,7 @@ enum ToolEnum: Int, CaseIterable{
     var title: String{
         switch self {
         case .subslist: return "Subslist"
-        case .presets: return "Presets"
+        case .presets: return "Templates"
         }
     }
     

@@ -18,7 +18,7 @@ struct ToolsSectionView: View {
     @ObservedObject var textEditor: TextEditorViewModel
     @Binding var showCustomSubslistSheet: Bool
     @Binding var showEditSubtitlesMode: Bool
-    private let columns = Array(repeating: GridItem(.flexible()), count: 4)
+    private let columns = Array(repeating: GridItem(.fixed(90)), count: 3)
     @State private var showPresetAlert = false
     @State private var selectedPresetName: String? = nil
     @State private var showPresetsSheet = false
@@ -167,7 +167,7 @@ struct ToolsSectionView: View {
                         .multilineTextAlignment(.center)
                 }
             }
-            ForEach(Array(ToolEnum.allCases.enumerated()), id: \.element) { index, tool in
+            ForEach(Array(ToolEnum.allCases.filter { $0 != .subslist }.enumerated()), id: \.element) { index, tool in
                 VStack(spacing: 4) {
                     ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
                         editorVM.selectedTools = tool
@@ -262,7 +262,7 @@ extension ToolsSectionView {
     private func toolLabel(for tool: ToolEnum) -> String {
         switch tool {
         case .presets:
-            return selectedPreset?.name ?? "Select presets"
+            return selectedPreset?.name ?? "Select Template"
         case .subslist:
             return "Subtitle list"
         }

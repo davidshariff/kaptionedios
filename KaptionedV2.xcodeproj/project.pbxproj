@@ -84,6 +84,8 @@
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
+		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
+		F4AFDAED2E3E301B00D3466A /* PresetsBottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE92E3E301B00D3466A /* PresetsBottomSheetView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -165,6 +167,8 @@
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
+		F4AFDAE92E3E301B00D3466A /* PresetsBottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsBottomSheetView.swift; sourceTree = "<group>"; };
+		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,6 +232,7 @@
 		5A9EDCFE29F03D800014A1CF /* ToolsView */ = {
 			isa = PBXGroup;
 			children = (
+				F4AFDAEB2E3E301B00D3466A /* PresetsList */,
 				F42230F12E3505CB001CCAE5 /* Subslist */,
 				F42230EE2E350495001CCAE5 /* PresetsList */,
 				5A62B4772A0284E400E84093 /* Audio */,
@@ -526,6 +531,15 @@
 			path = Subslist;
 			sourceTree = "<group>";
 		};
+		F4AFDAEB2E3E301B00D3466A /* PresetsList */ = {
+			isa = PBXGroup;
+			children = (
+				F4AFDAE92E3E301B00D3466A /* PresetsBottomSheetView.swift */,
+				F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */,
+			);
+			path = PresetsList;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -667,6 +681,8 @@
 				F42364942E36567D00057C86 /* SubslistView.swift in Sources */,
 				5ACFF99D29ED5C4900827A37 /* SliderView.swift in Sources */,
 				5A5E6F9D2A03C88A00F5EBF8 /* AudioSheetView.swift in Sources */,
+				F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */,
+				F4AFDAED2E3E301B00D3466A /* PresetsBottomSheetView.swift in Sources */,
 				5AE2A2B029F88113003D217F /* FilteredImage.swift in Sources */,
 				5A5F95732A0166D90041C3F6 /* Swipe.swift in Sources */,
 				5A3D13B029F186160027E25E /* CoreDataManager.swift in Sources */,

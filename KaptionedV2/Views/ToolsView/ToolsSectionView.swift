@@ -21,7 +21,7 @@ struct ToolsSectionView: View {
     private let columns = Array(repeating: GridItem(.fixed(90)), count: 3)
     @State private var showPresetAlert = false
     @State private var selectedPresetName: String? = nil
-    @State private var showPresetsSheet = false
+    @State private var showPresetsBottomSheet = false
     @State private var showPresetConfirm = false
     @State private var pendingPreset: SubtitleStyle? = nil
     @State private var selectedPreset: SubtitleStyle? = nil
@@ -36,13 +36,23 @@ struct ToolsSectionView: View {
             }
         }
         return mainContent
-            .sheet(isPresented: $showPresetsSheet) {
-                PresetsListView(showPresetConfirm: $showPresetConfirm, pendingPreset: $pendingPreset, onSelect: { style in
-                    print("DEBUG: Preset selected: \(style.name)")
-                    pendingPreset = style
-                    showPresetConfirm = true
-                    print("DEBUG: showPresetConfirm set to: \(showPresetConfirm)")
-                })
+            .overlay {
+                if showPresetsBottomSheet {
+                    PresetsBottomSheetView(
+                        isPresented: $showPresetsBottomSheet,
+                        showPresetConfirm: $showPresetConfirm,
+                        pendingPreset: $pendingPreset,
+                        onSelect: { style in
+                            print("DEBUG: Preset selected: \(style.name)")
+                            pendingPreset = style
+                            showPresetConfirm = true
+                            print("DEBUG: showPresetConfirm set to: \(showPresetConfirm)")
+                        }
+                    )
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(1000)
+                    .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet)
+                }
             }
             .confirmationDialog(
                 "Apply preset to all subtitles?",
@@ -81,7 +91,7 @@ struct ToolsSectionView: View {
                     showPresetConfirm = false
                     pendingPreset = nil
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        showPresetsSheet = false
+                        showPresetsBottomSheet = false
                     }
                 }
                 Button("Cancel", role: .cancel) {
@@ -212,9 +222,9 @@ extension ToolsSectionView{
                     }
                 }
             case .presets:
-                // Open the custom sheet and close the bottom sheet
+                // Open the custom bottom sheet and close the bottom sheet
                 Color.clear.onAppear {
-                    showPresetsSheet = true
+                    showPresetsBottomSheet = true
                     // Close the bottom sheet
                     DispatchQueue.main.async {
                         editorVM.selectedTools = nil

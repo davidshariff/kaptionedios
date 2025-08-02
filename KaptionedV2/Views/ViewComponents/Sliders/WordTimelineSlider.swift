@@ -11,9 +11,12 @@ struct TimelineTextBox: View {
     let textBox: TextBox
     let timelineWidth: CGFloat
     let duration: Double
-    let offset: CGFloat
+    let offset: Binding<CGFloat>
     let isSelected: Bool
     let onTap: () -> Void
+    let onSeek: (Double) -> Void
+    let bounds: ClosedRange<Double>
+    let isChange: Bool
     
     var body: some View {
         GeometryReader { geometry in
@@ -27,7 +30,7 @@ struct TimelineTextBox: View {
             // wordPosition is the position of the word within the timeline
             // offset is to move it as the slider moves
             // boxWidth/2 is to shift it left of center
-            let absoluteTextPosition = (wordPosition - abs(offset)) + boxWidth/2
+            let absoluteTextPosition = (wordPosition - abs(offset.wrappedValue)) + boxWidth/2
 
             // TODO: fix this, especially if a lot of text boxes are present and performance is an issue
             // let isVisible = wordPosition > 0
@@ -52,6 +55,17 @@ struct TimelineTextBox: View {
                     .truncationMode(.tail)
                     .onTapGesture {
                         onTap()
+                        onSeek(textBox.timeRange.lowerBound)
+                        // Update timeline position immediately
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            TimelineSliderUtils.setOffset(
+                                value: textBox.timeRange.lowerBound,
+                                offset: offset,
+                                isChange: isChange,
+                                bounds: bounds,
+                                timelineWidth: timelineWidth
+                            )
+                        }
                         print("📝 TimelineTextBox tapped - Text: '\(textBox.text)', Time Range: \(textBox.timeRange.lowerBound)...\(textBox.timeRange.upperBound)")
                     }
             }
@@ -81,6 +95,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
     @ViewBuilder
     var actionView: () -> A
     let onChange: () -> Void
+    let onSeek: (Double) -> Void
     
     var body: some View {
         GeometryReader { proxy in
@@ -115,12 +130,15 @@ struct WordTimelineSlider<T: View, A: View>: View {
                         textBox: textBox,
                         timelineWidth: timelineWidth,
                         duration: duration,
-                        offset: offset,
+                        offset: $offset,
                         isSelected: selectedTextBoxId == textBox.id,
                         onTap: {
                             selectedTextBoxId = textBox.id
                             selectedTextBox = textBox // Set the selected text box
-                        }
+                        },
+                        onSeek: onSeek,
+                        bounds: bounds,
+                        isChange: isChange
                     )
                 }
                 // Half-width container view, needed to place the text boxes from the middle of the screen

@@ -163,8 +163,17 @@ final class VideoPlayerManager: ObservableObject{
         }
     }
     
-    private func seek(_ seconds: Double, player: AVPlayer){
+    func seek(_ seconds: Double, player: AVPlayer){
         player.seek(to: CMTime(seconds: seconds, preferredTimescale: 600))
+    }
+    
+    func seekToTime(_ seconds: Double) {
+        seek(seconds, player: videoPlayer)
+        if isSetAudio {
+            seek(seconds, player: audioPlayer)
+        }
+        // Update currentTime immediately so the UI reflects the new position
+        currentTime = seconds
     }
     
     private func startTimer() {

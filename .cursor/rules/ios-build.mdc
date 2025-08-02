@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Don't try to test the code by compiling, I will do it for you.

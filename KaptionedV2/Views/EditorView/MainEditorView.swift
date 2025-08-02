@@ -278,6 +278,9 @@ extension MainEditorView{
                             },
                             onChange: {
                                 videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                            },
+                            onSeek: { time in
+                                videoPlayer.seekToTime(time)
                             }
                         )
                         .frame(height: 120)

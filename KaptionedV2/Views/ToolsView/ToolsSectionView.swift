@@ -1,10 +1,3 @@
-//
-//  ToolsSectionView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 18.04.2023.
-//
-
 import SwiftUI
 import AVKit
 import Foundation
@@ -12,19 +5,21 @@ import Foundation
 
 
 struct ToolsSectionView: View {
+
     @StateObject var filtersVM = FiltersViewModel()
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var textEditor: TextEditorViewModel
     @Binding var showCustomSubslistSheet: Bool
     @Binding var showEditSubtitlesMode: Bool
+    @Binding var showPresetsBottomSheet: Bool
     private let columns = Array(repeating: GridItem(.fixed(90)), count: 3)
     @State private var showPresetAlert = false
     @State private var selectedPresetName: String? = nil
-    @State private var showPresetsBottomSheet = false
     @State private var showPresetConfirm = false
     @State private var pendingPreset: SubtitleStyle? = nil
     @State private var selectedPreset: SubtitleStyle? = nil
+    
     var body: some View {
         let mainContent = ZStack {
             toolGrid
@@ -36,24 +31,6 @@ struct ToolsSectionView: View {
             }
         }
         return mainContent
-            .overlay {
-                if showPresetsBottomSheet {
-                    PresetsBottomSheetView(
-                        isPresented: $showPresetsBottomSheet,
-                        showPresetConfirm: $showPresetConfirm,
-                        pendingPreset: $pendingPreset,
-                        onSelect: { style in
-                            print("DEBUG: Preset selected: \(style.name)")
-                            pendingPreset = style
-                            showPresetConfirm = true
-                            print("DEBUG: showPresetConfirm set to: \(showPresetConfirm)")
-                        }
-                    )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(1000)
-                    .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet)
-                }
-            }
             .confirmationDialog(
                 "Apply preset to all subtitles?",
                 isPresented: $showPresetConfirm,

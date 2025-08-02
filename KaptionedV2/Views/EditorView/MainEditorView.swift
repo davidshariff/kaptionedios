@@ -23,30 +23,127 @@ struct MainEditorView: View {
     @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
     @State var isToolbarAnimating: Bool = false // State to control toolbar animation
     @State var toolbarOffset: CGFloat = 100 // State to control toolbar position
+    @State var showPresetsBottomSheet: Bool = false // State to track presets bottom sheet
+    @State var showPresetConfirm: Bool = false // State for preset confirmation
+    @State var pendingPreset: SubtitleStyle? = nil // State for pending preset
+    @State var videoPlayerHeight: CGFloat = 0 // State for video player height
+    @State var videoPlayerSize: VideoPlayerSize = .half // State to track video player size
+    @State var availableHeightExcludingPlayer: CGFloat = 200 // State for available height excluding video player
+    
+    // Enum for video player sizes
+    enum VideoPlayerSize: CaseIterable {
+        case quarter, half, threeQuarters, full, custom
+        
+        var displayName: String {
+            switch self {
+            case .quarter: return "¼"
+            case .half: return "½"
+            case .threeQuarters: return "¾"
+            case .full: return "Full"
+            case .custom: return "Custom"
+            }
+        }
+        
+        var iconName: String {
+            switch self {
+            case .quarter: return "rectangle.compress.vertical"
+            case .half: return "rectangle"
+            case .threeQuarters: return "rectangle.expand.vertical"
+            case .full: return "rectangle.fill"
+            case .custom: return "rectangle.dashed"
+            }
+        }
+    }
     
     @StateObject var editorVM = EditorViewModel()
     @StateObject var audioRecorder = AudioRecorderManager()
     @StateObject var videoPlayer = VideoPlayerManager()
     @StateObject var textEditor = TextEditorViewModel()
     
+    // Function to calculate video player height based on size and screen dimensions
+    private func calculateVideoPlayerHeight(for size: VideoPlayerSize, screenHeight: CGFloat, headerHeight: CGFloat = 0) -> CGFloat {
+        switch size {
+        case .quarter:
+            return screenHeight * 0.25
+        case .half:
+            return screenHeight * 0.5
+        case .threeQuarters:
+            return screenHeight * 0.75
+        case .full:
+            return screenHeight - headerHeight // Subtract header height for full size
+        case .custom:
+            return 200 // Custom height when presets bottom sheet is open
+        }
+    }
+    
     var body: some View {
         ZStack{
             GeometryReader { proxy in
+
                 // main editor view
                 VStack(spacing: 0){
+
                     headerView(safeAreaTop: proxy.safeAreaInsets.top)
+
                     // video player
                     PlayerHolderView(
-                        availableHeight: .constant(proxy.size.height - controlsHeight - 100),
+                        availableHeight: .constant(videoPlayerHeight),
                         editorVM: editorVM, 
                         videoPlayer: videoPlayer, 
                         textEditor: textEditor
                     )
-                    .frame(height: proxy.size.height - controlsHeight - 100) // Dynamic height based on controls
+                    .frame(height: videoPlayerHeight) // Dynamic height based on controls and bottom sheet
+                    .animation(.easeInOut(duration: 0.5), value: videoPlayerHeight) // Smooth animation when video height changes
+                    .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet) // Smooth animation when bottom sheet opens/closes
+
                     draggableSection(proxy: proxy)
+
+                    Spacer()
+
+                    if !showEditSubtitlesMode {
+                        ToolsSectionView(
+                            videoPlayer: videoPlayer, 
+                            editorVM: editorVM, 
+                            textEditor: textEditor, 
+                            showCustomSubslistSheet: $showCustomSubslistSheet,
+                            showEditSubtitlesMode: $showEditSubtitlesMode,
+                            showPresetsBottomSheet: $showPresetsBottomSheet
+                        )
+                    }
+
                 }
+                // Set initial video player height
                 .onAppear{
                     setVideo(proxy)
+                    let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
+                    videoPlayerHeight = calculateVideoPlayerHeight(for: videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
+                }
+                // Update video player height when video player size changes
+                .onChange(of: videoPlayerSize) { _ in
+                    let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
+                    videoPlayerHeight = calculateVideoPlayerHeight(for: videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
+                }
+                .onChange(of: videoPlayerHeight) { _ in
+                    // Update available height whenever video player height changes
+                    let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
+                    availableHeightExcludingPlayer = proxy.size.height - videoPlayerHeight - headerHeight // Subtract video height, header, and some padding
+                }
+                // Update video player height when bottom sheet state changes
+                .onChange(of: showPresetsBottomSheet) { newValue in
+                    if newValue {
+                        // When bottom sheet opens, set to quarter size
+                        videoPlayerSize = .quarter
+                    } else {
+                        // When bottom sheet closes, restore to half size
+                        videoPlayerSize = .half
+                    }
+                }
+                // Update video player height when edit mode changes
+                .onChange(of: showEditSubtitlesMode) { newValue in
+                    if newValue {
+                        // When edit mode is activated, set to half size
+                        videoPlayerSize = .half
+                    }
                 }
             }
             
@@ -116,6 +213,28 @@ struct MainEditorView: View {
                     .animation(.easeInOut(duration: 0.5), value: showCustomSubslistSheet)
             }
             
+            // Presets bottom sheet
+            if showPresetsBottomSheet {
+                VStack(spacing: 0) {
+                    Spacer()
+                    PresetsListView(
+                        isPresented: $showPresetsBottomSheet,
+                        showPresetConfirm: $showPresetConfirm,
+                        pendingPreset: $pendingPreset,
+                        onSelect: { style in
+                            print("DEBUG: Preset selected: \(style.name)")
+                            pendingPreset = style
+                            showPresetConfirm = true
+                            print("DEBUG: showPresetConfirm set to: \(showPresetConfirm)")
+                        }
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: availableHeightExcludingPlayer) // Dynamic height based on available space
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .zIndex(2000)
+                    .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet)
+                }
+            }
+            
             // Centered cross overlay
             if showCrossOverlay {
                 CrossOverlayView()
@@ -124,6 +243,55 @@ struct MainEditorView: View {
         }
         .background(Color.black)
         .navigationBarHidden(true)
+        .confirmationDialog(
+            "Apply preset to all subtitles?",
+            isPresented: $showPresetConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Apply", role: .destructive) {
+                print("DEBUG: Apply button tapped")
+                if let style = pendingPreset {
+                    print("DEBUG: Applying style: \(style.name)")
+                    if isKaraokePreset(style) {
+                        print("DEBUG: Generating karaoke subtitles")
+                        // For karaoke presets, generate new subtitles
+                        if let video = editorVM.currentVideo {
+                            let karaokeType = getKaraokeType(for: style)
+                            // Convert current textBoxes to lines format
+                            let lines = textEditor.textBoxes.map { textBox in
+                                (text: textBox.text, start: textBox.timeRange.lowerBound, end: textBox.timeRange.upperBound)
+                            }
+                            let subs = KaraokeSubsHelper.generateKaraokeSubs(
+                                for: video,
+                                karaokeType: karaokeType,
+                                lines: lines
+                            )
+                            textEditor.textBoxes = subs
+                            editorVM.setText(subs)
+                        }
+                    } else {
+                        print("DEBUG: Applying regular preset")
+                        // For regular presets, apply style to existing subtitles
+                        textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
+                        editorVM.setText(textEditor.textBoxes)
+                    }
+                }
+                showPresetConfirm = false
+                // Only close the preset view for karaoke presets
+                if let style = pendingPreset, isKaraokePreset(style) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        showPresetsBottomSheet = false
+                    }
+                }
+                pendingPreset = nil
+            }
+            Button("Cancel", role: .cancel) {
+                print("DEBUG: Cancel button tapped")
+                pendingPreset = nil
+            }
+        } message: {
+            Text("This will replace the style of all subtitles with the selected preset.")
+        }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.all, edges: .top)
         .fullScreenCover(isPresented: $showRecordView) {
@@ -141,6 +309,22 @@ struct MainEditorView: View {
             if textEditor.showEditor{
                 TextEditorView(viewModel: textEditor, onSave: editorVM.setText)
             }
+        }
+    }
+    
+    // Helper functions for preset handling
+    private func isKaraokePreset(_ style: SubtitleStyle) -> Bool {
+        return style.name == "Highlight by letter" || 
+               style.name == "Highlight by word" || 
+               style.name == "Background by word"
+    }
+    
+    private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
+        switch style.name {
+        case "Highlight by letter": return .letter
+        case "Highlight by word": return .word
+        case "Background by word": return .wordbg
+        default: return .word
         }
     }
 }
@@ -191,17 +375,42 @@ extension MainEditorView{
 
             Spacer()
             
-            // Cross overlay toggle button
-            Button {
-                showCrossOverlay.toggle()
-            } label: {
-                VStack(spacing: 4) {
-                    Image(systemName: showCrossOverlay ? "plus.circle.fill" : "plus.circle")
-                    Text("Cross")
-                        .font(.caption2)
+            // Center buttons container
+            HStack(spacing: 20) {
+                // Video player size toggle button
+                Button {
+                    // Cycle through video player sizes (excluding custom)
+                    let cycleSizes: [VideoPlayerSize] = [.quarter, .half, .threeQuarters, .full]
+                    if let currentIndex = cycleSizes.firstIndex(of: videoPlayerSize) {
+                        let nextIndex = (currentIndex + 1) % cycleSizes.count
+                        videoPlayerSize = cycleSizes[nextIndex]
+                    } else {
+                        // If current size is custom, go to half
+                        videoPlayerSize = .half
+                    }
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: videoPlayerSize.iconName)
+                        Text(videoPlayerSize.displayName)
+                            .font(.caption2)
+                    }
                 }
+                .foregroundColor(videoPlayerSize == .custom ? .green : .white)
+                
+                // Cross overlay toggle button
+                Button {
+                    showCrossOverlay.toggle()
+                } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: showCrossOverlay ? "plus.circle.fill" : "plus.circle")
+                        Text("Cross")
+                        .font(.caption2)
+                    }
+                }
+                .foregroundColor(showCrossOverlay ? .yellow : .white)
             }
-            .foregroundColor(showCrossOverlay ? .yellow : .white)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 8)
             
             Spacer()
             
@@ -230,7 +439,7 @@ extension MainEditorView{
     private func draggableSection(proxy: GeometryProxy) -> some View {
 
         VStack(spacing: 0) {
-            if !showEditSubtitlesMode {
+            if !showEditSubtitlesMode, !showPresetsBottomSheet {
                 PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                 Spacer()
             }
@@ -257,8 +466,7 @@ extension MainEditorView{
                             .padding(.trailing, 8)
                         }
                         .frame(height: 40)
-                        .padding(.bottom, 8)
-                
+                        .padding(.bottom, 8)                
                         
                         WordTimelineSlider(
                             bounds: video.rangeDuration,
@@ -376,18 +584,8 @@ extension MainEditorView{
                 }
             }
             
-            if !showEditSubtitlesMode {
-                ToolsSectionView(
-                    videoPlayer: videoPlayer, 
-                    editorVM: editorVM, 
-                    textEditor: textEditor, 
-                    showCustomSubslistSheet: $showCustomSubslistSheet,
-                    showEditSubtitlesMode: $showEditSubtitlesMode
-                )
-                .padding(.bottom, 20)
-            }
         }
-        .frame(height: controlsHeight)
+
     }
     
     private func saveProject(_ phase: ScenePhase){

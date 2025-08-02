@@ -1,8 +1,5 @@
 import SwiftUI
 import AVKit
-import Foundation
-
-
 
 struct ToolsSectionView: View {
 
@@ -14,8 +11,6 @@ struct ToolsSectionView: View {
     @Binding var showEditSubtitlesMode: Bool
     @Binding var showPresetsBottomSheet: Bool
     private let columns = Array(repeating: GridItem(.fixed(90)), count: 3)
-    @State private var showPresetAlert = false
-    @State private var selectedPresetName: String? = nil
     @State private var showPresetConfirm = false
     @State private var pendingPreset: SubtitleStyle? = nil
     @State private var selectedPreset: SubtitleStyle? = nil
@@ -182,8 +177,6 @@ extension ToolsSectionView{
     
     @ViewBuilder
     private func bottomSheet(_ tool: ToolEnum, _ video: Video) -> some View{
-        
-        let isAppliedTool = video.isAppliedTool(for: tool)
         
         VStack(spacing: 16){
             

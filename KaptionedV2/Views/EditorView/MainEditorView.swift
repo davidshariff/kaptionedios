@@ -18,10 +18,8 @@ struct MainEditorView: View {
     @State var showVideoQualitySheet: Bool = false
     @State var showRecordView: Bool = false
     @State var showCustomSubslistSheet: Bool = false
-    @State var controlsHeight: CGFloat = 350 // New state for draggable height
     @State var showCrossOverlay: Bool = false // New state for cross overlay
     @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
-    @State var isToolbarAnimating: Bool = false // State to control toolbar animation
     @State var toolbarOffset: CGFloat = 100 // State to control toolbar position
     @State var showPresetsBottomSheet: Bool = false // State to track presets bottom sheet
     @State var showPresetConfirm: Bool = false // State for preset confirmation
@@ -56,9 +54,9 @@ struct MainEditorView: View {
     }
     
     @StateObject var editorVM = EditorViewModel()
-    @StateObject var audioRecorder = AudioRecorderManager()
     @StateObject var videoPlayer = VideoPlayerManager()
     @StateObject var textEditor = TextEditorViewModel()
+    @StateObject var audioRecorder = AudioRecorderManager()
     
     // Function to calculate video player height based on size and screen dimensions
     private func calculateVideoPlayerHeight(for size: VideoPlayerSize, screenHeight: CGFloat, headerHeight: CGFloat = 0) -> CGFloat {
@@ -96,7 +94,7 @@ struct MainEditorView: View {
                     .animation(.easeInOut(duration: 0.5), value: videoPlayerHeight) // Smooth animation when video height changes
                     .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet) // Smooth animation when bottom sheet opens/closes
 
-                    draggableSection(proxy: proxy)
+                    draggableSection()
 
                     Spacer()
 
@@ -436,7 +434,7 @@ extension MainEditorView{
         .padding(.bottom)
     }
     
-    private func draggableSection(proxy: GeometryProxy) -> some View {
+    private func draggableSection() -> some View {
 
         VStack(spacing: 0) {
             if !showEditSubtitlesMode, !showPresetsBottomSheet {

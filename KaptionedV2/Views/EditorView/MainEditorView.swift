@@ -17,6 +17,7 @@ struct MainEditorView: View {
 
     @State var showVideoQualitySheet: Bool = false
     @State var showRecordView: Bool = false
+    @State var showBackConfirmation: Bool = false
     @State var showCustomSubslistSheet: Bool = false
     @State var showCrossOverlay: Bool = false // New state for cross overlay
     @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
@@ -295,6 +296,17 @@ struct MainEditorView: View {
         } message: {
             Text("This will replace the style of all subtitles with the selected preset.")
         }
+        .confirmationDialog("Are you sure?", isPresented: $showBackConfirmation) {
+            Button("Yes, go back", role: .destructive) {
+                editorVM.updateProject()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {
+                // Do nothing, just dismiss the dialog
+            }
+        } message: {
+            Text("Are you sure you want to exit this project? Your changes will be saved.")
+        }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.all, edges: .top)
         .fullScreenCover(isPresented: $showRecordView) {
@@ -364,8 +376,7 @@ extension MainEditorView{
         private func headerView(safeAreaTop: CGFloat) -> some View{
         HStack{
             Button {
-                editorVM.updateProject()
-                dismiss()
+                showBackConfirmation = true
             } label: {
                 VStack(spacing: 4) {
                     Image(systemName: "folder.fill")

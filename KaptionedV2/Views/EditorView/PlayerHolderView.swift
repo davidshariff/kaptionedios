@@ -174,21 +174,19 @@ struct PlayerControl: View{
     @ViewBuilder
     private var timeLineControlSection: some View{
         if let video = editorVM.currentVideo{
-            RulerTimelineSlider(
+            RulerView(
+                value: $videoPlayer.currentTime,
                 bounds: video.rangeDuration,
                 disableOffset: false,
-                value: $videoPlayer.currentTime,
-                frameWidth: 300
-            ) {
-                RulerView(duration: video.originalDuration, currentTime: videoPlayer.currentTime, frameWidth: 300, showPlayhead: false)
-                    .frame(maxHeight: .infinity)
-            } actionView: {
-                recordButton
-            }
-            onChange: {
-                videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
-            }
-            .frame(height: 60)
+                duration: video.originalDuration,
+                currentTime: videoPlayer.currentTime,
+                showMinorTicks: false,
+                showPlayhead: true,
+                onChange: {
+                    videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                }
+            )
+            .frame(width: 300)
         }
     }
     

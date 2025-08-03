@@ -27,6 +27,10 @@ struct MainEditorView: View {
     @State var videoPlayerHeight: CGFloat = 0 // State for video player height
     @State var videoPlayerSize: VideoPlayerSize = .half // State to track video player size
     @State var availableHeightExcludingPlayer: CGFloat = 200 // State for available height excluding video player
+    @State var rulerOffset: CGFloat = 0 // State to track ruler offset
+    @State var actualTimelineWidth: CGFloat = 0 // State for actual timeline width
+    @State var rulerStartInParentX: CGFloat = 0 // State for ruler start position in parent
+    @State var externalDragOffset: CGFloat = 0 // State for external drag offset from text boxes
     
     // Enum for video player sizes
     enum VideoPlayerSize: CaseIterable {
@@ -467,16 +471,35 @@ extension MainEditorView{
                         .padding(.bottom, 8)                
                         
                         WordTimelineSlider(
+                            value: $videoPlayer.currentTime,
+                            selectedTextBox: $textEditor.selectedTextBox,
                             bounds: video.rangeDuration,
                             disableOffset: false,
-                            value: $videoPlayer.currentTime,
-                            timelineWidth: 300,
                             textBoxes: video.textBoxes,
                             duration: video.originalDuration,
-                            selectedTextBox: $textEditor.selectedTextBox,
-                            frameView: {
-                                RulerView(duration: video.originalDuration, currentTime: videoPlayer.currentTime, frameWidth: 300, showPlayhead: false, tickHeight: 60)
-                                    .frame(maxHeight: .infinity)
+                            offset: $rulerOffset,
+                            actualTimelineWidth: $actualTimelineWidth,
+                            rulerStartInParentX: $rulerStartInParentX,
+                            externalDragOffset: $externalDragOffset,
+                            backgroundView: {
+                                RulerView(
+                                    value: $videoPlayer.currentTime,
+                                    bounds: video.rangeDuration,
+                                    disableOffset: false,
+                                    duration: video.originalDuration, 
+                                    currentTime: videoPlayer.currentTime, 
+                                    showPlayhead: true, 
+                                    tickHeight: 60, 
+                                    customPixelsPerSecond: 50,
+                                    actualTimelineWidth: $actualTimelineWidth,
+                                    rulerStartInParentX: $rulerStartInParentX,
+                                    exposedOffset: $rulerOffset,
+                                    externalDragOffset: $externalDragOffset,
+                                    onChange: {
+                                        videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                                    }
+                                )
+                                .frame(maxHeight: .infinity)
                             },
                             actionView: {
                                 Rectangle()

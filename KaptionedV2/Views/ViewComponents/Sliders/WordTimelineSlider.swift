@@ -1,17 +1,120 @@
-//
-//  WordTimelineSlider.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 19.04.2023.
-//
-
 import SwiftUI
+
+//  Main Word Timeline Slider
+struct WordTimelineSlider<T: View, A: View>: View {
+
+    // Bindings
+    @Binding var value: Double
+    @Binding var selectedTextBox: TextBox?
+
+    // State
+    @State private var selectedTextBoxId: UUID?
+
+    // Configuration
+    var bounds: ClosedRange<Double>
+    var disableOffset: Bool
+    var offset: Binding<CGFloat>
+    var actualTimelineWidth: Binding<CGFloat>?
+    var rulerStartInParentX: Binding<CGFloat>?
+    var externalDragOffset: Binding<CGFloat>?
+
+    // Constants
+    let textBoxes: [TextBox]
+    let duration: Double
+
+    // Views & Actions
+    @ViewBuilder var backgroundView: () -> T
+    @ViewBuilder var actionView: () -> A
+    let onChange: () -> Void
+    let onSeek: (Double) -> Void
+    
+    // Initializer
+    init(
+        value: Binding<Double>,
+        selectedTextBox: Binding<TextBox?>,
+        bounds: ClosedRange<Double>,
+        disableOffset: Bool,
+        textBoxes: [TextBox],
+        duration: Double,
+        offset: Binding<CGFloat>,
+        actualTimelineWidth: Binding<CGFloat>? = nil,
+        rulerStartInParentX: Binding<CGFloat>? = nil,
+        externalDragOffset: Binding<CGFloat>? = nil,
+        @ViewBuilder backgroundView: @escaping () -> T,
+        @ViewBuilder actionView: @escaping () -> A,
+        onChange: @escaping () -> Void,
+        onSeek: @escaping (Double) -> Void
+    ) {
+        self._value = value
+        self._selectedTextBox = selectedTextBox
+        self.bounds = bounds
+        self.disableOffset = disableOffset
+        self.textBoxes = textBoxes
+        self.duration = duration
+        self.offset = offset
+        self.actualTimelineWidth = actualTimelineWidth
+        self.rulerStartInParentX = rulerStartInParentX
+        self.externalDragOffset = externalDragOffset
+        self.backgroundView = backgroundView
+        self.actionView = actionView
+        self.onChange = onChange
+        self.onSeek = onSeek
+    }
+    
+    private func createTextBoxView(_ textBox: TextBox) -> TimelineTextBox {
+        let timelineWidth = actualTimelineWidth?.wrappedValue ?? 0
+        return TimelineTextBox(
+            textBox: textBox,
+            timelineWidth: timelineWidth,
+            duration: duration,
+            offset: offset,
+            externalDragOffset: externalDragOffset,
+            isSelected: selectedTextBox?.id == textBox.id,
+            onTap: {
+                selectedTextBox = textBox
+            },
+            onSeek: onSeek,
+            bounds: bounds,
+            isChange: false
+        )
+    }
+    
+    private var textBoxViews: some View {
+        ForEach(textBoxes, id: \.id) { (textBox: TextBox) in
+            createTextBoxView(textBox)
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+
+            backgroundView()
+
+            textBoxViews
+            .border(.red, width: 1)
+            .offset(x: rulerStartInParentX?.wrappedValue ?? 0)
+            .allowsHitTesting(true)
+
+        }
+        .onAppear {
+            let rulerStartValue = rulerStartInParentX?.wrappedValue ?? 0
+            print("📏 WordTimelineSlider - rulerStartInParentX: \(rulerStartValue)")
+            print("📏 WordTimelineSlider - textBoxes count: \(textBoxes.count)")
+        }
+        .onChange(of: rulerStartInParentX?.wrappedValue) { newValue in
+            let rulerStartValue = newValue ?? 0
+            print("📏 WordTimelineSlider - rulerStartInParentX changed to: \(rulerStartValue)")
+        }
+    }
+    
+}
 
 struct TimelineTextBox: View {
     let textBox: TextBox
     let timelineWidth: CGFloat
     let duration: Double
     let offset: Binding<CGFloat>
+    let externalDragOffset: Binding<CGFloat>?
     let isSelected: Bool
     let onTap: () -> Void
     let onSeek: (Double) -> Void
@@ -22,7 +125,7 @@ struct TimelineTextBox: View {
         GeometryReader { geometry in
             let textBoxStart = textBox.timeRange.lowerBound
             let textBoxEnd = textBox.timeRange.upperBound
-            let pixelsPerSecond = timelineWidth / duration
+            let pixelsPerSecond = (timelineWidth / duration)
             let boxDuration = textBoxEnd - textBoxStart
             let boxWidth = boxDuration * pixelsPerSecond
             let wordPosition = textBoxStart * pixelsPerSecond
@@ -46,160 +149,63 @@ struct TimelineTextBox: View {
                     .background(
                         RoundedRectangle(cornerRadius: 4)
                             .fill(Color.gray.opacity(0.7))
-                            
                     )
                     .border(isSelected ? .white : .clear, width: 1)
                     .position(x: absoluteTextPosition, y: geometry.size.height / 2)
                     .opacity(0.9)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                    .onTapGesture {
-                        onTap()
-                        onSeek(textBox.timeRange.lowerBound)
-                        // Update timeline position immediately
-                        withAnimation(.easeInOut(duration: 0.15)) {
-                            TimelineSliderUtils.setOffset(
-                                value: textBox.timeRange.lowerBound,
-                                offset: offset,
-                                isChange: isChange,
-                                bounds: bounds,
-                                timelineWidth: timelineWidth
-                            )
-                        }
-                        print("📝 TimelineTextBox tapped - Text: '\(textBox.text)', Time Range: \(textBox.timeRange.lowerBound)...\(textBox.timeRange.upperBound)")
-                    }
-            }
-        }
-    }
-}
-
-//  Main Word Timeline Slider
-struct WordTimelineSlider<T: View, A: View>: View {
-    @State private var lastOffset: CGFloat = 0
-    @State private var selectedTextBoxId: UUID?
-    var bounds: ClosedRange<Double>
-    var disableOffset: Bool
-    @Binding var value: Double
-    @State var isChange: Bool = false
-    @State var offset: CGFloat = 0
-    @State var gestureW: CGFloat = 0
-    
-    var timelineWidth: CGFloat = 65
-    let frameWidth: CGFloat = 30
-    let textBoxes: [TextBox]
-    let duration: Double
-    @Binding var selectedTextBox: TextBox? // New binding for selected text box
-    
-    @ViewBuilder
-    var frameView: () -> T
-    @ViewBuilder
-    var actionView: () -> A
-    let onChange: () -> Void
-    let onSeek: (Double) -> Void
-    
-    var body: some View {
-        GeometryReader { proxy in
-
-            let sliderViewYCenter = proxy.size.height / 2
-            let sliderPositionX = proxy.size.width / 2 + timelineWidth / 2 + (disableOffset ? 0 : offset)
-
-            // Timeline container, contains the playhead and the text boxes
-            // everything is aligned to the left
-            ZStack(alignment: .leading) {
-
-                // Background gesture area that covers the full width
-                Rectangle()
-                    .fill(Color.black.opacity(0.001)) // Nearly transparent but still captures gestures as SwiftUI does not capture gestures on transparent views
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                
-                ZStack(alignment: .leading) {
-                    // Ruler view (frameView) - this displays the ticks
-                    frameView()
-                        .frame(width: timelineWidth, height: proxy.size.height)
-                        .position(x: sliderPositionX - frameWidth/2, y: sliderViewYCenter)
-                    
-                    // Playhead indicator
-                    PlayheadView(height: proxy.size.height * 0.3)
-                        .opacity(disableOffset ? 0 : 1)
-                        .position(x: (proxy.size.width / 2), y: (proxy.size.height * 0.3) / 2)
-                }
-                
-                // Text box overlays with absolute positioning
-                ForEach(textBoxes, id: \.id) { textBox in
-                    TimelineTextBox(
-                        textBox: textBox,
-                        timelineWidth: timelineWidth,
-                        duration: duration,
-                        offset: $offset,
-                        isSelected: selectedTextBoxId == textBox.id,
-                        onTap: {
-                            selectedTextBoxId = textBox.id
-                            selectedTextBox = textBox // Set the selected text box
-                        },
-                        onSeek: onSeek,
-                        bounds: bounds,
-                        isChange: isChange
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                // This will be called for any drag, even very small ones
+                                let distance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
+                                
+                                // If this is a significant drag, pass it to the RulerView immediately
+                                if distance >= 5 {
+                                    if let externalDragBinding = externalDragOffset {
+                                        externalDragBinding.wrappedValue = value.translation.width
+                                    }
+                                }
+                            }
+                            .onEnded { value in
+                                let dragDistance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
+                                
+                                // If drag distance is very small, treat as tap
+                                if dragDistance < 5 {
+                                    onTap()
+                                    onSeek(textBox.timeRange.lowerBound)
+                                    // Update timeline position immediately
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        // Note: This will need to be updated when we integrate with the new RulerView drag logic
+                                        // TimelineSliderUtils.setOffset(
+                                        //     value: textBox.timeRange.lowerBound,
+                                        //     offset: offset,
+                                        //     isChange: isChange,
+                                        //     bounds: bounds,
+                                        //     timelineWidth: timelineWidth
+                                        // )
+                                    }
+                                } else {
+                                    // Pass the drag translation to the external drag offset
+                                    if let externalDragBinding = externalDragOffset {
+                                        externalDragBinding.wrappedValue = value.translation.width
+                                    }
+                                }
+                                
+                                // Reset external drag offset after a short delay to let RulerView process the final position
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    if let externalDragBinding = externalDragOffset {
+                                        externalDragBinding.wrappedValue = 0
+                                    }
+                                }
+                            }
                     )
-                }
-                // Half-width container view, needed to place the text boxes from the middle of the screen
-                .frame(width: proxy.size.width / 2)
-                // move it to the middle of the screen
-                .offset(x: proxy.size.width / 2, y: 0)
-            }
-            .frame(width: proxy.size.width, height: proxy.size.height)
-            .border(Color.red, width: 1)
-            .gesture(
-                DragGesture(minimumDistance: 1)
-                    .onChanged { gesture in
-                        TimelineSliderUtils.handleDragChanged(
-                            gesture: gesture,
-                            isChange: $isChange,
-                            lastOffset: $lastOffset,
-                            offset: $offset,
-                            timelineWidth: timelineWidth,
-                            bounds: bounds,
-                            value: $value,
-                            onChange: onChange
-                        )
+                    .onAppear {
+                        // Debug positioning
+                        print("📝 TimelineTextBox - Text: '\(textBox.text)', Position: \(absoluteTextPosition), BoxWidth: \(boxWidth), WordPosition: \(wordPosition), Offset: \(offset.wrappedValue)")
                     }
-                    .onEnded { gesture in
-                        print("📝 WordTimelineSlider gesture ended")
-                        TimelineSliderUtils.handleDragEnded(
-                            gesture: gesture,
-                            isChange: $isChange,
-                            lastOffset: $lastOffset,
-                            offset: $offset
-                        )
-                    }
-            )
-            .onChange(of: value) { newValue in
-                print("📝 WordTimelineSlider value changed to: \(newValue)")
-                if !disableOffset{
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        TimelineSliderUtils.setOffset(
-                            value: value,
-                            offset: $offset,
-                            isChange: isChange,
-                            bounds: bounds,
-                            timelineWidth: timelineWidth
-                        )
-                    }
-                }
-            }
-            .onAppear {
-                // Set initial offset based on current value
-                TimelineSliderUtils.setOffset(
-                    value: value,
-                    offset: $offset,
-                    isChange: isChange,
-                    bounds: bounds,
-                    timelineWidth: timelineWidth
-                )
-                lastOffset = offset
-                print("📏 WordTimelineSlider - frameWidth: \(frameWidth), timelineWidth: \(timelineWidth)")
             }
         }
     }
 }
-
-// setOffset method moved to TimelineSliderUtils 

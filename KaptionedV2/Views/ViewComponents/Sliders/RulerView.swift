@@ -104,8 +104,8 @@ struct RulerView: View {
     private func createPlayhead(geometry: GeometryProxy) -> some View {
         Group {
             if showPlayhead {
-                PlayheadView(height: geometry.size.height)
-                    .position(x: 0, y: geometry.size.height / 2)
+                PlayheadView(height: geometry.size.height / 2)
+                    .position(x: 0, y: (geometry.size.height / 2) / 2)
             }
         }
     }

@@ -17,6 +17,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
     var actualTimelineWidth: Binding<CGFloat>?
     var rulerStartInParentX: Binding<CGFloat>?
     var externalDragOffset: Binding<CGFloat>?
+    var externalZoomOffset: Binding<CGFloat>?
 
     // Constants
     let textBoxes: [TextBox]
@@ -40,6 +41,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
         actualTimelineWidth: Binding<CGFloat>? = nil,
         rulerStartInParentX: Binding<CGFloat>? = nil,
         externalDragOffset: Binding<CGFloat>? = nil,
+        externalZoomOffset: Binding<CGFloat>? = nil,
         @ViewBuilder backgroundView: @escaping () -> T,
         @ViewBuilder actionView: @escaping () -> A,
         onChange: @escaping () -> Void,
@@ -55,6 +57,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
         self.actualTimelineWidth = actualTimelineWidth
         self.rulerStartInParentX = rulerStartInParentX
         self.externalDragOffset = externalDragOffset
+        self.externalZoomOffset = externalZoomOffset
         self.backgroundView = backgroundView
         self.actionView = actionView
         self.onChange = onChange
@@ -69,6 +72,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
             duration: duration,
             offset: offset,
             externalDragOffset: externalDragOffset,
+            externalZoomOffset: externalZoomOffset,
             isSelected: selectedTextBox?.id == textBox.id,
             onTap: {
                 selectedTextBox = textBox
@@ -115,11 +119,23 @@ struct TimelineTextBox: View {
     let duration: Double
     let offset: Binding<CGFloat>
     let externalDragOffset: Binding<CGFloat>?
+    let externalZoomOffset: Binding<CGFloat>?
     let isSelected: Bool
     let onTap: () -> Void
     let onSeek: (Double) -> Void
     let bounds: ClosedRange<Double>
     let isChange: Bool
+    
+    // Zoom state for pinch gesture
+    @State private var zoomLevel: CGFloat = 1.0
+    @State private var lastZoomLevel: CGFloat = 1.0
+    @State private var isZooming: Bool = false
+    @State private var isDragging: Bool = false
+    @State private var gestureStartTime: Date = Date()
+    
+    // Zoom constraints
+    let minZoomLevel: CGFloat = 0.5
+    let maxZoomLevel: CGFloat = 5.0
     
     var body: some View {
         GeometryReader { geometry in
@@ -161,8 +177,9 @@ struct TimelineTextBox: View {
                                 // This will be called for any drag, even very small ones
                                 let distance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
                                 
-                                // If this is a significant drag, pass it to the RulerView immediately
-                                if distance >= 5 {
+                                // If this is a significant drag and we're not zooming, pass it to the RulerView immediately
+                                if distance >= 5 && !isZooming {
+                                    isDragging = true
                                     if let externalDragBinding = externalDragOffset {
                                         externalDragBinding.wrappedValue = value.translation.width
                                     }
@@ -171,8 +188,8 @@ struct TimelineTextBox: View {
                             .onEnded { value in
                                 let dragDistance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
                                 
-                                // If drag distance is very small, treat as tap
-                                if dragDistance < 5 {
+                                // If drag distance is very small and we're not zooming, treat as tap
+                                if dragDistance < 5 && !isZooming {
                                     onTap()
                                     onSeek(textBox.timeRange.lowerBound)
                                     // Update timeline position immediately
@@ -186,16 +203,44 @@ struct TimelineTextBox: View {
                                         //     timelineWidth: timelineWidth
                                         // )
                                     }
-                                } else {
+                                } else if isDragging {
                                     // Pass the drag translation to the external drag offset
                                     if let externalDragBinding = externalDragOffset {
                                         externalDragBinding.wrappedValue = value.translation.width
                                     }
                                 }
                                 
+                                isDragging = false
+                                
                                 // Reset external drag offset after a short delay to let RulerView process the final position
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                     if let externalDragBinding = externalDragOffset {
+                                        externalDragBinding.wrappedValue = 0
+                                    }
+                                }
+                            }
+                    )
+                    .gesture(
+                        MagnificationGesture()
+                            .onChanged { scale in
+                                isZooming = true
+                                let newZoomLevel = lastZoomLevel * scale
+                                zoomLevel = min(maxZoomLevel, max(minZoomLevel, newZoomLevel))
+                                
+                                // Pass zoom information to RulerView through external zoom offset
+                                if let externalZoomBinding = externalZoomOffset {
+                                    // Use a positive value for zoom level
+                                    let zoomIndicator = zoomLevel * 1000 // Scale up for precision
+                                    externalZoomBinding.wrappedValue = zoomIndicator
+                                }
+                            }
+                            .onEnded { scale in
+                                isZooming = false
+                                lastZoomLevel = zoomLevel
+                                
+                                // Reset the external drag offset after zoom ends
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                    if let externalDragBinding = externalZoomOffset {
                                         externalDragBinding.wrappedValue = 0
                                     }
                                 }

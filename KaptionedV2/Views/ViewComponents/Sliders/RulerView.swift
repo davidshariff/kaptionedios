@@ -12,6 +12,11 @@ struct RulerView: View {
     @State private var isExternalDrag: Bool = false
     @State private var externalDragStartOffset: CGFloat = 0
     
+    // Zoom state
+    @State private var zoomLevel: CGFloat = 1.0
+    @State private var lastZoomLevel: CGFloat = 1.0
+    @State private var isZooming: Bool = false
+    
     // Configuration
     var bounds: ClosedRange<Double>
     var disableOffset: Bool
@@ -19,6 +24,7 @@ struct RulerView: View {
     var rulerStartInParentX: Binding<CGFloat>?
     var exposedOffset: Binding<CGFloat>?
     var externalDragOffset: Binding<CGFloat>?
+    var externalZoomOffset: Binding<CGFloat>?
     
     // Constants
     let duration: Double
@@ -29,6 +35,10 @@ struct RulerView: View {
     let showTimelabel: Bool
     let tickHeight: CGFloat
     let customPixelsPerSecond: CGFloat
+    
+    // Zoom constraints
+    let minZoomLevel: CGFloat = 0.5
+    let maxZoomLevel: CGFloat = 5.0
     
     // Actions
     let onChange: () -> Void
@@ -50,6 +60,7 @@ struct RulerView: View {
         rulerStartInParentX: Binding<CGFloat>? = nil,
         exposedOffset: Binding<CGFloat>? = nil,
         externalDragOffset: Binding<CGFloat>? = nil,
+        externalZoomOffset: Binding<CGFloat>? = nil,
         onChange: @escaping () -> Void = {}
     ) {
         self._value = value
@@ -67,6 +78,7 @@ struct RulerView: View {
         self.rulerStartInParentX = rulerStartInParentX
         self.exposedOffset = exposedOffset
         self.externalDragOffset = externalDragOffset
+        self.externalZoomOffset = externalZoomOffset
         self.onChange = onChange
     }
     
@@ -112,12 +124,13 @@ struct RulerView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            let pixelsPerSecond = customPixelsPerSecond > 0 ? customPixelsPerSecond : (geometry.size.width / CGFloat(duration))
-            let calculatedTimelineWidth = duration * pixelsPerSecond
+            let basePixelsPerSecond = customPixelsPerSecond > 0 ? customPixelsPerSecond : (geometry.size.width / CGFloat(duration))
+            let zoomedPixelsPerSecond = basePixelsPerSecond * zoomLevel
+            let calculatedTimelineWidth = duration * zoomedPixelsPerSecond
             let rulerStartX = geometry.size.width / 2
             
             ZStack {
-                createRulerTicks(pixelsPerSecond: pixelsPerSecond)
+                createRulerTicks(pixelsPerSecond: zoomedPixelsPerSecond)
                 createPlayhead(geometry: geometry)
             }
             // center the timeline in the parent view
@@ -149,6 +162,31 @@ struct RulerView: View {
                     }
                     .onEnded { gesture in
                         isChange = false
+                        lastOffset = offset
+                    }
+            )
+            .gesture(
+                MagnificationGesture()
+                    .onChanged { scale in
+                        isZooming = true
+                        let newZoomLevel = lastZoomLevel * scale
+                        zoomLevel = min(maxZoomLevel, max(minZoomLevel, newZoomLevel))
+                    }
+                    .onEnded { scale in
+                        isZooming = false
+                        lastZoomLevel = zoomLevel
+                        
+                        // Adjust offset to keep the current time position centered
+                        let oldTimelineWidth = duration * (basePixelsPerSecond * lastZoomLevel)
+                        let newTimelineWidth = calculatedTimelineWidth
+                        let scaleRatio = newTimelineWidth / oldTimelineWidth
+                        
+                        // Adjust offset to maintain relative position
+                        offset = offset * scaleRatio
+                        lastOffset = offset
+                        
+                        // Ensure offset stays within bounds
+                        offset = min(0, max(offset, -calculatedTimelineWidth))
                         lastOffset = offset
                     }
             )
@@ -186,7 +224,7 @@ struct RulerView: View {
                 
                 // Check actualTimelineWidth binding
                 if let actualTimelineWidthBinding = actualTimelineWidth {
-                    let newTimelineWidth = duration * (customPixelsPerSecond > 0 ? customPixelsPerSecond : (geometry.size.width / CGFloat(duration)))
+                    let newTimelineWidth = calculatedTimelineWidth
                     actualTimelineWidthBinding.wrappedValue = newTimelineWidth
                 }
             }
@@ -205,7 +243,7 @@ struct RulerView: View {
                 
                 // Also update actualTimelineWidth when geometry changes
                 if let actualTimelineWidthBinding = actualTimelineWidth {
-                    let newTimelineWidth = duration * (customPixelsPerSecond > 0 ? customPixelsPerSecond : (geometry.size.width / CGFloat(duration)))
+                    let newTimelineWidth = calculatedTimelineWidth
                     actualTimelineWidthBinding.wrappedValue = newTimelineWidth
                 }
             }
@@ -244,6 +282,34 @@ struct RulerView: View {
                     let newValue = range * normalizedOffset - bounds.lowerBound
                     value = abs(newValue)
                     onChange()
+                }
+            }
+            .onChange(of: externalZoomOffset?.wrappedValue) { newZoomOffset in
+                // Handle external zoom offset from text boxes
+                if let zoomSignal = newZoomOffset {
+                    // Check if this is a zoom signal (should be positive now since we're using separate binding)
+                    if zoomSignal > 0 {
+                        // Extract the zoom level
+                        let zoomLevel = zoomSignal / 1000.0 // Reverse the scaling from TimelineTextBox
+                        let newZoomLevel = min(maxZoomLevel, max(minZoomLevel, zoomLevel))
+                        
+                        // Apply the zoom
+                        self.zoomLevel = newZoomLevel
+                        lastZoomLevel = newZoomLevel
+                        
+                        // Adjust offset to keep the current time position centered
+                        let oldTimelineWidth = duration * (basePixelsPerSecond * lastZoomLevel)
+                        let newTimelineWidth = calculatedTimelineWidth
+                        let scaleRatio = newTimelineWidth / oldTimelineWidth
+                        
+                        // Adjust offset to maintain relative position
+                        offset = offset * scaleRatio
+                        lastOffset = offset
+                        
+                        // Ensure offset stays within bounds
+                        offset = min(0, max(offset, -calculatedTimelineWidth))
+                        lastOffset = offset
+                    }
                 }
             }
         }

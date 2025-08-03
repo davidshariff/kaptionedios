@@ -31,6 +31,7 @@ struct MainEditorView: View {
     @State var actualTimelineWidth: CGFloat = 0 // State for actual timeline width
     @State var rulerStartInParentX: CGFloat = 0 // State for ruler start position in parent
     @State var externalDragOffset: CGFloat = 0 // State for external drag offset from text boxes
+    @State var externalZoomOffset: CGFloat = 0 // State for external zoom offset from text boxes
     
     // Enum for video player sizes
     enum VideoPlayerSize: CaseIterable {
@@ -481,6 +482,7 @@ extension MainEditorView{
                             actualTimelineWidth: $actualTimelineWidth,
                             rulerStartInParentX: $rulerStartInParentX,
                             externalDragOffset: $externalDragOffset,
+                            externalZoomOffset: $externalZoomOffset,
                             backgroundView: {
                                 RulerView(
                                     value: $videoPlayer.currentTime,
@@ -495,6 +497,7 @@ extension MainEditorView{
                                     rulerStartInParentX: $rulerStartInParentX,
                                     exposedOffset: $rulerOffset,
                                     externalDragOffset: $externalDragOffset,
+                                    externalZoomOffset: $externalZoomOffset,
                                     onChange: {
                                         videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                                     }

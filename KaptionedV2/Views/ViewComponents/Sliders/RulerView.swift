@@ -37,7 +37,7 @@ struct RulerView: View {
     let customPixelsPerSecond: CGFloat
     
     // Zoom constraints
-    let minZoomLevel: CGFloat = 0.5
+    let minZoomLevel: CGFloat = 1.0
     let maxZoomLevel: CGFloat = 5.0
     
     // Actions
@@ -144,9 +144,15 @@ struct RulerView: View {
                     .onChanged { gesture in
                         isChange = true
                         let translation = gesture.translation.width
+                        
+                        // Scale the drag sensitivity based on zoom level
+                        // Higher zoom = slower drag (more precise), Lower zoom = faster drag (less precise)
+                        let zoomSensitivity = 1.0 / zoomLevel
+                        let scaledTranslation = translation * zoomSensitivity
+                        
                         let scaleFactor = calculatedTimelineWidth / geometry.size.width
-                        let scaledTranslation = translation * scaleFactor
-                        let newOffset = lastOffset + scaledTranslation
+                        let finalTranslation = scaledTranslation * scaleFactor
+                        let newOffset = lastOffset + finalTranslation
                         offset = min(0, max(newOffset, -calculatedTimelineWidth))
                         
                         // Update the exposed offset binding if provided
@@ -265,7 +271,10 @@ struct RulerView: View {
                     
                     // Calculate the scale factor for the timeline
                     let scaleFactor = calculatedTimelineWidth / geometry.size.width
-                    let scaledTranslation = newOffset * scaleFactor
+                    
+                    // Scale the drag sensitivity based on zoom level
+                    let zoomSensitivity = 1.0 / zoomLevel
+                    let scaledTranslation = newOffset * zoomSensitivity * scaleFactor
                     
                     // Apply the external drag as a relative movement from the start position
                     let newRulerOffset = externalDragStartOffset + scaledTranslation

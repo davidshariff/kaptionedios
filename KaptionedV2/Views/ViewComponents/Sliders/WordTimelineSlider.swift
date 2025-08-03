@@ -134,7 +134,7 @@ struct TimelineTextBox: View {
     @State private var gestureStartTime: Date = Date()
     
     // Zoom constraints
-    let minZoomLevel: CGFloat = 0.5
+    let minZoomLevel: CGFloat = 1.0
     let maxZoomLevel: CGFloat = 5.0
     
     var body: some View {

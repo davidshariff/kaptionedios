@@ -18,6 +18,7 @@ class TextEditorViewModel: ObservableObject{
     @Published var isEditMode: Bool = false
     
     var onEditTextContentClosed: (() -> Void)?
+    var onSave: (([TextBox]) -> Void)?
     
     func cancelTextEditor(){
         showEditor = false
@@ -26,6 +27,17 @@ class TextEditorViewModel: ObservableObject{
     }
     
     func closeEditTextContent(){
+        // Save the changes back to the original text box
+        if let selectedTextBox = selectedTextBox,
+           let index = textBoxes.firstIndex(where: {$0.id == selectedTextBox.id}){
+            textBoxes[index] = currentTextBox
+            // Update the selectedTextBox reference to point to the updated text box
+            self.selectedTextBox = textBoxes[index]
+        }
+        
+        // Call onSave to update the main video model
+        onSave?(textBoxes)
+        
         showEditTextContent = false
         showEditor = false
         onEditTextContentClosed?()

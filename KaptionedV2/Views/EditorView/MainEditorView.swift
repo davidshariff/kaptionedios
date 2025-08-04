@@ -93,6 +93,11 @@ struct MainEditorView: View {
             textEditor.onEditTextContentClosed = {
                 editorVM.videoPlayerSize = .half
             }
+            
+            // Set callback to save text boxes to the main video model
+            textEditor.onSave = { textBoxes in
+                editorVM.setText(textBoxes)
+            }
         }
                 // Update video player height when video player size changes
                 .onChange(of: editorVM.videoPlayerSize) { _ in
@@ -239,7 +244,7 @@ struct MainEditorView: View {
         .blur(radius: textEditor.showEditor && !textEditor.showEditTextContent ? 10 : 0)
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .overlay {
-            if textEditor.showEditor{
+            if textEditor.showEditor && !textEditor.showEditTextContent {
                 TextEditorView(viewModel: textEditor, onSave: editorVM.setText)
             }
         }
@@ -371,6 +376,7 @@ extension MainEditorView{
     private func centerSection() -> some View {
 
         VStack(spacing: 0) {
+
             if !showEditSubtitlesMode, !showPresetsBottomSheet {
                 PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                 Spacer()
@@ -382,73 +388,81 @@ extension MainEditorView{
                     VStack(spacing: 0) {
 
                         // Top row with close button at the right
-                        HStack {
-                            Spacer()
-                            Button {
-                                showEditSubtitlesMode = false
-                                textEditor.selectedTextBox = nil
-                                textEditor.cancelTextEditor()
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.title2)
-                                    .foregroundColor(.white)
+                        if !textEditor.showEditTextContent {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    showEditSubtitlesMode = false
+                                    textEditor.selectedTextBox = nil
+                                    textEditor.cancelTextEditor()
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                }
+                                .padding(.top, 8)
+                                .padding(.trailing, 8)
                             }
-                            .padding(.top, 8)
-                            .padding(.trailing, 8)
+                            .frame(height: 40)
+                            .padding(.bottom, 8)
                         }
-                        .frame(height: 40)
-                        .padding(.bottom, 8)
-                        
-                        WordTimelineSlider(
-                            value: $videoPlayer.currentTime,
-                            selectedTextBox: $textEditor.selectedTextBox,
-                            bounds: video.rangeDuration,
-                            disableOffset: false,
-                            textBoxes: video.textBoxes,
-                            duration: video.originalDuration,
-                            offset: $rulerOffset,
-                            actualTimelineWidth: $actualTimelineWidth,
-                            rulerStartInParentX: $rulerStartInParentX,
-                            externalDragOffset: $externalDragOffset,
-                            externalZoomOffset: $externalZoomOffset,
-                            backgroundView: {
-                                RulerView(
-                                    value: $videoPlayer.currentTime,
-                                    bounds: video.rangeDuration,
-                                    disableOffset: false,
-                                    duration: video.originalDuration, 
-                                    currentTime: videoPlayer.currentTime, 
-                                    showPlayhead: true, 
-                                    tickHeight: 60, 
-                                    customPixelsPerSecond: 50,
-                                    actualTimelineWidth: $actualTimelineWidth,
-                                    rulerStartInParentX: $rulerStartInParentX,
-                                    exposedOffset: $rulerOffset,
-                                    externalDragOffset: $externalDragOffset,
-                                    externalZoomOffset: $externalZoomOffset,
-                                    onChange: {
-                                        videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
-                                    }
-                                )
-                                .frame(maxHeight: .infinity)
-                            },
-                            actionView: {
-                                Rectangle()
-                                    .opacity(0)
-                            },
-                            onChange: {
-                                videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
-                            },
-                            onSeek: { time in
-                                videoPlayer.seekToTime(time)
-                            }
-                        )
-                        .frame(height: 120)
-                        
+
+                        if !textEditor.showEditTextContent {
+                            WordTimelineSlider(
+                                value: $videoPlayer.currentTime,
+                                selectedTextBox: $textEditor.selectedTextBox,
+                                bounds: video.rangeDuration,
+                                disableOffset: false,
+                                textBoxes: video.textBoxes,
+                                duration: video.originalDuration,
+                                offset: $rulerOffset,
+                                actualTimelineWidth: $actualTimelineWidth,
+                                rulerStartInParentX: $rulerStartInParentX,
+                                externalDragOffset: $externalDragOffset,
+                                externalZoomOffset: $externalZoomOffset,
+                                backgroundView: {
+                                    RulerView(
+                                        value: $videoPlayer.currentTime,
+                                        bounds: video.rangeDuration,
+                                        disableOffset: false,
+                                        duration: video.originalDuration, 
+                                        currentTime: videoPlayer.currentTime, 
+                                        showPlayhead: true, 
+                                        tickHeight: 60, 
+                                        customPixelsPerSecond: 50,
+                                        actualTimelineWidth: $actualTimelineWidth,
+                                        rulerStartInParentX: $rulerStartInParentX,
+                                        exposedOffset: $rulerOffset,
+                                        externalDragOffset: $externalDragOffset,
+                                        externalZoomOffset: $externalZoomOffset,
+                                        onChange: {
+                                            videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                                        }
+                                    )
+                                    .frame(maxHeight: .infinity)
+                                },
+                                actionView: {
+                                    Rectangle()
+                                        .opacity(0)
+                                },
+                                onChange: {
+                                    videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
+                                },
+                                onSeek: { time in
+                                    videoPlayer.seekToTime(time)
+                                }
+                            )
+                            .frame(height: 120)
+                        }
+
+                        if textEditor.showEditor {
+                            TextEditorView(viewModel: textEditor, onSave: editorVM.setText)
+                        }
+
                         Spacer()
                     }
                     
-                    // Toolbar overlay at the bottom
+                    // Toolbar at the bottom
                     TextToolbar(textEditor: textEditor, videoPlayerSize: $editorVM.videoPlayerSize)
                 }
             }

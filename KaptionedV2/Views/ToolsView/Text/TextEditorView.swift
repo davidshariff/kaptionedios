@@ -28,11 +28,10 @@ struct TextEditorView: View{
             
             if viewModel.showEditTextContent {
                 // Show compact text field above toolbar when editing text content
-                VStack {
-                    Spacer()
+                VStack(alignment: .center, spacing: 0) {
                     VStack(spacing: 12) {
                         TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
-                            .font(.system(size: 24, weight: .medium)) 
+                            .font(.system(size: 24, weight: .medium))
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
@@ -43,25 +42,26 @@ struct TextEditorView: View{
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                             .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.black.opacity(0.8))
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Color.gray.opacity(0.5))
                             )
-                            .frame(maxWidth: 300, maxHeight: 120)
-                            .border(Color.white, width: 1)
-                        
+                            .frame(maxWidth: 300, maxHeight: 200)
+
                         // Close button for text-only mode
                         Button {
                             viewModel.closeEditTextContent()
-                            
                         } label: {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.title2)
+                                .font(.system(size: 44)) // Larger icon
                                 .foregroundColor(.white)
-                                .padding(8)
+                                .padding(20)
                                 .background(Color.black.opacity(0.6), in: Circle())
                         }
                     }
-                    .padding(.bottom, 100) // Space above toolbar
+                    .padding(.top, 40) // Space from top, adjust as needed
+                    .padding(.bottom, 0)
+                    
+                    Spacer()
                 }
                 .padding(.horizontal)
             } 

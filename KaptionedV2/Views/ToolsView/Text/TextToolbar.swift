@@ -8,7 +8,7 @@ struct TextToolbar: View {
     var body: some View {
         VStack {
             Spacer()
-            if textEditor.selectedTextBox != nil {
+            if textEditor.selectedTextBox != nil && !textEditor.showEditTextContent {
                 HStack(spacing: 0) {
                     Button {
                         // Handle Edit Text action

@@ -85,6 +85,7 @@
 		F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */; };
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
+		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
 /* End PBXBuildFile section */
@@ -169,6 +170,7 @@
 		F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
+		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -235,6 +237,7 @@
 		5A9EDCFE29F03D800014A1CF /* ToolsView */ = {
 			isa = PBXGroup;
 			children = (
+				F4A4B7882E40DABC00016ED9 /* Style */,
 				F4AFDAEB2E3E301B00D3466A /* PresetsList */,
 				F42230F12E3505CB001CCAE5 /* Subslist */,
 				F42230EE2E350495001CCAE5 /* PresetsList */,
@@ -535,6 +538,14 @@
 			path = Subslist;
 			sourceTree = "<group>";
 		};
+		F4A4B7882E40DABC00016ED9 /* Style */ = {
+			isa = PBXGroup;
+			children = (
+				F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */,
+			);
+			path = Style;
+			sourceTree = "<group>";
+		};
 		F4AFDAEB2E3E301B00D3466A /* PresetsList */ = {
 			isa = PBXGroup;
 			children = (
@@ -636,6 +647,7 @@
 				5ACFF9A929EE878500827A37 /* ToolButtonView.swift in Sources */,
 				5AADA50329F919800064EA7E /* FiltersViewModel.swift in Sources */,
 				5ACFF98329E945C300827A37 /* MainEditorView.swift in Sources */,
+				F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */,
 				5ACFF98929E98EE700827A37 /* CameraManager.swift in Sources */,
 				5ACFF99629EC8A2400827A37 /* AVAssets+Ext.swift in Sources */,
 				5ACFF97129E944FA00827A37 /* ContentView.swift in Sources */,

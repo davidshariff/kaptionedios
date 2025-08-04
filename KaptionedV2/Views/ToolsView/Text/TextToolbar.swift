@@ -42,29 +42,28 @@ struct TextToolbar: View {
     @Binding var showWordTimeline: Bool
     @State private var toolbarOffset: CGFloat = 100
     @State private var isStyleMode: Bool = false
-    @State private var selectedStyleOption: String? = nil
     
     // MARK: - Computed Properties
     private var styleOptions: [StyleOption] {
         [
             StyleOption(title: "Text\nColor", iconName: "paintpalette") {
-                selectedStyleOption = "Text\nColor"
+                textEditor.selectedStyleOption = "Text\nColor"
                 print("Text Color tapped")
             },
             StyleOption(title: "Background", iconName: "rectangle.fill") {
-                selectedStyleOption = "Background"
+                textEditor.selectedStyleOption = "Background"
                 print("Background tapped")
             },
             StyleOption(title: "Stroke", iconName: "circle.dashed") {
-                selectedStyleOption = "Stroke"
+                textEditor.selectedStyleOption = "Stroke"
                 print("Stroke tapped")
             },
             StyleOption(title: "Font\nSize", iconName: "textformat.size") {
-                selectedStyleOption = "Font\nSize"
+                textEditor.selectedStyleOption = "Font\nSize"
                 print("Font Size tapped")
             },
             StyleOption(title: "Shadow", iconName: "shadow") {
-                selectedStyleOption = "Shadow"
+                textEditor.selectedStyleOption = "Shadow"
                 print("Shadow tapped")
             }
         ]
@@ -82,7 +81,7 @@ struct TextToolbar: View {
                             isStyleMode = false
                             videoPlayerSize = .half
                             showWordTimeline = true
-                            selectedStyleOption = nil
+                            textEditor.selectedStyleOption = nil
                         } label: {
                             Image(systemName: "xmark")
                                 .font(.title2)
@@ -99,7 +98,7 @@ struct TextToolbar: View {
                         ForEach(styleOptions, id: \.title) { option in
                             StyleButton(
                                 option: option,
-                                isSelected: selectedStyleOption == option.title
+                                isSelected: textEditor.selectedStyleOption == option.title
                             )
                         }
                     }
@@ -115,15 +114,11 @@ struct TextToolbar: View {
                 HStack(spacing: 0) {
                     Button {
                         // Handle Edit Text action
-                        if let selectedTextBox = textEditor.selectedTextBox {
-
-                           // textEditor.openTextEditor(isEdit: true, selectedTextBox, timeRange: selectedTextBox.timeRange)
-                            
+                        if textEditor.selectedTextBox != nil {
                             // Resize video player to quarter size when editing text
                             videoPlayerSize = .quarter
                             
                             textEditor.openEditTextContent()
-
                         }
                     } label: {
                         VStack(spacing: 6) {
@@ -156,7 +151,7 @@ struct TextToolbar: View {
                             Image(systemName: "paintbrush")
                                 .font(.title2)
                                 .frame(width: 24, height: 24)
-                            Text("Style")
+                            Text("Edit Style")
                                 .font(.caption)
                                 .fontWeight(.medium)
                         }
@@ -175,7 +170,7 @@ struct TextToolbar: View {
                 .offset(y: toolbarOffset)
             }
         }
-        .onChange(of: textEditor.selectedTextBox) { newValue in
+        .onChange(of: textEditor.selectedTextBox?.id) { newValue in
             if newValue != nil {
                 // If switching between text boxes (not from nil), trigger animation
                 if textEditor.selectedTextBox != nil {
@@ -204,14 +199,3 @@ struct TextToolbar: View {
         }
     }
 }
-
-struct TextToolbar_Previews: PreviewProvider {
-    static var previews: some View {
-        TextToolbar(
-            textEditor: TextEditorViewModel(),
-            videoPlayerSize: .constant(.half),
-            showWordTimeline: .constant(true)
-        )
-        .preferredColorScheme(.dark)
-    }
-} 

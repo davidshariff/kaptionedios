@@ -16,6 +16,7 @@ class TextEditorViewModel: ObservableObject{
     @Published var currentTextBox: TextBox = TextBox()
     @Published var selectedTextBox: TextBox?
     @Published var isEditMode: Bool = false
+    @Published var selectedStyleOption: String? = nil
     
     var onEditTextContentClosed: (() -> Void)?
     var onSave: (([TextBox]) -> Void)?
@@ -89,7 +90,10 @@ class TextEditorViewModel: ObservableObject{
 
     func openEditTextContent(){
         if let selectedTextBox = selectedTextBox {
+            // Create a copy to avoid reference issues
             currentTextBox = selectedTextBox
+            // Ensure we have a unique ID for editing
+            currentTextBox.id = selectedTextBox.id
         }
         showEditTextContent = true
         showEditor = true
@@ -115,6 +119,61 @@ class TextEditorViewModel: ObservableObject{
             selectedTextBox = nil
         }
         cancelTextEditor()
+    }
+    
+    func updateSelectedTextBox() {
+        // Update the selected text box with current changes
+        if let selectedTextBox = selectedTextBox,
+           let index = textBoxes.firstIndex(where: {$0.id == selectedTextBox.id}) {
+            
+            // Print the differences
+            print("🔄 TextBox Update - ID: \(selectedTextBox.id)")
+            if selectedTextBox.bgColor != currentTextBox.bgColor {
+                print("   bgColor: \(selectedTextBox.bgColor) → \(currentTextBox.bgColor)")
+            }
+            if selectedTextBox.backgroundPadding != currentTextBox.backgroundPadding {
+                print("   backgroundPadding: \(selectedTextBox.backgroundPadding) → \(currentTextBox.backgroundPadding)")
+            }
+            if selectedTextBox.cornerRadius != currentTextBox.cornerRadius {
+                print("   cornerRadius: \(selectedTextBox.cornerRadius) → \(currentTextBox.cornerRadius)")
+            }
+            if selectedTextBox.fontColor != currentTextBox.fontColor {
+                print("   fontColor: \(selectedTextBox.fontColor) → \(currentTextBox.fontColor)")
+            }
+            if selectedTextBox.strokeColor != currentTextBox.strokeColor {
+                print("   strokeColor: \(selectedTextBox.strokeColor) → \(currentTextBox.strokeColor)")
+            }
+            if selectedTextBox.strokeWidth != currentTextBox.strokeWidth {
+                print("   strokeWidth: \(selectedTextBox.strokeWidth) → \(currentTextBox.strokeWidth)")
+            }
+            if selectedTextBox.fontSize != currentTextBox.fontSize {
+                print("   fontSize: \(selectedTextBox.fontSize) → \(currentTextBox.fontSize)")
+            }
+            if selectedTextBox.text != currentTextBox.text {
+                print("   text: '\(selectedTextBox.text)' → '\(currentTextBox.text)'")
+            }
+            
+            textBoxes[index] = currentTextBox
+            // Update the selectedTextBox reference to point to the updated text box
+            self.selectedTextBox = textBoxes[index]
+            // Clean up any duplicate IDs before saving
+            cleanupDuplicateIDs()
+            // Call onSave to update the main video model
+            onSave?(textBoxes)
+        }
+    }
+    
+    func cleanupDuplicateIDs() {
+        // Remove any duplicate IDs by keeping only the first occurrence
+        var seenIDs: Set<UUID> = []
+        textBoxes = textBoxes.filter { textBox in
+            if seenIDs.contains(textBox.id) {
+                return false
+            } else {
+                seenIDs.insert(textBox.id)
+                return true
+            }
+        }
     }
 }
 

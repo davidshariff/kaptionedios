@@ -253,12 +253,7 @@ struct TextEditorView: View{
     }
 }
 
-// MARK: - Shared Color Palette
-struct ColorPalette {
-    static let colors: [Color] = [
-        .clear, .white, .black, .red, .orange, .yellow, .green, .blue, .purple, .pink, .gray
-    ]
-}
+
 
 // MARK: - Reusable Tool Button
 struct ToolButton: View {
@@ -385,42 +380,7 @@ struct SheetHeaderView: View {
     }
 }
 
-// MARK: - Reusable Color Grid
-struct ColorGridView: View {
-    let colors: [Color]
-    let selectedColor: Color
-    let onColorSelected: (Color) -> Void
-    
-    private let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
-    
-    var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: columns, spacing: 24) {
-                ForEach(colors, id: \.self) { color in
-                    Button {
-                        onColorSelected(color)
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(color == .clear ? Color.gray.opacity(0.2) : color)
-                                .frame(width: 36, height: 36)
-                                .overlay(
-                                    Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
-                                )
-                            if color == .clear {
-                                Image(systemName: "slash.circle")
-                                    .foregroundColor(.white)
-    }
-                        }
-                    }
-                }
-            }
-            .padding(.top, 10)
-            .padding(.bottom, 20)
-        }
-        .frame(maxHeight: 220)
-    }
-}
+
 struct TextEditorView_Previews: PreviewProvider {
     static var previews: some View {
         TextEditorView(viewModel: TextEditorViewModel(), onSave: {_ in})

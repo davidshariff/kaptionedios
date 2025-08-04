@@ -64,7 +64,6 @@ struct MainEditorView: View {
                     .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet) // Smooth animation when bottom sheet opens/closes
 
                     centerSection()
-                    .border(.purple, width: 2)
 
                     Spacer()
 
@@ -464,6 +463,12 @@ extension MainEditorView{
                     
                     // Toolbar at the bottom
                     TextToolbar(textEditor: textEditor, videoPlayerSize: $editorVM.videoPlayerSize, showWordTimeline: $editorVM.showWordTimeline)
+                    
+                    // Style Editor View
+                    StyleEditorView(
+                        textEditor: textEditor,
+                        selectedStyleOption: $textEditor.selectedStyleOption
+                    )
                 }
             }
         }

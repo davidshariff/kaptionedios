@@ -12,12 +12,14 @@ class TextEditorViewModel: ObservableObject{
     
     @Published var textBoxes: [TextBox] = []
     @Published var showEditor: Bool = false
+    @Published var showEditTextContent: Bool = false
     @Published var currentTextBox: TextBox = TextBox()
     @Published var selectedTextBox: TextBox?
     @Published var isEditMode: Bool = false
     
     func cancelTextEditor(){
         showEditor = false
+        showEditTextContent = false
     }
     
     func selectTextBox(_ texBox: TextBox){
@@ -55,11 +57,11 @@ class TextEditorViewModel: ObservableObject{
         if let textBox, isEdit{
             isEditMode = true
             currentTextBox = textBox
-            print("DEBUG: Editing existing TextBox - karaokeType: \(textBox.karaokeType), highlightColor: \(textBox.highlightColor), wordBGColor: \(textBox.wordBGColor)")
+            showEditTextContent = true
         }else{
             currentTextBox = TextBox(timeRange: timeRange ?? (1...5))
-            print("DEBUG: Creating new TextBox - karaokeType: \(currentTextBox.karaokeType), highlightColor: \(currentTextBox.highlightColor), wordBGColor: \(currentTextBox.wordBGColor)")
             isEditMode = false
+            showEditTextContent = false
         }
         showEditor = true
     }

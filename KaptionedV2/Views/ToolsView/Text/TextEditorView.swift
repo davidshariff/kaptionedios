@@ -534,7 +534,7 @@ private struct BgColorPickerSheet: View {
     var body: some View {
         VStack(spacing: 0) {
             SheetHeaderView(title: "Background Color", onCancel: onCancel)
-            ColorGridView(
+            ColorRowView(
                 colors: ColorPalette.colors,
                 selectedColor: selectedColor,
                 onColorSelected: { color in
@@ -600,7 +600,7 @@ private struct StrokePickerSheet: View {
             .padding(.horizontal)
             
             // Color picker
-            ColorGridView(
+            ColorRowView(
                 colors: ColorPalette.colors,
                 selectedColor: selectedColor,
                 onColorSelected: { color in
@@ -663,7 +663,7 @@ private struct ShadowPickerSheet: View {
     var body: some View {
         VStack(spacing: 0) {
             SheetHeaderView(title: "Text Shadow", onCancel: onCancel)
-            ColorGridView(
+            ColorRowView(
                 colors: ColorPalette.colors,
                 selectedColor: shadowColor,
                 onColorSelected: { color in

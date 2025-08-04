@@ -11,8 +11,10 @@ struct ColorPalette {
         .red, .orange, .yellow, .green, .mint, .teal, .cyan, .blue, .indigo, .purple, .pink, .brown
     ]
     
-    static let grayscaleSteps: Int = 6
+    // Reduce the number of grayscale steps to avoid too many dark/grey/white shades
+    static let grayscaleSteps: Int = 3
     static var grayscale: [Color] {
+        // Only include black, a mid-gray, and white
         (0..<grayscaleSteps).map { i in
             let value = Double(i) / Double(grayscaleSteps - 1)
             return Color(white: value)
@@ -40,40 +42,56 @@ struct ColorPalette {
     }()
 }
 
-// MARK: - Reusable Color Grid
-struct ColorGridView: View {
+// MARK: - Reusable Color Row (Horizontal Scrollable)
+struct ColorRowView: View {
     let colors: [Color]
     let selectedColor: Color
     let onColorSelected: (Color) -> Void
     
-    private let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
-    
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: columns, spacing: 24) {
-                ForEach(colors, id: \.self) { color in
-                    Button {
-                        onColorSelected(color)
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .fill(color == .clear ? Color.gray.opacity(0.2) : color)
-                                .frame(width: 36, height: 36)
-                                .overlay(
-                                    Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
-                                )
-                            if color == .clear {
-                                Image(systemName: "slash.circle")
-                                    .foregroundColor(.white)
+        ZStack {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(colors, id: \.self) { color in
+                        Button {
+                            onColorSelected(color)
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(color == .clear ? Color.gray.opacity(0.2) : color)
+                                    .frame(width: 44, height: 44)
+                                    .overlay(
+                                        Circle().stroke(Color.white, lineWidth: selectedColor == color ? 3 : 1)
+                                    )
+                                if color == .clear {
+                                    Image(systemName: "slash.circle")
+                                        .foregroundColor(.white)
+                                }
                             }
                         }
                     }
                 }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
             }
-            .padding(.top, 10)
-            .padding(.bottom, 20)
+            .frame(height: 76) // Fixed height for the horizontal row
+            
+            // Gradient blur indicator on the right side
+            HStack {
+                Spacer()
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.black.opacity(0.0),
+                        Color.black.opacity(0.3),
+                        Color.black.opacity(0.6)
+                    ]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: 40)
+                .allowsHitTesting(false)
+            }
         }
-        .frame(maxHeight: 220)
     }
 }
 
@@ -200,8 +218,8 @@ struct BackgroundColorPickerView: View {
             ZStack {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack(spacing: 20) {
-                        // Color grid
-                        ColorGridView(
+                        // Color row
+                        ColorRowView(
                             colors: ColorPalette.colors,
                             selectedColor: selectedColor,
                             onColorSelected: { color in
@@ -387,8 +405,8 @@ struct TextColorPickerView: View {
             ZStack {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack(spacing: 20) {
-                        // Color grid
-                        ColorGridView(
+                        // Color row
+                        ColorRowView(
                             colors: ColorPalette.colors,
                             selectedColor: selectedColor,
                             onColorSelected: { color in
@@ -457,8 +475,8 @@ struct ShadowPickerView: View {
             ZStack {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack(spacing: 20) {
-                        // Color grid
-                        ColorGridView(
+                        // Color row
+                        ColorRowView(
                             colors: ColorPalette.colors,
                             selectedColor: shadowColor,
                             onColorSelected: { color in
@@ -636,8 +654,8 @@ struct StrokeColorPickerView: View {
             ZStack {
                 ScrollView(.vertical, showsIndicators: true) {
                     VStack(spacing: 20) {
-                        // Color grid
-                        ColorGridView(
+                        // Color row
+                        ColorRowView(
                             colors: ColorPalette.colors,
                             selectedColor: selectedColor,
                             onColorSelected: { color in

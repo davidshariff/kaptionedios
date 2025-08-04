@@ -1,10 +1,3 @@
-//
-//  TextEditorViewModel.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 02.05.2023.
-//
-
 import Foundation
 import SwiftUI
 

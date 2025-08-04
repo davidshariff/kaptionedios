@@ -71,28 +71,35 @@ struct TextToolbar: View {
     
     var body: some View {
         VStack {
+            
             // Style mode toolbar at the top
             if textEditor.selectedTextBox != nil && !textEditor.showEditTextContent && isStyleMode {
-                VStack(spacing: 0) {
-                    // Top bar with close button
-                    HStack {
-                        Spacer()
-                        Button {
-                            isStyleMode = false
-                            videoPlayerSize = .half
-                            showWordTimeline = true
-                            textEditor.selectedStyleOption = nil
-                        } label: {
-                            Image(systemName: "xmark")
+
+                Spacer()
+
+                // Back button
+                HStack {
+                    Spacer()
+                    Button {
+                        isStyleMode = false
+                        videoPlayerSize = .half
+                        showWordTimeline = true
+                        textEditor.selectedStyleOption = nil
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "chevron.left")
                                 .font(.title2)
-                                .foregroundColor(.white)
-                                .padding(8)
-                                .background(Color.black.opacity(0.7), in: Circle())
+                            Text("Back")
+                                .font(.headline)
                         }
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Color.black.opacity(0.7), in: Capsule())
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 8)
-                    
+                }
+                .padding(.horizontal, 10)
+
+                VStack(spacing: 0) {
                     // Style options centered horizontally
                     HStack(spacing: 4) {
                         ForEach(styleOptions, id: \.title) { option in
@@ -103,14 +110,16 @@ struct TextToolbar: View {
                         }
                     }
                     .padding(.vertical, 4)
+                    
                 }
                 .offset(y: toolbarOffset)
             }
             
-            Spacer()
-            
             // Normal toolbar at the bottom
             if textEditor.selectedTextBox != nil && !textEditor.showEditTextContent && !isStyleMode {
+
+                Spacer()
+
                 HStack(spacing: 0) {
                     Button {
                         // Handle Edit Text action
@@ -144,8 +153,8 @@ struct TextToolbar: View {
                     Button {
                         // Handle Style action
                         isStyleMode = true
-                        videoPlayerSize = .quarter
-                        showWordTimeline = false
+                        videoPlayerSize = .half
+                        showWordTimeline = true
                     } label: {
                         VStack(spacing: 6) {
                             Image(systemName: "paintbrush")

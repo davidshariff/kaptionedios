@@ -1,10 +1,3 @@
-//
-//  EditorViewModel.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 14.04.2023.
-//
-
 import Foundation
 import AVKit
 import SwiftUI

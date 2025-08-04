@@ -1,9 +1,3 @@
-//
-//  MainEditorView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 14.04.2023.
-//
 import AVKit
 import SwiftUI
 import PhotosUI
@@ -398,6 +392,8 @@ extension MainEditorView{
                                     Image(systemName: "xmark")
                                         .font(.title2)
                                         .foregroundColor(.white)
+                                        .padding(8)
+                                        .background(Color.gray.opacity(0.3), in: Circle())
                                 }
                                 .padding(.top, 8)
                                 .padding(.trailing, 8)

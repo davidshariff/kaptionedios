@@ -388,7 +388,7 @@ extension MainEditorView{
                     VStack(spacing: 0) {
 
                         // Top row with close button at the right
-                        if !textEditor.showEditTextContent {
+                        if !textEditor.showEditTextContent && editorVM.showWordTimeline {
                             HStack {
                                 Spacer()
                                 Button {
@@ -407,7 +407,7 @@ extension MainEditorView{
                             .padding(.bottom, 8)
                         }
 
-                        if !textEditor.showEditTextContent {
+                        if !textEditor.showEditTextContent && editorVM.showWordTimeline {
                             WordTimelineSlider(
                                 value: $videoPlayer.currentTime,
                                 selectedTextBox: $textEditor.selectedTextBox,
@@ -463,7 +463,7 @@ extension MainEditorView{
                     }
                     
                     // Toolbar at the bottom
-                    TextToolbar(textEditor: textEditor, videoPlayerSize: $editorVM.videoPlayerSize)
+                    TextToolbar(textEditor: textEditor, videoPlayerSize: $editorVM.videoPlayerSize, showWordTimeline: $editorVM.showWordTimeline)
                 }
             }
         }

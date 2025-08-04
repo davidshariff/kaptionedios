@@ -23,6 +23,7 @@ class EditorViewModel: ObservableObject{
     @Published var errorMessage: String = ""
     
     @Published var videoPlayerSize: VideoPlayerSize = .half
+    @Published var showWordTimeline: Bool = true
     
     private var projectEntity: ProjectEntity?
     

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct PresetsListView: View {
     @Binding var isPresented: Bool
-    @Binding var showPresetConfirm: Bool
     @Binding var pendingPreset: SubtitleStyle?
     var onSelect: (SubtitleStyle) -> Void
     

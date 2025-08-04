@@ -57,12 +57,20 @@ class TextEditorViewModel: ObservableObject{
         if let textBox, isEdit{
             isEditMode = true
             currentTextBox = textBox
-            showEditTextContent = true
+            showEditTextContent = false  // Show full editor for openTextEditor
         }else{
             currentTextBox = TextBox(timeRange: timeRange ?? (1...5))
             isEditMode = false
             showEditTextContent = false
         }
+        showEditor = true
+    }
+
+    func openEditTextContent(){
+        if let selectedTextBox = selectedTextBox {
+            currentTextBox = selectedTextBox
+        }
+        showEditTextContent = true
         showEditor = true
     }
     

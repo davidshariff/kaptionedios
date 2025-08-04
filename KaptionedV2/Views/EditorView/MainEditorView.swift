@@ -23,6 +23,7 @@ struct MainEditorView: View {
     @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
     @State var showPresetsBottomSheet: Bool = false // State to track presets bottom sheet
     @State var showPresetConfirm: Bool = false // State for preset confirmation
+
     @State var pendingPreset: SubtitleStyle? = nil // State for pending preset
     @State var videoPlayerHeight: CGFloat = 0 // State for video player height
     @State var videoPlayerSize: VideoPlayerSize = .half // State to track video player size
@@ -81,9 +82,10 @@ struct MainEditorView: View {
     
     var body: some View {
         ZStack{
+
+            // main video player view
             GeometryReader { proxy in
 
-                // main editor view
                 VStack(spacing: 0){
 
                     headerView(safeAreaTop: proxy.safeAreaInsets.top)
@@ -110,7 +112,9 @@ struct MainEditorView: View {
                             textEditor: textEditor, 
                             showCustomSubslistSheet: $showCustomSubslistSheet,
                             showEditSubtitlesMode: $showEditSubtitlesMode,
-                            showPresetsBottomSheet: $showPresetsBottomSheet
+                            showPresetsBottomSheet: $showPresetsBottomSheet,
+                            showPresetConfirm: $showPresetConfirm,
+                            pendingPreset: $pendingPreset
                         )
                     }
 
@@ -150,6 +154,7 @@ struct MainEditorView: View {
                 }
             }
             
+            // export view
             if showVideoQualitySheet, let video = editorVM.currentVideo{
                 VideoExporterBottomSheetView(isPresented: $showVideoQualitySheet, video: video)
             }
@@ -169,6 +174,7 @@ struct MainEditorView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 .ignoresSafeArea()
             }
+
             // Error overlay for subtitle generation
             if editorVM.showErrorAlert {
                 ZStack {
@@ -208,27 +214,17 @@ struct MainEditorView: View {
                 .animation(.easeInOut, value: editorVM.showErrorAlert)
             }
             
-            // Custom subslist sheet
-            if showCustomSubslistSheet {
-                SubslistView(isPresented: $showCustomSubslistSheet, textEditor: textEditor, videoPlayer: videoPlayer)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .zIndex(1000)
-                    .animation(.easeInOut(duration: 0.5), value: showCustomSubslistSheet)
-            }
-            
             // Presets bottom sheet
             if showPresetsBottomSheet {
                 VStack(spacing: 0) {
                     Spacer()
                     PresetsListView(
                         isPresented: $showPresetsBottomSheet,
-                        showPresetConfirm: $showPresetConfirm,
                         pendingPreset: $pendingPreset,
                         onSelect: { style in
                             print("DEBUG: Preset selected: \(style.name)")
                             pendingPreset = style
                             showPresetConfirm = true
-                            print("DEBUG: showPresetConfirm set to: \(showPresetConfirm)")
                         }
                     )
                     .frame(maxWidth: .infinity, maxHeight: availableHeightExcludingPlayer) // Dynamic height based on available space
@@ -243,58 +239,12 @@ struct MainEditorView: View {
                 CrossOverlayView()
                     .zIndex(1500)
             }
+
         }
         .background(Color.black)
         .navigationBarHidden(true)
-        .confirmationDialog(
-            "Apply preset to all subtitles?",
-            isPresented: $showPresetConfirm,
-            titleVisibility: .visible
-        ) {
-            Button("Apply", role: .destructive) {
-                print("DEBUG: Apply button tapped")
-                if let style = pendingPreset {
-                    print("DEBUG: Applying style: \(style.name)")
-                    if isKaraokePreset(style) {
-                        print("DEBUG: Generating karaoke subtitles")
-                        // For karaoke presets, generate new subtitles
-                        if let video = editorVM.currentVideo {
-                            let karaokeType = getKaraokeType(for: style)
-                            // Convert current textBoxes to lines format
-                            let lines = textEditor.textBoxes.map { textBox in
-                                (text: textBox.text, start: textBox.timeRange.lowerBound, end: textBox.timeRange.upperBound)
-                            }
-                            let subs = KaraokeSubsHelper.generateKaraokeSubs(
-                                for: video,
-                                karaokeType: karaokeType,
-                                lines: lines
-                            )
-                            textEditor.textBoxes = subs
-                            editorVM.setText(subs)
-                        }
-                    } else {
-                        print("DEBUG: Applying regular preset")
-                        // For regular presets, apply style to existing subtitles
-                        textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
-                        editorVM.setText(textEditor.textBoxes)
-                    }
-                }
-                showPresetConfirm = false
-                // Only close the preset view for karaoke presets
-                if let style = pendingPreset, isKaraokePreset(style) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        showPresetsBottomSheet = false
-                    }
-                }
-                pendingPreset = nil
-            }
-            Button("Cancel", role: .cancel) {
-                print("DEBUG: Cancel button tapped")
-                pendingPreset = nil
-            }
-        } message: {
-            Text("This will replace the style of all subtitles with the selected preset.")
-        }
+
+
         .confirmationDialog("Are you sure?", isPresented: $showBackConfirmation) {
             Button("Yes, go back", role: .destructive) {
                 editorVM.updateProject()
@@ -317,7 +267,7 @@ struct MainEditorView: View {
         .onChange(of: scenePhase) { phase in
             saveProject(phase)
         }
-        .blur(radius: textEditor.showEditor ? 10 : 0)
+        .blur(radius: textEditor.showEditor && !textEditor.showEditTextContent ? 10 : 0)
         .ignoresSafeArea(.keyboard, edges: .bottom)
         .overlay {
             if textEditor.showEditor{

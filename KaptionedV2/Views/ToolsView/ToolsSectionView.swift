@@ -10,9 +10,9 @@ struct ToolsSectionView: View {
     @Binding var showCustomSubslistSheet: Bool
     @Binding var showEditSubtitlesMode: Bool
     @Binding var showPresetsBottomSheet: Bool
+    @Binding var showPresetConfirm: Bool
+    @Binding var pendingPreset: SubtitleStyle?
     private let columns = Array(repeating: GridItem(.fixed(90)), count: 3)
-    @State private var showPresetConfirm = false
-    @State private var pendingPreset: SubtitleStyle? = nil
     @State private var selectedPreset: SubtitleStyle? = nil
     
     var body: some View {
@@ -25,7 +25,7 @@ struct ToolsSectionView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        return mainContent
+                return mainContent
             .confirmationDialog(
                 "Apply preset to all subtitles?",
                 isPresented: $showPresetConfirm,
@@ -73,7 +73,7 @@ struct ToolsSectionView: View {
             } message: {
                 Text("This will replace the style of all subtitles with the selected preset.")
             }
-        .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
+            .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
         .onChange(of: editorVM.currentVideo){ newValue in
             if let video = newValue, let image = video.thumbnailsImages.first?.image{
                 filtersVM.loadFilters(for: image)

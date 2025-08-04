@@ -25,134 +25,175 @@ struct TextEditorView: View{
         ZStack {
             viewModel.currentTextBox.bgColor.opacity(0.35)
                 .ignoresSafeArea()
-            VStack{
-                HStack(alignment: .center) {
-                    Button{
-                        closeKeyboard()
-                        viewModel.cancelTextEditor()
-                    } label: {
-                        Image(systemName: "chevron.down")
-                            .foregroundColor(.white)
+            
+            if viewModel.showEditTextContent {
+                // Show compact text field above toolbar when editing text content
+                VStack {
+                    Spacer()
+                    VStack(spacing: 12) {
+                        TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
+                            .font(.system(size: viewModel.currentTextBox.fontSize, weight: .medium))
+                            .foregroundColor(viewModel.currentTextBox.fontColor)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .focused($isTextFieldFocused)
+                            .onAppear {
+                                isTextFieldFocused = true
+                            }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
-                            .background(Color.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.black.opacity(0.8))
+                            )
+                            .frame(maxWidth: 300, maxHeight: 120)
+                        
+                        // Close button for text-only mode
+                        Button {
+                            viewModel.showEditTextContent = false
+                            viewModel.showEditor = false
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(Color.black.opacity(0.6), in: Circle())
+                        }
                     }
-
-                Spacer()
-                
-                Button{
-                    closeKeyboard()
-                    showDeleteConfirmation = true
-                } label: {
-                    Image(systemName: "trash")
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
-                        .background(Color.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+                    .padding(.bottom, 100) // Space above toolbar
                 }
-                .disabled(!viewModel.isEditMode)
-                
-                Button {
-                    closeKeyboard()
-                    viewModel.saveTapped()
-                    onSave(viewModel.textBoxes)
-                } label: {
-                    Image(systemName: "checkmark")
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 12)
+                .padding(.horizontal)
+            } else {
+                // Show full text editor when not editing text content
+                VStack{
+                    HStack(alignment: .center) {
+                        Button{
+                            closeKeyboard()
+                            viewModel.cancelTextEditor()
+                        } label: {
+                            Image(systemName: "chevron.down")
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+                        }
+
+                    Spacer()
+                    
+                    Button{
+                        closeKeyboard()
+                        showDeleteConfirmation = true
+                    } label: {
+                        Image(systemName: "trash")
                             .foregroundColor(.white)
-                            .background(Color.green.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
-                        .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                            .background(Color.red.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
                     }
-                        .disabled(viewModel.currentTextBox.text.isEmpty)
-                }
-                .padding(.horizontal, 0)
-                .alert("Delete Subtitle", isPresented: $showDeleteConfirmation) {
-                    Button("Delete", role: .destructive) {
-                        viewModel.deleteCurrentTextBox()
+                    .disabled(!viewModel.isEditMode)
+                    
+                    Button {
+                        closeKeyboard()
+                        viewModel.saveTapped()
                         onSave(viewModel.textBoxes)
+                    } label: {
+                        Image(systemName: "checkmark")
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 12)
+                                .foregroundColor(.white)
+                                .background(Color.green.opacity(0.8), in: RoundedRectangle(cornerRadius: 12))
+                            .opacity(viewModel.currentTextBox.text.isEmpty ? 0.5 : 1)
+                        }
+                            .disabled(viewModel.currentTextBox.text.isEmpty)
                     }
-                    Button("Cancel", role: .cancel) { }
-                } message: {
-                    Text("Are you sure you want to delete this subtitle? This action cannot be undone.")
-                }
+                    .padding(.horizontal, 0)
+                    .alert("Delete Subtitle", isPresented: $showDeleteConfirmation) {
+                        Button("Delete", role: .destructive) {
+                            viewModel.deleteCurrentTextBox()
+                            onSave(viewModel.textBoxes)
+                        }
+                        Button("Cancel", role: .cancel) { }
+                    } message: {
+                        Text("Are you sure you want to delete this subtitle? This action cannot be undone.")
+                    }
 
-                Spacer()
-                TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
-                    .font(.system(size: viewModel.currentTextBox.fontSize, weight: .medium))
-                    .foregroundColor(viewModel.currentTextBox.fontColor)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(nil)
-                    .focused($isTextFieldFocused)
-                    .onAppear {
-                        isTextFieldFocused = true
-                    }
-                    .padding(.horizontal, viewModel.currentTextBox.backgroundPadding)
-                    .padding(.vertical, viewModel.currentTextBox.backgroundPadding / 2)
-                Spacer()
-                HStack(spacing: 20) {
-                    VStack {
-                        ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
-                        }.labelsHidden()
-                        Text("Text Color")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
-                    }
-                    VStack {
-                        ToolButton(
-                            color: viewModel.currentTextBox.bgColor,
-                            accessibilityLabel: "Background color"
-                        ) {
-                            activeSheet = .bgColor
+                    Spacer()
+                    TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
+                        .font(.system(size: viewModel.currentTextBox.fontSize, weight: .medium))
+                        .foregroundColor(viewModel.currentTextBox.fontColor)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .focused($isTextFieldFocused)
+                        .onAppear {
+                            isTextFieldFocused = true
                         }
-                        Text("Background")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
-                    }
-                    VStack {
-                        ToolButton(
-                            color: viewModel.currentTextBox.strokeColor,
-                            accessibilityLabel: "Stroke color"
-                        ) {
-                            activeSheet = .stroke
+                        .padding(.horizontal, viewModel.currentTextBox.backgroundPadding)
+                        .padding(.vertical, viewModel.currentTextBox.backgroundPadding / 2)
+                    Spacer()
+                    HStack(spacing: 20) {
+                        VStack {
+                            ColorPicker(selection: $viewModel.currentTextBox.fontColor, supportsOpacity: true) {
+                            }.labelsHidden()
+                            Text("Text Color")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 4)
                         }
-                        Text("Stroke")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
-                    }
-                    VStack {
-                        ToolButton(
-                            color: .blue.opacity(0.8),
-                            text: "\(Int(viewModel.currentTextBox.fontSize))",
-                            accessibilityLabel: "Font size"
-                        ) {
-                            activeSheet = .fontSize
+                        VStack {
+                            ToolButton(
+                                color: viewModel.currentTextBox.bgColor,
+                                accessibilityLabel: "Background color"
+                            ) {
+                                activeSheet = .bgColor
+                            }
+                            Text("Background")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 4)
                         }
-                        Text("Font Size")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
-                    }
-                    VStack {
-                        ToolButton(
-                            color: viewModel.currentTextBox.shadowColor.opacity(viewModel.currentTextBox.shadowOpacity),
-                            accessibilityLabel: "Shadow"
-                        ) {
-                            activeSheet = .shadow
+                        VStack {
+                            ToolButton(
+                                color: viewModel.currentTextBox.strokeColor,
+                                accessibilityLabel: "Stroke color"
+                            ) {
+                                activeSheet = .stroke
+                            }
+                            Text("Stroke")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 4)
                         }
-                        Text("Shadow")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .padding(.top, 4)
+                        VStack {
+                            ToolButton(
+                                color: .blue.opacity(0.8),
+                                text: "\(Int(viewModel.currentTextBox.fontSize))",
+                                accessibilityLabel: "Font size"
+                            ) {
+                                activeSheet = .fontSize
+                            }
+                            Text("Font Size")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 4)
+                        }
+                        VStack {
+                            ToolButton(
+                                color: viewModel.currentTextBox.shadowColor.opacity(viewModel.currentTextBox.shadowOpacity),
+                                accessibilityLabel: "Shadow"
+                            ) {
+                                activeSheet = .shadow
+                            }
+                            Text("Shadow")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 4)
+                        }
                     }
+                    .padding(.bottom)
+                    .hCenter()
                 }
-                .padding(.bottom)
-                .hCenter()
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
 
             // Custom overlays for pickers, anchored to bottom
             if let activeSheet = activeSheet {

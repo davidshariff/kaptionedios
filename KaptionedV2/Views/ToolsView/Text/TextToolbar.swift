@@ -13,9 +13,14 @@ struct TextToolbar: View {
                     Button {
                         // Handle Edit Text action
                         if let selectedTextBox = textEditor.selectedTextBox {
-                            textEditor.openTextEditor(isEdit: true, selectedTextBox, timeRange: selectedTextBox.timeRange)
+
+                           // textEditor.openTextEditor(isEdit: true, selectedTextBox, timeRange: selectedTextBox.timeRange)
+                            
                             // Resize video player to quarter size when editing text
-                            //videoPlayerSize = .quarter
+                            videoPlayerSize = .quarter
+                            
+                            textEditor.openEditTextContent()
+
                         }
                     } label: {
                         VStack(spacing: 6) {

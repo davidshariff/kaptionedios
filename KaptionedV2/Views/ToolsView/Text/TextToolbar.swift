@@ -30,9 +30,9 @@ struct StyleButton: View {
             .padding(.horizontal, 4)
             .padding(.vertical, 6)
         }
-        .background(isSelected ? Color.yellow : Color.gray.opacity(0.8))
+        .background(isSelected ? Color.white : Color.gray.opacity(0.2))
         .cornerRadius(10)
-        .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1)
+        .shadow(color: .white.opacity(0.3), radius: 3, x: 0, y: 1)
     }
 }
 
@@ -139,9 +139,9 @@ struct TextToolbar: View {
                         .padding(.horizontal, 4)
                         .padding(.vertical, 8)
                     }
-                    .background(Color.black.opacity(0.7))
+                    .background(Color.gray.opacity(0.2))
                     .cornerRadius(12)
-                    .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                    .shadow(color: .white.opacity(0.3), radius: 4, x: 0, y: 2)
                     
                     Spacer()
                         .frame(width: 20)
@@ -165,9 +165,9 @@ struct TextToolbar: View {
                         .padding(.horizontal, 4)
                         .padding(.vertical, 8)
                     }
-                    .background(Color.black.opacity(0.7))
+                    .background(Color.gray.opacity(0.2))
                     .cornerRadius(12)
-                    .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+                    .shadow(color: .white.opacity(0.3), radius: 4, x: 0, y: 2)
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)

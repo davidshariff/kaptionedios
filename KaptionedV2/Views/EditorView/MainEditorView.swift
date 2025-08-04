@@ -26,7 +26,6 @@ struct MainEditorView: View {
 
     @State var pendingPreset: SubtitleStyle? = nil // State for pending preset
     @State var videoPlayerHeight: CGFloat = 0 // State for video player height
-    @State var videoPlayerSize: VideoPlayerSize = .half // State to track video player size
     @State var availableHeightExcludingPlayer: CGFloat = 200 // State for available height excluding video player
     @State var rulerOffset: CGFloat = 0 // State to track ruler offset
     @State var actualTimelineWidth: CGFloat = 0 // State for actual timeline width
@@ -34,51 +33,14 @@ struct MainEditorView: View {
     @State var externalDragOffset: CGFloat = 0 // State for external drag offset from text boxes
     @State var externalZoomOffset: CGFloat = 0 // State for external zoom offset from text boxes
     
-    // Enum for video player sizes
-    enum VideoPlayerSize: CaseIterable {
-        case quarter, half, threeQuarters, full, custom
-        
-        var displayName: String {
-            switch self {
-            case .quarter: return "¼"
-            case .half: return "½"
-            case .threeQuarters: return "¾"
-            case .full: return "Full"
-            case .custom: return "Custom"
-            }
-        }
-        
-        var iconName: String {
-            switch self {
-            case .quarter: return "rectangle.compress.vertical"
-            case .half: return "rectangle"
-            case .threeQuarters: return "rectangle.expand.vertical"
-            case .full: return "rectangle.fill"
-            case .custom: return "rectangle.dashed"
-            }
-        }
-    }
+
     
     @StateObject var editorVM = EditorViewModel()
     @StateObject var videoPlayer = VideoPlayerManager()
     @StateObject var textEditor = TextEditorViewModel()
     @StateObject var audioRecorder = AudioRecorderManager()
     
-    // Function to calculate video player height based on size and screen dimensions
-    private func calculateVideoPlayerHeight(for size: VideoPlayerSize, screenHeight: CGFloat, headerHeight: CGFloat = 0) -> CGFloat {
-        switch size {
-        case .quarter:
-            return screenHeight * 0.25
-        case .half:
-            return screenHeight * 0.5
-        case .threeQuarters:
-            return screenHeight * 0.75
-        case .full:
-            return screenHeight - headerHeight // Subtract header height for full size
-        case .custom:
-            return 200 // Custom height when presets bottom sheet is open
-        }
-    }
+
     
     var body: some View {
         ZStack{
@@ -101,7 +63,8 @@ struct MainEditorView: View {
                     .animation(.easeInOut(duration: 0.5), value: videoPlayerHeight) // Smooth animation when video height changes
                     .animation(.easeInOut(duration: 0.5), value: showPresetsBottomSheet) // Smooth animation when bottom sheet opens/closes
 
-                    draggableSection()
+                    centerSection()
+                    .border(.purple, width: 2)
 
                     Spacer()
 
@@ -116,19 +79,25 @@ struct MainEditorView: View {
                             showPresetConfirm: $showPresetConfirm,
                             pendingPreset: $pendingPreset
                         )
+                        .border(.yellow, width: 2)
                     }
 
                 }
                 // Set initial video player height
-                .onAppear{
-                    setVideo(proxy)
-                    let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
-                    videoPlayerHeight = calculateVideoPlayerHeight(for: videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
-                }
+                        .onAppear{
+            setVideo(proxy)
+            let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
+            videoPlayerHeight = editorVM.calculateVideoPlayerHeight(for: editorVM.videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
+            
+            // Set callback to reset video player size when edit text content is closed
+            textEditor.onEditTextContentClosed = {
+                editorVM.videoPlayerSize = .half
+            }
+        }
                 // Update video player height when video player size changes
-                .onChange(of: videoPlayerSize) { _ in
+                .onChange(of: editorVM.videoPlayerSize) { _ in
                     let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
-                    videoPlayerHeight = calculateVideoPlayerHeight(for: videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
+                    videoPlayerHeight = editorVM.calculateVideoPlayerHeight(for: editorVM.videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
                 }
                 .onChange(of: videoPlayerHeight) { _ in
                     // Update available height whenever video player height changes
@@ -139,17 +108,17 @@ struct MainEditorView: View {
                 .onChange(of: showPresetsBottomSheet) { newValue in
                     if newValue {
                         // When bottom sheet opens, set to quarter size
-                        videoPlayerSize = .quarter
+                        editorVM.videoPlayerSize = .quarter
                     } else {
                         // When bottom sheet closes, restore to half size
-                        videoPlayerSize = .half
+                        editorVM.videoPlayerSize = .half
                     }
                 }
                 // Update video player height when edit mode changes
                 .onChange(of: showEditSubtitlesMode) { newValue in
                     if newValue {
                         // When edit mode is activated, set to half size
-                        videoPlayerSize = .half
+                        editorVM.videoPlayerSize = .half
                     }
                 }
             }
@@ -344,21 +313,21 @@ extension MainEditorView{
                 Button {
                     // Cycle through video player sizes (excluding custom)
                     let cycleSizes: [VideoPlayerSize] = [.quarter, .half, .threeQuarters, .full]
-                    if let currentIndex = cycleSizes.firstIndex(of: videoPlayerSize) {
+                    if let currentIndex = cycleSizes.firstIndex(of: editorVM.videoPlayerSize) {
                         let nextIndex = (currentIndex + 1) % cycleSizes.count
-                        videoPlayerSize = cycleSizes[nextIndex]
+                        editorVM.videoPlayerSize = cycleSizes[nextIndex]
                     } else {
                         // If current size is custom, go to half
-                        videoPlayerSize = .half
+                        editorVM.videoPlayerSize = .half
                     }
                 } label: {
                     VStack(spacing: 4) {
-                        Image(systemName: videoPlayerSize.iconName)
-                        Text(videoPlayerSize.displayName)
+                        Image(systemName: editorVM.videoPlayerSize.iconName)
+                        Text(editorVM.videoPlayerSize.displayName)
                             .font(.caption2)
                     }
                 }
-                .foregroundColor(videoPlayerSize == .custom ? .green : .white)
+                .foregroundColor(editorVM.videoPlayerSize == .custom ? .green : .white)
                 
                 // Cross overlay toggle button
                 Button {
@@ -399,7 +368,7 @@ extension MainEditorView{
         .padding(.bottom)
     }
     
-    private func draggableSection() -> some View {
+    private func centerSection() -> some View {
 
         VStack(spacing: 0) {
             if !showEditSubtitlesMode, !showPresetsBottomSheet {
@@ -415,10 +384,11 @@ extension MainEditorView{
                         // Top row with close button at the right
                         HStack {
                             Spacer()
-                                                    Button {
-                            showEditSubtitlesMode = false
-                            textEditor.selectedTextBox = nil
-                        } label: {
+                            Button {
+                                showEditSubtitlesMode = false
+                                textEditor.selectedTextBox = nil
+                                textEditor.cancelTextEditor()
+                            } label: {
                                 Image(systemName: "xmark")
                                     .font(.title2)
                                     .foregroundColor(.white)
@@ -427,7 +397,7 @@ extension MainEditorView{
                             .padding(.trailing, 8)
                         }
                         .frame(height: 40)
-                        .padding(.bottom, 8)                
+                        .padding(.bottom, 8)
                         
                         WordTimelineSlider(
                             value: $videoPlayer.currentTime,
@@ -479,7 +449,7 @@ extension MainEditorView{
                     }
                     
                     // Toolbar overlay at the bottom
-                    TextToolbar(textEditor: textEditor, videoPlayerSize: $videoPlayerSize)
+                    TextToolbar(textEditor: textEditor, videoPlayerSize: $editorVM.videoPlayerSize)
                 }
             }
         }

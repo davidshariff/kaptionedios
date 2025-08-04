@@ -17,9 +17,18 @@ class TextEditorViewModel: ObservableObject{
     @Published var selectedTextBox: TextBox?
     @Published var isEditMode: Bool = false
     
+    var onEditTextContentClosed: (() -> Void)?
+    
     func cancelTextEditor(){
         showEditor = false
         showEditTextContent = false
+        onEditTextContentClosed?()
+    }
+    
+    func closeEditTextContent(){
+        showEditTextContent = false
+        showEditor = false
+        onEditTextContentClosed?()
     }
     
     func selectTextBox(_ texBox: TextBox){

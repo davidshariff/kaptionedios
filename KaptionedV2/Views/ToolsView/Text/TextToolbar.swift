@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TextToolbar: View {
     @ObservedObject var textEditor: TextEditorViewModel
-    @Binding var videoPlayerSize: MainEditorView.VideoPlayerSize
+    @Binding var videoPlayerSize: VideoPlayerSize
     @State private var toolbarOffset: CGFloat = 100
     
     var body: some View {

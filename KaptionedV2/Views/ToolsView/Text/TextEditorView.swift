@@ -32,8 +32,8 @@ struct TextEditorView: View{
                     Spacer()
                     VStack(spacing: 12) {
                         TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
-                            .font(.system(size: viewModel.currentTextBox.fontSize, weight: .medium))
-                            .foregroundColor(viewModel.currentTextBox.fontColor)
+                            .font(.system(size: 24, weight: .medium)) 
+                            .foregroundColor(.white)
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
                             .focused($isTextFieldFocused)
@@ -47,13 +47,14 @@ struct TextEditorView: View{
                                     .fill(Color.black.opacity(0.8))
                             )
                             .frame(maxWidth: 300, maxHeight: 120)
+                            .border(Color.white, width: 1)
                         
                         // Close button for text-only mode
                         Button {
-                            viewModel.showEditTextContent = false
-                            viewModel.showEditor = false
+                            viewModel.closeEditTextContent()
+                            
                         } label: {
-                            Image(systemName: "xmark.circle.fill")
+                            Image(systemName: "checkmark.circle.fill")
                                 .font(.title2)
                                 .foregroundColor(.white)
                                 .padding(8)
@@ -63,7 +64,8 @@ struct TextEditorView: View{
                     .padding(.bottom, 100) // Space above toolbar
                 }
                 .padding(.horizontal)
-            } else {
+            } 
+            else {
                 // Show full text editor when not editing text content
                 VStack{
                     HStack(alignment: .center) {

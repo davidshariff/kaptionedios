@@ -22,8 +22,25 @@ class EditorViewModel: ObservableObject{
     @Published var showErrorAlert: Bool = false
     @Published var errorMessage: String = ""
     
+    @Published var videoPlayerSize: VideoPlayerSize = .half
+    
     private var projectEntity: ProjectEntity?
     
+    // Function to calculate video player height based on size and screen dimensions
+    func calculateVideoPlayerHeight(for size: VideoPlayerSize, screenHeight: CGFloat, headerHeight: CGFloat = 0) -> CGFloat {
+        switch size {
+        case .quarter:
+            return screenHeight * 0.25
+        case .half:
+            return screenHeight * 0.5
+        case .threeQuarters:
+            return screenHeight * 0.75
+        case .full:
+            return screenHeight - headerHeight // Subtract header height for full size
+        case .custom:
+            return 200 // Custom height when presets bottom sheet is open
+        }
+    }
 
     func setNewVideo(_ url: URL, geo: GeometryProxy){
         currentVideo = .init(url: url)

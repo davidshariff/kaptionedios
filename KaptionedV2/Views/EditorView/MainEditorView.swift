@@ -370,11 +370,15 @@ extension MainEditorView{
 
         VStack(spacing: 0) {
 
+            // PlayerControl section - always present but conditionally visible
             if !showEditSubtitlesMode, !showPresetsBottomSheet {
                 PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .animation(.easeInOut(duration: 0.3), value: showEditSubtitlesMode)
                 Spacer()
             }
 
+            // Edit subtitles mode section
             if let video = editorVM.currentVideo, showEditSubtitlesMode {
                 // Show word timeline only when in edit subtitles mode
                 ZStack {
@@ -385,9 +389,11 @@ extension MainEditorView{
                             HStack {
                                 Spacer()
                                 Button {
-                                    showEditSubtitlesMode = false
-                                    textEditor.selectedTextBox = nil
-                                    textEditor.cancelTextEditor()
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        showEditSubtitlesMode = false
+                                        textEditor.selectedTextBox = nil
+                                        textEditor.cancelTextEditor()
+                                    }
                                 } label: {
                                     Image(systemName: "xmark")
                                         .font(.title2)
@@ -400,6 +406,7 @@ extension MainEditorView{
                             }
                             .frame(height: 40)
                             .padding(.bottom, 8)
+                            .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
                         if !textEditor.showEditTextContent && editorVM.showWordTimeline {
@@ -448,6 +455,7 @@ extension MainEditorView{
                                 }
                             )
                             .frame(height: 120)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
 
                         if textEditor.showEditor {
@@ -466,6 +474,8 @@ extension MainEditorView{
                         selectedStyleOption: $textEditor.selectedStyleOption
                     )
                 }
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                .animation(.easeInOut(duration: 0.3), value: showEditSubtitlesMode)
             }
         }
     }

@@ -139,7 +139,9 @@ struct ToolsSectionView: View {
                 VStack(spacing: 4) {
                     ToolButtonView(label: "Edit", image: "list.bullet", isChange: false) {
                         // Handle edit subtitles action
-                        showEditSubtitlesMode = true
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            showEditSubtitlesMode = true
+                        }
                     }
                     Text("Edit Subtitles")
                         .font(.caption2)

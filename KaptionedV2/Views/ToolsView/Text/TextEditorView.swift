@@ -23,47 +23,50 @@ struct TextEditorView: View{
     }
     var body: some View{
         ZStack {
-            viewModel.currentTextBox.bgColor.opacity(0.35)
-                .ignoresSafeArea()
             
             if viewModel.showEditTextContent {
-                // Show compact text field above toolbar when editing text content
-                VStack(alignment: .center, spacing: 0) {
-                    VStack(spacing: 12) {
-                        TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
-                            .font(.system(size: 24, weight: .medium))
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(nil)
-                            .focused($isTextFieldFocused)
-                            .onAppear {
-                                isTextFieldFocused = true
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(Color.gray.opacity(0.5))
-                            )
-                            .frame(maxWidth: 300, maxHeight: 200)
 
-                        // Close button for text-only mode
-                        Button {
-                            viewModel.closeEditTextContent()
-                        } label: {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 44)) // Larger icon
+                // Show compact text field above toolbar when editing text content
+                ScrollView {
+                    VStack(alignment: .center, spacing: 0) {
+                        VStack(spacing: 12) {
+                            TextField("Enter text...", text: $viewModel.currentTextBox.text, axis: .vertical)
+                                .font(.system(size: 24, weight: .medium))
                                 .foregroundColor(.white)
-                                .padding(20)
-                                .background(Color.black.opacity(0.6), in: Circle())
+                                .multilineTextAlignment(.center)
+                                .lineLimit(nil)
+                                .focused($isTextFieldFocused)
+                                .onAppear {
+                                    isTextFieldFocused = true
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Color.gray.opacity(0.5))
+                                )
+                                .frame(maxWidth: 300, maxHeight: 200)
+
+                            // Close button for text-only mode
+                            Button {
+                                viewModel.closeEditTextContent()
+                            } label: {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 44)) // Larger icon
+                                    .foregroundColor(.white)
+                                    .padding(20)
+                                    .background(Color.black.opacity(0.6), in: Circle())
+                            }
+                            
                         }
+                        .padding(.top, 40) // Space from top, adjust as needed
+                        .padding(.bottom, 100) // Extra padding to ensure button is visible above keyboard
+                        
+                        Spacer(minLength: 0)
                     }
-                    .padding(.top, 40) // Space from top, adjust as needed
-                    .padding(.bottom, 0)
-                    
-                    Spacer()
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
+                .scrollDismissesKeyboard(.immediately)
             } 
             else {
                 // Show full text editor when not editing text content
@@ -211,7 +214,7 @@ struct TextEditorView: View{
             }
         }
         .animation(.easeInOut, value: activeSheet != nil)
-                        }
+    }
                         
     
     private func closeKeyboard(){

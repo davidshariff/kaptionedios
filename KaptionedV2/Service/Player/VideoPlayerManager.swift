@@ -20,6 +20,7 @@ final class VideoPlayerManager: ObservableObject{
     @Published private(set) var videoPlayer = AVPlayer()
     @Published private(set) var audioPlayer = AVPlayer()
     @Published private(set) var isPlaying: Bool = false
+    @Published var isMuted: Bool = false
     private var isSetAudio: Bool = false
     private var cancellable = Set<AnyCancellable>()
     private var timeObserver: Any?
@@ -124,6 +125,21 @@ final class VideoPlayerManager: ObservableObject{
             videoPlayer.volume = value
         }else{
             audioPlayer.volume = value
+        }
+    }
+    
+    func toggleMute() {
+        isMuted.toggle()
+        if isMuted {
+            videoPlayer.volume = 0
+            if isSetAudio {
+                audioPlayer.volume = 0
+            }
+        } else {
+            videoPlayer.volume = 1
+            if isSetAudio {
+                audioPlayer.volume = 1
+            }
         }
     }
 

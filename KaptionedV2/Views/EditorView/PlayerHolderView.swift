@@ -182,6 +182,7 @@ struct PlayerControl: View{
                 currentTime: videoPlayer.currentTime,
                 showMinorTicks: false,
                 showPlayhead: true,
+                customPixelsPerSecond: 20,
                 onChange: {
                     videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                 }
@@ -197,17 +198,34 @@ struct PlayerControl: View{
     
     private var controlsSection: some View{
         
-        HStack(spacing: 0) {
-            // Current time on the left
-            if let video = editorVM.currentVideo {
-                Text((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString())
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        ZStack {
+            // Background HStack for time and mute button
+            HStack {
+                // Time / Duration on the left
+                if let video = editorVM.currentVideo {
+                    Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+                
+                Spacer()
+                
+                // Mute/Unmute button on the right
+                Button {
+                    videoPlayer.toggleMute()
+                } label: {
+                    Image(systemName: videoPlayer.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                        .background(Color.black.opacity(0.3))
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
             }
             
-            // Play button in the center
+            // Play button centered on top
             Button {
                 if let video = editorVM.currentVideo{
                     videoPlayer.action(video)
@@ -223,15 +241,6 @@ struct PlayerControl: View{
                     )
             }
             .buttonStyle(.plain)
-            
-            // Total duration on the right
-            if let video = editorVM.currentVideo {
-                Text(video.totalDuration.formatterTimeString())
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
         }
         .frame(height: 70)
     }

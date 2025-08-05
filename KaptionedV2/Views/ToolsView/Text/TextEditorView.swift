@@ -138,10 +138,4 @@ struct TextEditorView: View{
     }
 }
 
-struct TextEditorView_Previews: PreviewProvider {
-    static var previews: some View {
-        TextEditorView(viewModel: TextEditorViewModel(), onSave: {_ in})
-    }
-}
-
 

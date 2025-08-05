@@ -417,35 +417,49 @@ extension MainEditorView{
 
                         // Top row with time/duration on the left and close button on the right
                         if !textEditor.showEditTextContent && editorVM.showWordTimeline {
-                            HStack {
-                                // Time / Duration on the left
-                                if let video = editorVM.currentVideo {
-                                    Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .padding(.top, 8)
-                                        .padding(.leading, 8)
-                                }
-                                
-                                Spacer()
-                                
-                                // Close button on the right
-                                Button {
-                                    withAnimation(.easeInOut(duration: 0.3)) {
-                                        showEditSubtitlesMode = false
-                                        textEditor.selectedTextBox = nil
-                                        textEditor.cancelTextEditor()
+                            ZStack {
+                                HStack {
+                                    // Time / Duration on the left
+                                    if let video = editorVM.currentVideo {
+                                        Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .padding(.top, 8)
+                                            .padding(.leading, 8)
                                     }
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .font(.title2)
-                                        .foregroundColor(.white)
-                                        .padding(8)
-                                        .background(Color.gray.opacity(0.3), in: Circle())
+                                    
+                                    Spacer()
+                                    
+                                    // Close button on the right
+                                    Button {
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            showEditSubtitlesMode = false
+                                            textEditor.selectedTextBox = nil
+                                            textEditor.cancelTextEditor()
+                                        }
+                                    } label: {
+                                        Image(systemName: "xmark")
+                                            .font(.title2)
+                                            .foregroundColor(.white)
+                                            .padding(8)
+                                            .background(Color.gray.opacity(0.3), in: Circle())
+                                    }
+                                    .padding(.top, 8)
+                                    .padding(.trailing, 8)
                                 }
-                                .padding(.top, 8)
-                                .padding(.trailing, 8)
+                                
+                                // Play/Pause button absolutely centered
+                                if let video = editorVM.currentVideo {
+                                    Button {
+                                        videoPlayer.action(video)
+                                    } label: {
+                                        Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding(.top, 8)
+                                }
                             }
                             .frame(height: 40)
                             .padding(.bottom, 8)

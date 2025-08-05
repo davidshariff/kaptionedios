@@ -307,8 +307,8 @@ struct AttributedTextOverlay: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UILabel {
         let label = UILabel()
-        label.numberOfLines = 1
-        label.lineBreakMode = .byClipping
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
         label.backgroundColor = bgColor
         label.layer.cornerRadius = cornerRadius
         label.layer.masksToBounds = true

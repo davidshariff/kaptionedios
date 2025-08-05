@@ -28,6 +28,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
     @ViewBuilder var actionView: () -> A
     let onChange: () -> Void
     let onSeek: (Double) -> Void
+    let onTextBoxUpdate: ((TextBox) -> Void)?
     
     // Initializer
     init(
@@ -45,7 +46,8 @@ struct WordTimelineSlider<T: View, A: View>: View {
         @ViewBuilder backgroundView: @escaping () -> T,
         @ViewBuilder actionView: @escaping () -> A,
         onChange: @escaping () -> Void,
-        onSeek: @escaping (Double) -> Void
+        onSeek: @escaping (Double) -> Void,
+        onTextBoxUpdate: ((TextBox) -> Void)? = nil
     ) {
         self._value = value
         self._selectedTextBox = selectedTextBox
@@ -62,6 +64,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
         self.actionView = actionView
         self.onChange = onChange
         self.onSeek = onSeek
+        self.onTextBoxUpdate = onTextBoxUpdate
     }
     
     private func createTextBoxView(_ textBox: TextBox) -> TimelineTextBox {
@@ -79,7 +82,8 @@ struct WordTimelineSlider<T: View, A: View>: View {
             },
             onSeek: onSeek,
             bounds: bounds,
-            isChange: false
+            isChange: false,
+            onTextBoxUpdate: onTextBoxUpdate
         )
     }
     
@@ -114,7 +118,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
 }
 
 struct TimelineTextBox: View {
-    let textBox: TextBox
+    @State var textBox: TextBox
     let timelineWidth: CGFloat
     let duration: Double
     let offset: Binding<CGFloat>
@@ -125,6 +129,7 @@ struct TimelineTextBox: View {
     let onSeek: (Double) -> Void
     let bounds: ClosedRange<Double>
     let isChange: Bool
+    let onTextBoxUpdate: ((TextBox) -> Void)?
     
     // Zoom state for pinch gesture
     @State private var zoomLevel: CGFloat = 1.0
@@ -133,9 +138,44 @@ struct TimelineTextBox: View {
     @State private var isDragging: Bool = false
     @State private var gestureStartTime: Date = Date()
     
+    // Edge dragging state
+    @State private var isDraggingLeftEdge: Bool = false
+    @State private var isDraggingRightEdge: Bool = false
+    @State private var dragStartTime: Double = 0
+    @State private var originalTimeRange: ClosedRange<Double> = 0...0
+    
     // Zoom constraints
     let minZoomLevel: CGFloat = 1.0
     let maxZoomLevel: CGFloat = 5.0
+    
+    // Initializer
+    init(
+        textBox: TextBox,
+        timelineWidth: CGFloat,
+        duration: Double,
+        offset: Binding<CGFloat>,
+        externalDragOffset: Binding<CGFloat>?,
+        externalZoomOffset: Binding<CGFloat>?,
+        isSelected: Bool,
+        onTap: @escaping () -> Void,
+        onSeek: @escaping (Double) -> Void,
+        bounds: ClosedRange<Double>,
+        isChange: Bool,
+        onTextBoxUpdate: ((TextBox) -> Void)?
+    ) {
+        self._textBox = State(initialValue: textBox)
+        self.timelineWidth = timelineWidth
+        self.duration = duration
+        self.offset = offset
+        self.externalDragOffset = externalDragOffset
+        self.externalZoomOffset = externalZoomOffset
+        self.isSelected = isSelected
+        self.onTap = onTap
+        self.onSeek = onSeek
+        self.bounds = bounds
+        self.isChange = isChange
+        self.onTextBoxUpdate = onTextBoxUpdate
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -156,100 +196,206 @@ struct TimelineTextBox: View {
             let isVisible = true
             
             if isVisible {
-                Text(textBox.text)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .frame(width: boxWidth, height: 50, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.gray.opacity(0.7))
-                    )
-                    .border(isSelected ? .white : .clear, width: 1)
-                    .position(x: absoluteTextPosition, y: geometry.size.height / 2)
-                    .opacity(0.9)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .gesture(
-                        DragGesture(minimumDistance: 0)
-                            .onChanged { value in
-                                // This will be called for any drag, even very small ones
-                                let distance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
-                                
-                                // If this is a significant drag and we're not zooming, pass it to the RulerView immediately
-                                if distance >= 5 && !isZooming {
-                                    isDragging = true
-                                    if let externalDragBinding = externalDragOffset {
-                                        externalDragBinding.wrappedValue = value.translation.width
+                ZStack {
+                    // Main text box
+                    Text(textBox.text)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .frame(width: boxWidth, height: 50, alignment: .leading)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(isSelected ? Color.blue.opacity(0.8) : Color.gray.opacity(0.7))
+                        )
+                        .border(isSelected ? .white : .clear, width: 1)
+                        .position(x: absoluteTextPosition, y: geometry.size.height / 2)
+                        .opacity(0.9)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .zIndex(isSelected ? 10 : 1)
+                        .gesture(
+                            DragGesture(minimumDistance: 0)
+                                .onChanged { value in
+                                    // This will be called for any drag, even very small ones
+                                    let distance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
+                                    
+                                    // If this is a significant drag and we're not zooming, pass it to the RulerView immediately
+                                    if distance >= 5 && !isZooming {
+                                        isDragging = true
+                                        if let externalDragBinding = externalDragOffset {
+                                            externalDragBinding.wrappedValue = value.translation.width
+                                        }
                                     }
                                 }
-                            }
-                            .onEnded { value in
-                                let dragDistance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
-                                
-                                // If drag distance is very small and we're not zooming, treat as tap
-                                if dragDistance < 5 && !isZooming {
-                                    onTap()
-                                    onSeek(textBox.timeRange.lowerBound)
-                                    // Update timeline position immediately
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        // Note: This will need to be updated when we integrate with the new RulerView drag logic
-                                        // TimelineSliderUtils.setOffset(
-                                        //     value: textBox.timeRange.lowerBound,
-                                        //     offset: offset,
-                                        //     isChange: isChange,
-                                        //     bounds: bounds,
-                                        //     timelineWidth: timelineWidth
-                                        // )
+                                .onEnded { value in
+                                    let dragDistance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
+                                    
+                                    // If drag distance is very small and we're not zooming, treat as tap
+                                    if dragDistance < 5 && !isZooming {
+                                        onTap()
+                                        onSeek(textBox.timeRange.lowerBound)
+                                        // Update timeline position immediately
+                                        withAnimation(.easeInOut(duration: 0.15)) {
+                                            // Note: This will need to be updated when we integrate with the new RulerView drag logic
+                                            // TimelineSliderUtils.setOffset(
+                                            //     value: textBox.timeRange.lowerBound,
+                                            //     offset: offset,
+                                            //     isChange: isChange,
+                                            //     bounds: bounds,
+                                            //     timelineWidth: timelineWidth
+                                            // )
+                                        }
+                                    } else if isDragging {
+                                        // Pass the drag translation to the external drag offset
+                                        if let externalDragBinding = externalDragOffset {
+                                            externalDragBinding.wrappedValue = value.translation.width
+                                        }
                                     }
-                                } else if isDragging {
-                                    // Pass the drag translation to the external drag offset
-                                    if let externalDragBinding = externalDragOffset {
-                                        externalDragBinding.wrappedValue = value.translation.width
-                                    }
-                                }
-                                
-                                isDragging = false
-                                
-                                // Reset external drag offset after a short delay to let RulerView process the final position
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                    if let externalDragBinding = externalDragOffset {
-                                        externalDragBinding.wrappedValue = 0
-                                    }
-                                }
-                            }
-                    )
-                    .gesture(
-                        MagnificationGesture()
-                            .onChanged { scale in
-                                isZooming = true
-                                let newZoomLevel = lastZoomLevel * scale
-                                zoomLevel = min(maxZoomLevel, max(minZoomLevel, newZoomLevel))
-                                
-                                // Pass zoom information to RulerView through external zoom offset
-                                if let externalZoomBinding = externalZoomOffset {
-                                    // Use a positive value for zoom level
-                                    let zoomIndicator = zoomLevel * 1000 // Scale up for precision
-                                    externalZoomBinding.wrappedValue = zoomIndicator
-                                }
-                            }
-                            .onEnded { scale in
-                                isZooming = false
-                                lastZoomLevel = zoomLevel
-                                
-                                // Reset the external drag offset after zoom ends
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                    if let externalDragBinding = externalZoomOffset {
-                                        externalDragBinding.wrappedValue = 0
+                                    
+                                    isDragging = false
+                                    
+                                    // Reset external drag offset after a short delay to let RulerView process the final position
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                        if let externalDragBinding = externalDragOffset {
+                                            externalDragBinding.wrappedValue = 0
+                                        }
                                     }
                                 }
-                            }
-                    )
-                    .onAppear {
-                        // Debug positioning
-                        print("📝 TimelineTextBox - Text: '\(textBox.text)', Position: \(absoluteTextPosition), BoxWidth: \(boxWidth), WordPosition: \(wordPosition), Offset: \(offset.wrappedValue)")
+                        )
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { scale in
+                                    isZooming = true
+                                    let newZoomLevel = lastZoomLevel * scale
+                                    zoomLevel = min(maxZoomLevel, max(minZoomLevel, newZoomLevel))
+                                    
+                                    // Pass zoom information to RulerView through external zoom offset
+                                    if let externalZoomBinding = externalZoomOffset {
+                                        // Use a positive value for zoom level
+                                        let zoomIndicator = zoomLevel * 1000 // Scale up for precision
+                                        externalZoomBinding.wrappedValue = zoomIndicator
+                                    }
+                                }
+                                .onEnded { scale in
+                                    isZooming = false
+                                    lastZoomLevel = zoomLevel
+                                    
+                                    // Reset the external drag offset after zoom ends
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                        if let externalDragBinding = externalZoomOffset {
+                                            externalDragBinding.wrappedValue = 0
+                                        }
+                                    }
+                                }
+                        )
+                    
+                    // Left edge handle (only show for selected text boxes)
+                    if isSelected {
+                        Rectangle()
+                            .fill(Color.blue)
+                            .frame(width: 8, height: 70)
+                            .overlay(
+                                Rectangle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
+                            .position(x: absoluteTextPosition - boxWidth/2, y: geometry.size.height / 2)
+                            .zIndex(20)
+                            .gesture(
+                                DragGesture()
+                                    .onChanged { value in
+                                        print("🔄 Left edge drag - translation: \(value.translation.width)")
+                                        
+                                        if !isDraggingLeftEdge {
+                                            isDraggingLeftEdge = true
+                                            dragStartTime = textBox.timeRange.lowerBound
+                                            originalTimeRange = textBox.timeRange
+                                            print("🔄 Left edge drag started - original start: \(dragStartTime)")
+                                        }
+                                        
+                                        // Calculate new start time based on drag
+                                        let pixelsPerSecond = (timelineWidth / duration)
+                                        let timeChange = value.translation.width / pixelsPerSecond
+                                        let newStartTime = max(0, dragStartTime + timeChange)
+                                        
+                                        // Ensure minimum duration (0.5 seconds)
+                                        let minDuration: Double = 0.5
+                                        let maxStartTime = textBox.timeRange.upperBound - minDuration
+                                        let clampedStartTime = min(newStartTime, maxStartTime)
+                                        
+                                        print("🔄 Left edge drag - new start time: \(clampedStartTime), original: \(textBox.timeRange.lowerBound)")
+                                        
+                                        // Update the text box time range
+                                        textBox.timeRange = clampedStartTime...textBox.timeRange.upperBound
+                                        
+                                        print("🔄 Left edge drag - updated time range: \(textBox.timeRange)")
+                                    }
+                                    .onEnded { value in
+                                        isDraggingLeftEdge = false
+                                        print("🔄 Left edge drag ended")
+                                        
+                                        // Update the video player text boxes with the new time range
+                                        onTextBoxUpdate?(textBox)
+                                        print("🔄 Left edge drag - calling onTextBoxUpdate with time range: \(textBox.timeRange)")
+                                    }
+                            )
                     }
+                    
+                    // Right edge handle (only show for selected text boxes)
+                    if isSelected {
+                        Rectangle()
+                            .fill(Color.blue)
+                            .frame(width: 8, height: 70)
+                            .overlay(
+                                Rectangle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
+                            .position(x: absoluteTextPosition + boxWidth/2, y: geometry.size.height / 2)
+                            .zIndex(20)
+                            .gesture(
+                                DragGesture()
+                                    .onChanged { value in
+                                        print("🔄 Right edge drag - translation: \(value.translation.width)")
+                                        
+                                        if !isDraggingRightEdge {
+                                            isDraggingRightEdge = true
+                                            dragStartTime = textBox.timeRange.upperBound
+                                            originalTimeRange = textBox.timeRange
+                                            print("🔄 Right edge drag started - original end: \(dragStartTime)")
+                                        }
+                                        
+                                        // Calculate new end time based on drag
+                                        let pixelsPerSecond = (timelineWidth / duration)
+                                        let timeChange = value.translation.width / pixelsPerSecond
+                                        let newEndTime = min(duration, dragStartTime + timeChange)
+                                        
+                                        // Ensure minimum duration (0.5 seconds)
+                                        let minDuration: Double = 0.5
+                                        let minEndTime = textBox.timeRange.lowerBound + minDuration
+                                        let clampedEndTime = max(newEndTime, minEndTime)
+                                        
+                                        print("🔄 Right edge drag - new end time: \(clampedEndTime), original: \(textBox.timeRange.upperBound)")
+                                        
+                                        // Update the text box time range
+                                        textBox.timeRange = textBox.timeRange.lowerBound...clampedEndTime
+                                        
+                                        print("🔄 Right edge drag - updated time range: \(textBox.timeRange)")
+                                    }
+                                    .onEnded { value in
+                                        isDraggingRightEdge = false
+                                        print("🔄 Right edge drag ended")
+                                        
+                                        // Update the video player text boxes with the new time range
+                                        onTextBoxUpdate?(textBox)
+                                        print("🔄 Right edge drag - calling onTextBoxUpdate with time range: \(textBox.timeRange)")
+                                    }
+                            )
+                    }
+                }
+                .onAppear {
+                    // Debug positioning
+                    print("📝 TimelineTextBox - Text: '\(textBox.text)', Position: \(absoluteTextPosition), BoxWidth: \(boxWidth), WordPosition: \(wordPosition), Offset: \(offset.wrappedValue)")
+                }
             }
         }
     }

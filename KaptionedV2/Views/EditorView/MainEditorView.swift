@@ -483,6 +483,16 @@ extension MainEditorView{
                                 },
                                 onSeek: { time in
                                     videoPlayer.seekToTime(time)
+                                },
+                                onTextBoxUpdate: { updatedTextBox in
+                                    // Update the text box in the text editor view model
+                                    if let index = textEditor.textBoxes.firstIndex(where: { $0.id == updatedTextBox.id }) {
+                                        textEditor.textBoxes[index] = updatedTextBox
+                                        print("📝 Text editor - updated text box '\(updatedTextBox.text)' with time range: \(updatedTextBox.timeRange)")
+                                        
+                                        // Call onSave to update the main video model through the editor view model
+                                        textEditor.onSave?(textEditor.textBoxes)
+                                    }
                                 }
                             )
                             .frame(height: 120)

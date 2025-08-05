@@ -461,7 +461,7 @@ extension MainEditorView{
                                         duration: video.originalDuration, 
                                         currentTime: videoPlayer.currentTime, 
                                         showPlayhead: true, 
-                                        tickHeight: 60, 
+                                        tickHeight: 80, 
                                         customPixelsPerSecond: 50,
                                         actualTimelineWidth: $actualTimelineWidth,
                                         rulerStartInParentX: $rulerStartInParentX,
@@ -495,7 +495,7 @@ extension MainEditorView{
                                     }
                                 }
                             )
-                            .frame(height: 120)
+                            .frame(height: 80)
                             .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
 

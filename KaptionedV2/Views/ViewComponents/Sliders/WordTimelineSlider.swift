@@ -365,14 +365,16 @@ struct TimelineTextBox: View {
                     
                     // Left edge handle (only show for selected text boxes)
                     if isSelected {
-                        Rectangle()
-                            .fill(Color.blue)
-                            .frame(width: 8, height: 70)
-                            .overlay(
-                                Rectangle()
-                                    .stroke(Color.white, lineWidth: 1)
+                        Image(systemName: "arrow.left.and.right")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.blue)
+                            .frame(width: 24, height: 24)
+                            .background(
+                                Circle()
+                                    .fill(Color.white)
+                                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                             )
-                            .position(x: absoluteTextPosition - boxWidth/2, y: geometry.size.height / 2)
+                            .position(x: (absoluteTextPosition - boxWidth/2) + 2, y: geometry.size.height / 2 + 35)
                             .zIndex(TimelineZIndex.dragHandles)
                             .gesture(
                                 DragGesture()
@@ -421,14 +423,16 @@ struct TimelineTextBox: View {
                     
                     // Right edge handle (only show for selected text boxes)
                     if isSelected {
-                        Rectangle()
-                            .fill(Color.blue)
-                            .frame(width: 8, height: 70)
-                            .overlay(
-                                Rectangle()
-                                    .stroke(Color.white, lineWidth: 1)
+                        Image(systemName: "arrow.left.and.right")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.blue)
+                            .frame(width: 24, height: 24)
+                            .background(
+                                Circle()
+                                    .fill(Color.white)
+                                    .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
                             )
-                            .position(x: absoluteTextPosition + boxWidth/2, y: geometry.size.height / 2)
+                            .position(x: (absoluteTextPosition + boxWidth/2) - 2, y: geometry.size.height / 2 + 35)
                             .zIndex(TimelineZIndex.dragHandles)
                             .gesture(
                                 DragGesture()

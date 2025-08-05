@@ -205,5 +205,40 @@ struct TextToolbar: View {
                 }
             }
         }
+
+        if textEditor.selectedTextBox == nil {
+            VStack {
+                Spacer()
+                Text("Tap text to edit")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                
+                Text("or")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.7))
+                    .padding(.vertical, 4)
+                
+                Button {
+                    // Add new caption action
+                    textEditor.openTextEditor(isEdit: false)
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "plus")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text("Add New")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(Color.blue.opacity(0.7))
+                    .cornerRadius(8)
+                }
+                .padding(.bottom, 20)
+            }
+        }
+
     }
 }

@@ -1,5 +1,14 @@
 import SwiftUI
 
+// Z-Index enum for consistent layering
+enum TimelineZIndex {
+    static let nonSelectedTextBox: Double = 1
+    static let selectedTextBox: Double = 25
+    static let dragHandles: Double = 50
+    static let tooltip: Double = 75
+    static let selectedTextBoxContainer: Double = 100
+}
+
 //  Main Word Timeline Slider
 struct WordTimelineSlider<T: View, A: View>: View {
 
@@ -90,6 +99,7 @@ struct WordTimelineSlider<T: View, A: View>: View {
     private var textBoxViews: some View {
         ForEach(textBoxes, id: \.id) { (textBox: TextBox) in
             createTextBoxView(textBox)
+                .zIndex(selectedTextBox?.id == textBox.id ? TimelineZIndex.selectedTextBoxContainer : TimelineZIndex.nonSelectedTextBox)
         }
     }
     
@@ -218,7 +228,7 @@ struct TimelineTextBox: View {
                                 )
                         }
                         .position(x: absoluteTextPosition, y: geometry.size.height / 2 - 40)
-                        .zIndex(30)
+                        .zIndex(TimelineZIndex.tooltip)
                     }
                     
                     // Main text box
@@ -230,14 +240,14 @@ struct TimelineTextBox: View {
                         .frame(width: boxWidth, height: 50, alignment: .leading)
                         .background(
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(isSelected ? Color.blue.opacity(1) : Color.gray.opacity(0.7))
+                                .fill(isSelected ? Color.blue : Color.gray.opacity(0.7))
                         )
                         .border(isSelected ? .white : .clear, width: 1)
                         .position(x: absoluteTextPosition, y: geometry.size.height / 2)
                         .opacity(0.9)
                         .lineLimit(1)
                         .truncationMode(.tail)
-                        .zIndex(isSelected ? 10 : 1)
+                        .zIndex(isSelected ? TimelineZIndex.selectedTextBox : TimelineZIndex.nonSelectedTextBox)
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in
@@ -363,7 +373,7 @@ struct TimelineTextBox: View {
                                     .stroke(Color.white, lineWidth: 1)
                             )
                             .position(x: absoluteTextPosition - boxWidth/2, y: geometry.size.height / 2)
-                            .zIndex(20)
+                            .zIndex(TimelineZIndex.dragHandles)
                             .gesture(
                                 DragGesture()
                                     .onChanged { value in
@@ -419,7 +429,7 @@ struct TimelineTextBox: View {
                                     .stroke(Color.white, lineWidth: 1)
                             )
                             .position(x: absoluteTextPosition + boxWidth/2, y: geometry.size.height / 2)
-                            .zIndex(20)
+                            .zIndex(TimelineZIndex.dragHandles)
                             .gesture(
                                 DragGesture()
                                     .onChanged { value in

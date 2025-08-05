@@ -143,6 +143,8 @@ struct TimelineTextBox: View {
     @State private var isDraggingRightEdge: Bool = false
     @State private var dragStartTime: Double = 0
     @State private var originalTimeRange: ClosedRange<Double> = 0...0
+    @State private var currentDragTime: Double = 0
+    @State private var showTimeTooltip: Bool = false
     
     // Zoom constraints
     let minZoomLevel: CGFloat = 1.0
@@ -197,6 +199,27 @@ struct TimelineTextBox: View {
             
             if isVisible {
                 ZStack {
+                    // Time tooltip (shown during drag)
+                    if showTimeTooltip {
+                        VStack {
+                            Text(String(format: "%.2fs", currentDragTime))
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Color.black.opacity(0.8))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(Color.white, lineWidth: 1)
+                                )
+                        }
+                        .position(x: absoluteTextPosition, y: geometry.size.height / 2 - 40)
+                        .zIndex(30)
+                    }
+                    
                     // Main text box
                     Text(textBox.text)
                         .font(.system(size: 10, weight: .medium))
@@ -310,6 +333,7 @@ struct TimelineTextBox: View {
                                             isDraggingLeftEdge = true
                                             dragStartTime = textBox.timeRange.lowerBound
                                             originalTimeRange = textBox.timeRange
+                                            showTimeTooltip = true
                                             print("🔄 Left edge drag started - original start: \(dragStartTime)")
                                         }
                                         
@@ -323,6 +347,9 @@ struct TimelineTextBox: View {
                                         let maxStartTime = textBox.timeRange.upperBound - minDuration
                                         let clampedStartTime = min(newStartTime, maxStartTime)
                                         
+                                        // Update tooltip time
+                                        currentDragTime = clampedStartTime
+                                        
                                         print("🔄 Left edge drag - new start time: \(clampedStartTime), original: \(textBox.timeRange.lowerBound)")
                                         
                                         // Update the text box time range
@@ -332,6 +359,7 @@ struct TimelineTextBox: View {
                                     }
                                     .onEnded { value in
                                         isDraggingLeftEdge = false
+                                        showTimeTooltip = false
                                         print("🔄 Left edge drag ended")
                                         
                                         // Update the video player text boxes with the new time range
@@ -361,6 +389,7 @@ struct TimelineTextBox: View {
                                             isDraggingRightEdge = true
                                             dragStartTime = textBox.timeRange.upperBound
                                             originalTimeRange = textBox.timeRange
+                                            showTimeTooltip = true
                                             print("🔄 Right edge drag started - original end: \(dragStartTime)")
                                         }
                                         
@@ -374,6 +403,9 @@ struct TimelineTextBox: View {
                                         let minEndTime = textBox.timeRange.lowerBound + minDuration
                                         let clampedEndTime = max(newEndTime, minEndTime)
                                         
+                                        // Update tooltip time
+                                        currentDragTime = clampedEndTime
+                                        
                                         print("🔄 Right edge drag - new end time: \(clampedEndTime), original: \(textBox.timeRange.upperBound)")
                                         
                                         // Update the text box time range
@@ -383,6 +415,7 @@ struct TimelineTextBox: View {
                                     }
                                     .onEnded { value in
                                         isDraggingRightEdge = false
+                                        showTimeTooltip = false
                                         print("🔄 Right edge drag ended")
                                         
                                         // Update the video player text boxes with the new time range

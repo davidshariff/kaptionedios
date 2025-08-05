@@ -229,7 +229,7 @@ struct TimelineTextBox: View {
                         .frame(width: boxWidth, height: 50, alignment: .leading)
                         .background(
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(isSelected ? Color.blue.opacity(0.8) : Color.gray.opacity(0.7))
+                                .fill(isSelected ? Color.blue.opacity(1) : Color.gray.opacity(0.7))
                         )
                         .border(isSelected ? .white : .clear, width: 1)
                         .position(x: absoluteTextPosition, y: geometry.size.height / 2)

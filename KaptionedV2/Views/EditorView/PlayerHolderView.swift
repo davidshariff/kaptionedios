@@ -108,7 +108,7 @@ extension PlayerHolderView{
                             // this is the video player with grid
                             PlayerViewWithGrid(
                                 player: videoPlayer.videoPlayer,
-                                showGrid: true,
+                                showGrid: false,
                                 originalVideoSize: video.frameSize
                             )
                             ZStack {

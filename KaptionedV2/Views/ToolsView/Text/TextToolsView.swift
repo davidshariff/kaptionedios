@@ -1,10 +1,3 @@
-//
-//  TextToolsView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 02.05.2023.
-//
-
 import SwiftUI
 
 struct TextToolsView: View {
@@ -26,12 +19,6 @@ struct TextToolsView: View {
         .onDisappear{
             editor.selectedTextBox = nil
         }
-    }
-}
-
-struct TextToolsView_Previews: PreviewProvider {
-    static var previews: some View {
-        TextToolsView(video: Video.mock, editor: TextEditorViewModel())
     }
 }
 

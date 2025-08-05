@@ -414,10 +414,22 @@ extension MainEditorView{
                 ZStack {
                     VStack(spacing: 0) {
 
-                        // Top row with close button at the right
+                        // Top row with time/duration on the left and close button on the right
                         if !textEditor.showEditTextContent && editorVM.showWordTimeline {
                             HStack {
+                                // Time / Duration on the left
+                                if let video = editorVM.currentVideo {
+                                    Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .padding(.top, 8)
+                                        .padding(.leading, 8)
+                                }
+                                
                                 Spacer()
+                                
+                                // Close button on the right
                                 Button {
                                     withAnimation(.easeInOut(duration: 0.3)) {
                                         showEditSubtitlesMode = false

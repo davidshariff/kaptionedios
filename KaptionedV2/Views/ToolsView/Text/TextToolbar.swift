@@ -261,15 +261,27 @@ struct TextToolbar: View {
         if textEditor.selectedTextBox == nil {
             VStack {
                 Spacer()
-                Text("Tap text to edit")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
                 
-                Text("or")
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-                    .padding(.vertical, 4)
+                // Textbox-style container for "Tap text to edit"
+                VStack(spacing: 0) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "hand.tap")
+                            .font(.title2)
+                            .foregroundColor(.white.opacity(0.8))
+                        
+                        Text("tap text to edit")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 20)
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    
+                    Text("or")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.7))
+                        .padding(.vertical, 4)
+                }
                 
                 Button {
                     // Add new caption action with current time
@@ -280,7 +292,7 @@ struct TextToolbar: View {
                         Image(systemName: "plus")
                             .font(.headline)
                             .foregroundColor(.white)
-                        Text("Add New")
+                        Text("add new")
                             .font(.headline)
                             .foregroundColor(.white)
                     }

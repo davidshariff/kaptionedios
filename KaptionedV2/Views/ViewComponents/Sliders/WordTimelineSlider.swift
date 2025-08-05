@@ -238,52 +238,63 @@ struct TimelineTextBox: View {
                     }
                     
                     // Main text box
-                    Text(textBox.text)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .frame(width: boxWidth, height: 50, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(
-                                    isSelected ? 
-                                        AnyShapeStyle(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color(red: 0.6, green: 0.3, blue: 0.8, opacity: 0.9),  // Light purple
-                                                    Color(red: 0.5, green: 0.2, blue: 0.7, opacity: 0.9)   // Darker purple
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        ) :
-                                        AnyShapeStyle(Color.gray.opacity(0.7))
-                                )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(
-                                    isSelected ? 
-                                        AnyShapeStyle(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color.white.opacity(0.8),
-                                                    Color.white.opacity(0.4)
-                                                ],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        ) :
-                                        AnyShapeStyle(Color.clear),
-                                    lineWidth: 1.5
-                                )
-                        )
-                        .position(x: absoluteTextPosition, y: geometry.size.height / 2)
-                        .opacity(0.9)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .zIndex(isSelected ? TimelineZIndex.selectedTextBox : TimelineZIndex.nonSelectedTextBox)
+                    ZStack(alignment: .bottomTrailing) {
+                        Text(textBox.text)
+                            .font(.system(size: 10, weight: .medium))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .frame(width: boxWidth, height: 50, alignment: .leading)
+                            .background(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(
+                                        isSelected ? 
+                                            AnyShapeStyle(
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color(red: 0.6, green: 0.3, blue: 0.8, opacity: 0.9),  // Light purple
+                                                        Color(red: 0.5, green: 0.2, blue: 0.7, opacity: 0.9)   // Darker purple
+                                                    ],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            ) :
+                                            AnyShapeStyle(Color.gray.opacity(0.7))
+                                    )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(
+                                        isSelected ? 
+                                            AnyShapeStyle(
+                                                LinearGradient(
+                                                    colors: [
+                                                        Color.white.opacity(0.8),
+                                                        Color.white.opacity(0.4)
+                                                    ],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            ) :
+                                            AnyShapeStyle(Color.clear),
+                                        lineWidth: 1.5
+                                    )
+                            )
+                        
+                        // Hand tap icon for unselected textboxes
+                        if !isSelected {
+                            Image(systemName: "hand.tap.fill")
+                                .font(.system(size: 8))
+                                .foregroundColor(.white)
+                                .padding(2)
+                                .offset(x: -4, y: -4)
+                        }
+                    }
+                    .position(x: absoluteTextPosition, y: geometry.size.height / 2)
+                    .opacity(0.9)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .zIndex(isSelected ? TimelineZIndex.selectedTextBox : TimelineZIndex.nonSelectedTextBox)
                         .gesture(
                             DragGesture(minimumDistance: 0)
                                 .onChanged { value in

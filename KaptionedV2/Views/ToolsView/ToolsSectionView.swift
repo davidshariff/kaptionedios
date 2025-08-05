@@ -56,6 +56,7 @@ struct ToolsSectionView: View {
                             print("DEBUG: Applying regular preset")
                             // For regular presets, apply style to existing subtitles
                             textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
+                            print("DEBUG: After applying preset, first TextBox presetName: '\(textEditor.textBoxes.first?.presetName ?? "nil")'")
                             editorVM.setText(textEditor.textBoxes)
                         }
                         selectedPreset = style // Track the selected preset

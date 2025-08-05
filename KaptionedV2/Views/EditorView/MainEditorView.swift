@@ -210,7 +210,8 @@ struct MainEditorView: View {
                             print("DEBUG: Preset selected: \(style.name)")
                             pendingPreset = style
                             showPresetConfirm = true
-                        }
+                        },
+                        currentTextBox: textEditor.selectedTextBox ?? textEditor.textBoxes.first
                     )
                     .frame(maxWidth: .infinity, maxHeight: availableHeightExcludingPlayer) // Dynamic height based on available space
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -231,7 +232,7 @@ struct MainEditorView: View {
 
 
         .confirmationDialog("Are you sure?", isPresented: $showBackConfirmation) {
-            Button("Yes, go back", role: .destructive) {
+            Button("Yes", role: .destructive) {
                 editorVM.updateProject()
                 dismiss()
             }
@@ -239,7 +240,7 @@ struct MainEditorView: View {
                 // Do nothing, just dismiss the dialog
             }
         } message: {
-            Text("Are you sure you want to exit this project? Your changes will be saved.")
+            Text("Are you sure you want to exit this project?")
         }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.all, edges: .top)
@@ -313,8 +314,8 @@ extension MainEditorView{
                 showBackConfirmation = true
             } label: {
                 VStack(spacing: 4) {
-                    Image(systemName: "folder.fill")
-                    Text("Back")
+                    Image(systemName: "door.left.hand.open")
+                    Text("Exit")
                         .font(.caption2)
                 }
                 .padding(.top, 8)

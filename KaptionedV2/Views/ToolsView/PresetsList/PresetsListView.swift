@@ -4,6 +4,7 @@ struct PresetsListView: View {
     @Binding var isPresented: Bool
     @Binding var pendingPreset: SubtitleStyle?
     var onSelect: (SubtitleStyle) -> Void
+    var currentTextBox: TextBox? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -54,7 +55,11 @@ struct PresetsListView: View {
                                     )
                             }
                             .padding()
-                            .background(Color(.systemGray5))
+                            .background(isCurrentPreset(style) ? Color.blue.opacity(0.3) : Color(.systemGray5))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(isCurrentPreset(style) ? Color.blue : Color.clear, lineWidth: 3)
+                            )
                             .cornerRadius(12)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -68,5 +73,28 @@ struct PresetsListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGray6))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .onAppear {
+            print("DEBUG: PresetsListView appeared")
+            if let currentTextBox = currentTextBox {
+                print("DEBUG: currentTextBox provided with presetName: '\(currentTextBox.presetName ?? "nil")'")
+            } else {
+                print("DEBUG: No currentTextBox provided")
+            }
+        }
+    }
+    
+    // Helper function to determine if a preset matches the current TextBox style
+    private func isCurrentPreset(_ style: SubtitleStyle) -> Bool {
+        guard let currentTextBox = currentTextBox else { 
+            print("DEBUG: No currentTextBox provided to PresetsListView")
+            return false 
+        }
+        
+        print("DEBUG: Checking preset '\(style.name)' against currentTextBox.presetName: '\(currentTextBox.presetName ?? "nil")'")
+        
+        // Match based on preset name
+        let isMatch = currentTextBox.presetName == style.name
+        print("DEBUG: Match result for '\(style.name)': \(isMatch)")
+        return isMatch
     }
 } 

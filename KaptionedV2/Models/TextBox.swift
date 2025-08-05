@@ -50,6 +50,9 @@ struct TextBox: Identifiable{
     var highlightColor: Color = KaraokePreset.letter.highlightColor
     var wordBGColor: Color = KaraokePreset.letter.wordBGColor
     
+    // Preset tracking
+    var presetName: String? = nil
+    
     init(
         text: String = "",
         fontSize: CGFloat = 20,
@@ -71,7 +74,8 @@ struct TextBox: Identifiable{
         karaokeWords: [KaraokeWord]? = nil,
         karaokeType: KaraokeType = .word,
         highlightColor: Color = KaraokePreset.letter.highlightColor,
-        wordBGColor: Color = KaraokePreset.letter.wordBGColor
+        wordBGColor: Color = KaraokePreset.letter.wordBGColor,
+        presetName: String? = nil
     ) {
         self.text = text
         self.fontSize = fontSize
@@ -94,6 +98,7 @@ struct TextBox: Identifiable{
         self.karaokeType = karaokeType
         self.highlightColor = highlightColor
         self.wordBGColor = wordBGColor
+        self.presetName = presetName
     }
     
     
@@ -119,6 +124,7 @@ struct SubtitleStyle: Identifiable, Equatable {
     
     // Optionally, provide a method to apply this style to a TextBox
     func apply(to textBox: TextBox) -> TextBox {
+        print("DEBUG: Applying preset '\(name)' to TextBox")
         var box = textBox
         box.fontSize = fontSize
         box.bgColor = bgColor
@@ -138,6 +144,10 @@ struct SubtitleStyle: Identifiable, Equatable {
         box.karaokeType = KaraokePreset.letter.karaokeType
         box.highlightColor = KaraokePreset.letter.highlightColor
         box.wordBGColor = KaraokePreset.letter.wordBGColor
+        
+        // Set the preset name
+        box.presetName = name
+        print("DEBUG: Set presetName to '\(name)' for TextBox")
         
         return box
     }

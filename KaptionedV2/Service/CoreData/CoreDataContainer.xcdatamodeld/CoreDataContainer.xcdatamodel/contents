@@ -41,6 +41,7 @@
         <attribute name="strokeColor" optional="YES" attributeType="String"/>
         <attribute name="strokeWidth" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="text" optional="YES" attributeType="String"/>
+        <attribute name="presetName" optional="YES" attributeType="String"/>
         <attribute name="upperTime" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="textBoxes" inverseEntity="ProjectEntity"/>
     </entity>

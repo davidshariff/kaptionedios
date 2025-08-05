@@ -107,6 +107,13 @@ struct WordTimelineSlider<T: View, A: View>: View {
         ZStack {
 
             backgroundView()
+                .onTapGesture {
+                    // Deselect when tapping the background
+                    if selectedTextBox != nil {
+                        selectedTextBox = nil
+                        print("🔄 Text box deselected - background tap")
+                    }
+                }
 
             textBoxViews
             .border(.red, width: 1)

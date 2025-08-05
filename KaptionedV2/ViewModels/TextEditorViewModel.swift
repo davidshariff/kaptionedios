@@ -59,6 +59,9 @@ class TextEditorViewModel: ObservableObject{
     func removeTextBox(){
         guard let selectedTextBox else {return}
         textBoxes.removeAll(where: {$0.id == selectedTextBox.id})
+        self.selectedTextBox = nil
+        // Call onSave to update the main video model
+        onSave?(textBoxes)
     }
     
     func copy(_ textBox: TextBox){

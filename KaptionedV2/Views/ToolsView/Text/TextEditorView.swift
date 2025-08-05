@@ -62,6 +62,11 @@ struct TextEditorView: View{
                 .scrollDismissesKeyboard(.immediately)
             } 
             else {
+
+                // Background that fills the entire screen
+                Color.black.opacity(0.5)
+                    .ignoresSafeArea()
+
                 // Show full text editor when not editing text content
                 VStack{
                     HStack(alignment: .center) {
@@ -73,7 +78,7 @@ struct TextEditorView: View{
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
-                                .background(Color.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+                                .background(Color.white.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
                         }
 
                     Spacer()

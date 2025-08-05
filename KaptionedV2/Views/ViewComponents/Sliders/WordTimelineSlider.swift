@@ -141,6 +141,7 @@ struct TimelineTextBox: View {
     // Edge dragging state
     @State private var isDraggingLeftEdge: Bool = false
     @State private var isDraggingRightEdge: Bool = false
+    @State private var isDraggingTextBox: Bool = false
     @State private var dragStartTime: Double = 0
     @State private var originalTimeRange: ClosedRange<Double> = 0...0
     @State private var currentDragTime: Double = 0
@@ -243,19 +244,57 @@ struct TimelineTextBox: View {
                                     // This will be called for any drag, even very small ones
                                     let distance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
                                     
-                                    // If this is a significant drag and we're not zooming, pass it to the RulerView immediately
+                                    // If this is a significant drag and we're not zooming
                                     if distance >= 5 && !isZooming {
-                                        isDragging = true
-                                        if let externalDragBinding = externalDragOffset {
-                                            externalDragBinding.wrappedValue = value.translation.width
+                                        if isSelected {
+                                            // Handle text box timeline movement for selected text boxes
+                                            if !isDraggingTextBox {
+                                                isDraggingTextBox = true
+                                                dragStartTime = textBox.timeRange.lowerBound
+                                                originalTimeRange = textBox.timeRange
+                                                showTimeTooltip = true
+                                                print("🔄 Text box drag started - original start: \(dragStartTime)")
+                                            }
+                                            
+                                            // Calculate new position based on drag
+                                            let pixelsPerSecond = (timelineWidth / duration)
+                                            let timeChange = value.translation.width / pixelsPerSecond
+                                            let boxDuration = textBox.timeRange.upperBound - textBox.timeRange.lowerBound
+                                            let newStartTime = max(0, dragStartTime + timeChange)
+                                            let newEndTime = min(duration, newStartTime + boxDuration)
+                                            
+                                            // Update tooltip time
+                                            currentDragTime = newStartTime
+                                            
+                                            print("🔄 Text box drag - new start time: \(newStartTime), new end time: \(newEndTime)")
+                                            
+                                            // Update the text box time range
+                                            textBox.timeRange = newStartTime...newEndTime
+                                            
+                                        } else {
+                                            // Handle timeline scrolling for non-selected text boxes
+                                            isDragging = true
+                                            if let externalDragBinding = externalDragOffset {
+                                                externalDragBinding.wrappedValue = value.translation.width
+                                            }
                                         }
                                     }
                                 }
                                 .onEnded { value in
                                     let dragDistance = sqrt(value.translation.width * value.translation.width + value.translation.height * value.translation.height)
                                     
-                                    // If drag distance is very small and we're not zooming, treat as tap
-                                    if dragDistance < 5 && !isZooming {
+                                    if isDraggingTextBox {
+                                        // Text box drag ended
+                                        isDraggingTextBox = false
+                                        showTimeTooltip = false
+                                        print("🔄 Text box drag ended")
+                                        
+                                        // Update the video player text boxes with the new time range
+                                        onTextBoxUpdate?(textBox)
+                                        print("🔄 Text box drag - calling onTextBoxUpdate with time range: \(textBox.timeRange)")
+                                        
+                                    } else if dragDistance < 5 && !isZooming {
+                                        // Small drag - treat as tap
                                         onTap()
                                         onSeek(textBox.timeRange.lowerBound)
                                         // Update timeline position immediately
@@ -270,6 +309,7 @@ struct TimelineTextBox: View {
                                             // )
                                         }
                                     } else if isDragging {
+                                        // Timeline scroll ended
                                         // Pass the drag translation to the external drag offset
                                         if let externalDragBinding = externalDragOffset {
                                             externalDragBinding.wrappedValue = value.translation.width

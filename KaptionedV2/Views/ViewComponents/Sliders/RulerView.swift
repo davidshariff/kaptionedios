@@ -322,6 +322,5 @@ struct RulerView: View {
                 }
             }
         }
-        .border(.blue, width: 1)
     }
 } 

@@ -178,7 +178,7 @@ struct PlayerControl: View{
                 currentTime: videoPlayer.currentTime,
                 showMinorTicks: false,
                 showPlayhead: true,
-                customPixelsPerSecond: 20,
+                customPixelsPerSecond: 30,
                 onChange: {
                     videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                 }

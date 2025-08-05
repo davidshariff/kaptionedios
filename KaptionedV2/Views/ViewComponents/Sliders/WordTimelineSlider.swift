@@ -116,7 +116,6 @@ struct WordTimelineSlider<T: View, A: View>: View {
                 }
 
             textBoxViews
-            .border(.red, width: 1)
             .offset(x: rulerStartInParentX?.wrappedValue ?? 0)
             .allowsHitTesting(true)
 

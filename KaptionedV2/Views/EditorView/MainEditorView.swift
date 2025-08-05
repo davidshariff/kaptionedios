@@ -74,7 +74,6 @@ struct MainEditorView: View {
                             showPresetConfirm: $showPresetConfirm,
                             pendingPreset: $pendingPreset
                         )
-                        .border(.yellow, width: 2)
                     }
 
                 }
@@ -507,7 +506,14 @@ extension MainEditorView{
                     }
                     
                     // Toolbar at the bottom
-                    TextToolbar(textEditor: textEditor, videoPlayerSize: $editorVM.videoPlayerSize, showWordTimeline: $editorVM.showWordTimeline)
+                    TextToolbar(
+                        textEditor: textEditor, 
+                        videoPlayerSize: $editorVM.videoPlayerSize, 
+                        showWordTimeline: $editorVM.showWordTimeline,
+                        onSeek: { time in
+                            videoPlayer.seekToTime(time)
+                        }
+                    )
                     
                     // Style Editor View
                     StyleEditorView(

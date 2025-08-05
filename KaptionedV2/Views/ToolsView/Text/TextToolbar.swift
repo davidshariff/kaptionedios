@@ -40,30 +40,44 @@ struct TextToolbar: View {
     @ObservedObject var textEditor: TextEditorViewModel
     @Binding var videoPlayerSize: VideoPlayerSize
     @Binding var showWordTimeline: Bool
+    let onSeek: (Double) -> Void
     @State private var toolbarOffset: CGFloat = 100
     @State private var isStyleMode: Bool = false
     @State private var showDeleteConfirmation: Bool = false
+    
+    // MARK: - Helper Functions
+    private func seekToSelectedTextBox() {
+        if let selectedTextBox = textEditor.selectedTextBox {
+            onSeek(selectedTextBox.timeRange.lowerBound)
+            print("🎬 Seeking to text box start time: \(selectedTextBox.timeRange.lowerBound)")
+        }
+    }
     
     // MARK: - Computed Properties
     private var styleOptions: [StyleOption] {
         [
             StyleOption(title: "Text\nColor", iconName: "paintpalette") {
+                seekToSelectedTextBox()
                 textEditor.selectedStyleOption = "Text\nColor"
                 print("Text Color tapped")
             },
             StyleOption(title: "Background", iconName: "rectangle.fill") {
+                seekToSelectedTextBox()
                 textEditor.selectedStyleOption = "Background"
                 print("Background tapped")
             },
             StyleOption(title: "Stroke", iconName: "circle.dashed") {
+                seekToSelectedTextBox()
                 textEditor.selectedStyleOption = "Stroke"
                 print("Stroke tapped")
             },
             StyleOption(title: "Font\nSize", iconName: "textformat.size") {
+                seekToSelectedTextBox()
                 textEditor.selectedStyleOption = "Font\nSize"
                 print("Font Size tapped")
             },
             StyleOption(title: "Shadow", iconName: "shadow") {
+                seekToSelectedTextBox()
                 textEditor.selectedStyleOption = "Shadow"
                 print("Shadow tapped")
             }
@@ -124,6 +138,9 @@ struct TextToolbar: View {
                     Button {
                         // Handle Edit Text action
                         if textEditor.selectedTextBox != nil {
+                            // Seek to the start of the selected text box
+                            seekToSelectedTextBox()
+                            
                             // Resize video player to quarter size when editing text
                             videoPlayerSize = .quarter
                             
@@ -152,6 +169,7 @@ struct TextToolbar: View {
                     
                     Button {
                         // Handle Style action
+                        seekToSelectedTextBox()
                         isStyleMode = true
                         videoPlayerSize = .half
                         showWordTimeline = true

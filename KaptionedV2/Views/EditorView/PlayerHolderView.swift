@@ -122,10 +122,7 @@ extension PlayerHolderView{
                                     width: proxy.size.width,
                                     height: proxy.size.height
                                 ))
-                                
-                                // Rectangle()
-                                //     .foregroundColor(.clear)
-                                //     .border(Color.orange, width: 2)
+
                             }
                         }
                         .contentShape(Rectangle())
@@ -166,7 +163,6 @@ struct PlayerControl: View{
             timeLineControlSection
             controlsSection
         }
-        .border(Color.red.opacity(0.3), width: 1)
         .padding(.horizontal, 20)
         .padding(.top, 5)
     }

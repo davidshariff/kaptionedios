@@ -512,7 +512,8 @@ extension MainEditorView{
                         showWordTimeline: $editorVM.showWordTimeline,
                         onSeek: { time in
                             videoPlayer.seekToTime(time)
-                        }
+                        },
+                        currentTime: videoPlayer.currentTime
                     )
                     
                     // Style Editor View

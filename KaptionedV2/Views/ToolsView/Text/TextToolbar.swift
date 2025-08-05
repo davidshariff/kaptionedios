@@ -41,6 +41,7 @@ struct TextToolbar: View {
     @Binding var videoPlayerSize: VideoPlayerSize
     @Binding var showWordTimeline: Bool
     let onSeek: (Double) -> Void
+    let currentTime: Double
     @State private var toolbarOffset: CGFloat = 100
     @State private var isStyleMode: Bool = false
     @State private var showDeleteConfirmation: Bool = false
@@ -271,8 +272,9 @@ struct TextToolbar: View {
                     .padding(.vertical, 4)
                 
                 Button {
-                    // Add new caption action
-                    textEditor.openTextEditor(isEdit: false)
+                    // Add new caption action with current time
+                    let timeRange = currentTime...(currentTime + 1) // 1 second duration
+                    textEditor.openTextEditor(isEdit: false, nil, timeRange: timeRange)
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus")

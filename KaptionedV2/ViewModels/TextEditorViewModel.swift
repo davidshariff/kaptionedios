@@ -118,6 +118,7 @@ class TextEditorViewModel: ObservableObject{
     }
     
     func updateSelectedTextBox() {
+        print("DEBUG: updateSelectedTextBox called")
         // Update the selected text box with current changes
         if let selectedTextBox = selectedTextBox,
            let index = textBoxes.firstIndex(where: {$0.id == selectedTextBox.id}) {
@@ -155,6 +156,7 @@ class TextEditorViewModel: ObservableObject{
             // Clean up any duplicate IDs before saving
             cleanupDuplicateIDs()
             // Call onSave to update the main video model
+            print("DEBUG: Calling onSave from updateSelectedTextBox")
             onSave?(textBoxes)
         }
     }
@@ -180,5 +182,7 @@ extension TextEditorViewModel {
         textBoxes[index].karaokeType = preset.karaokeType
         textBoxes[index].highlightColor = preset.highlightColor
         textBoxes[index].wordBGColor = preset.wordBGColor
+        // Call onSave to update the main video model and trigger saving indicator
+        onSave?(textBoxes)
     }
 }

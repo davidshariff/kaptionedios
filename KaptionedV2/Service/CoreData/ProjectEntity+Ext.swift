@@ -173,8 +173,13 @@ extension ProjectEntity{
 
 extension NSManagedObjectContext {
     
+    static var onSaving: (() -> Void)?
+    
     func saveContext (){
         if self.hasChanges {
+            // Trigger saving indicator
+            NSManagedObjectContext.onSaving?()
+            
             do{
                 try self.save()
             } catch {

@@ -1,6 +1,7 @@
 import AVKit
 import SwiftUI
 import PhotosUI
+import CoreData
 
 struct MainEditorView: View {
 
@@ -17,6 +18,7 @@ struct MainEditorView: View {
     @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
     @State var showPresetsBottomSheet: Bool = false // State to track presets bottom sheet
     @State var showPresetConfirm: Bool = false // State for preset confirmation
+    @State var isSaving: Bool = false // State for saving indicator
 
     @State var pendingPreset: SubtitleStyle? = nil // State for pending preset
     @State var videoPlayerHeight: CGFloat = 0 // State for video player height
@@ -77,21 +79,38 @@ struct MainEditorView: View {
 
                 }
                 // Set initial video player height
-                        .onAppear{
-            setVideo(proxy)
-            let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
-            videoPlayerHeight = editorVM.calculateVideoPlayerHeight(for: editorVM.videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
-            
-            // Set callback to reset video player size when edit text content is closed
-            textEditor.onEditTextContentClosed = {
-                editorVM.videoPlayerSize = .half
-            }
-            
-            // Set callback to save text boxes to the main video model
-            textEditor.onSave = { textBoxes in
-                editorVM.setText(textBoxes)
-            }
-        }
+                .onAppear{
+                    setVideo(proxy)
+                    let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
+                    videoPlayerHeight = editorVM.calculateVideoPlayerHeight(for: editorVM.videoPlayerSize, screenHeight: proxy.size.height, headerHeight: headerHeight)
+                    
+                    // Set callback to reset video player size when edit text content is closed
+                     textEditor.onEditTextContentClosed = {
+                         editorVM.videoPlayerSize = .half
+                     }
+                     
+                     // Set callback to save text boxes to the main video model
+                     textEditor.onSave = { textBoxes in
+                         print("DEBUG: textEditor.onSave called")
+                         isSaving = true
+                         editorVM.setText(textBoxes)
+                         // Hide saving indicator after a short delay
+                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                             isSaving = false
+                         }
+                     }
+                     
+                     // Set callback for saving indicator
+                     editorVM.onSaving = {
+                         print("DEBUG: onSaving callback triggered")
+                         isSaving = true
+                         // Hide saving indicator after a short delay
+                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                             isSaving = false
+                         }
+                     }
+
+                }
                 // Update video player height when video player size changes
                 .onChange(of: editorVM.videoPlayerSize) { _ in
                     let headerHeight = 50 + proxy.safeAreaInsets.top + 40 + 20 // header height + safe area + top padding + bottom padding
@@ -338,6 +357,18 @@ extension MainEditorView{
                     }
                 }
                 .foregroundColor(showCrossOverlay ? .yellow : .white)
+                
+                // Saving indicator
+                if isSaving {
+                    VStack(spacing: 4) {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        Text("Saving")
+                            .font(.caption2)
+                    }
+                    .foregroundColor(.white)
+                }
             }
             .frame(maxWidth: .infinity)
             .padding(.top, 8)

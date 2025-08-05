@@ -18,6 +18,8 @@ class EditorViewModel: ObservableObject{
     @Published var videoPlayerSize: VideoPlayerSize = .half
     @Published var showWordTimeline: Bool = true
     
+    var onSaving: (() -> Void)?
+    
     private var projectEntity: ProjectEntity?
     
     // Function to calculate video player height based on size and screen dimensions
@@ -103,8 +105,14 @@ extension EditorViewModel{
     
     
     func setText(_ textBox: [TextBox]){
+        print("DEBUG: setText called with \(textBox.count) text boxes")
         currentVideo?.textBoxes = textBox
         setTools()
+        // Trigger saving indicator and update project
+        print("DEBUG: Calling onSaving callback")
+        onSaving?()
+        print("DEBUG: Calling updateProject")
+        updateProject()
     }
     
     func setFrames(){

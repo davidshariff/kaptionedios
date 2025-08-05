@@ -72,7 +72,7 @@ struct TextToolbar: View {
     var body: some View {
         VStack {
             
-            // Style mode toolbar at the top
+            // Style mode toolbar
             if textEditor.selectedTextBox != nil && !textEditor.showEditTextContent && isStyleMode {
 
                 Spacer()
@@ -114,9 +114,8 @@ struct TextToolbar: View {
                 }
                 .offset(y: toolbarOffset)
             }
-            
             // Normal toolbar at the bottom
-            if textEditor.selectedTextBox != nil && !textEditor.showEditTextContent && !isStyleMode {
+            else if textEditor.selectedTextBox != nil && !textEditor.showEditTextContent && !isStyleMode {
 
                 Spacer()
 

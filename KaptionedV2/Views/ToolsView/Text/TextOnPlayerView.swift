@@ -48,7 +48,9 @@ struct TextOnPlayerView: View {
             let isSelected = viewModel.isSelected(textBox.id)
             
             // Display only the textbox that is currently on screen
-            if textBox.timeRange.contains(currentTime) {
+            // Use a more precise condition to avoid showing multiple text boxes
+            let isInTimeRange = textBox.timeRange.lowerBound <= currentTime && currentTime < textBox.timeRange.upperBound
+            if isInTimeRange {
                 // Debug: Print current textbox on screen
                 let _ = print("📝 Current TextBox: \(textBox) | Time: \(currentTime) | Selected: \(isSelected)")
                 textBoxView(textBox: textBox, isSelected: isSelected)

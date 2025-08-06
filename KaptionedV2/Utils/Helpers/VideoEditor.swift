@@ -418,10 +418,10 @@ extension VideoEditor{
         let calculatedPadding = model.backgroundPadding * ratio
         let calculatedCornerRadius = model.cornerRadius * ratio
 
-        // If karaokeWords is present, render karaoke-style text highlighting
-        if let karaokeWords = model.karaokeWords {
+        // If wordTimings is present, render karaoke-style text highlighting
+        if let wordTimings = model.wordTimings {
             return createKaraokeTextLayer(
-                karaokeWords: karaokeWords,
+                wordTimings: wordTimings,
                 model: model,
                 position: position,
                 calculatedFontSize: calculatedFontSize,
@@ -480,7 +480,7 @@ extension VideoEditor{
 
     // Creates a karaoke-style text layer with animated highlighting for each word.
     private func createKaraokeTextLayer(
-        karaokeWords: [KaraokeWord],
+        wordTimings: [WordWithTiming],
         model: TextBox,
         position: CGSize,
         calculatedFontSize: CGFloat,
@@ -500,9 +500,9 @@ extension VideoEditor{
         let wordHorizontalPadding: CGFloat = (model.karaokeType == .wordbg) ? 8 : 0
 
         // Calculate the width of each word, including padding if needed
-        let wordWidths = karaokeWords.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
+        let wordWidths = wordTimings.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
         // Total width is the sum of all word widths plus spacing between words
-        let totalWidth = wordWidths.reduce(0, +) + CGFloat(karaokeWords.count - 1) * 8 // 8pt spacing between words
+        let totalWidth = wordWidths.reduce(0, +) + CGFloat(wordTimings.count - 1) * 8 // 8pt spacing between words
         // The padded size includes extra padding around the text for background/border
         let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
         let textLayer = CALayer()
@@ -518,7 +518,7 @@ extension VideoEditor{
         let textImage = renderer.image { context in
             var x: CGFloat = calculatedPadding
             // Loop through each word to lay out and animate them individually
-            for (i, word) in karaokeWords.enumerated() {
+            for (i, word) in wordTimings.enumerated() {
                 // Calculate the frame for this word (with horizontal padding for word-by-word)
                 let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
 

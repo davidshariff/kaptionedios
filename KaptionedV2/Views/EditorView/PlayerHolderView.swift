@@ -66,7 +66,7 @@ struct PlayerHolderView: View{
         }
         .onReceive(videoPlayer.$currentTime) { _ in
             guard videoPlayer.isPlaying, let video = editorVM.currentVideo else { return }
-            debugPlayerInfo(video: video)
+            //debugPlayerInfo(video: video)
         }
     }
     

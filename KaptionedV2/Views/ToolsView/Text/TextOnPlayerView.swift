@@ -111,10 +111,10 @@ struct TextPlayerView: View {
     
     @ViewBuilder
     private func textOverlay(textBox: TextBox, isSelected: Bool) -> some View {
-        if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .letter {
+        if let wordTimings = textBox.wordTimings, textBox.karaokeType == .letter {
             KaraokeTextByLetterHighlightOverlay(
                 text: textBox.text,
-                words: karaokeWords,
+                words: wordTimings,
                 fontSize: textBox.fontSize,
                 fontColor: textBox.fontColor,
                 highlightColor: textBox.highlightColor,
@@ -123,10 +123,10 @@ struct TextPlayerView: View {
             .padding(.horizontal, textBox.backgroundPadding)
             .padding(.vertical, textBox.backgroundPadding / 2)
         } 
-        else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .word {
+        else if let wordTimings = textBox.wordTimings, textBox.karaokeType == .word {
             KaraokeTextByWordHighlightOverlay(
                 text: textBox.text,
-                words: karaokeWords,
+                words: wordTimings,
                 fontSize: textBox.fontSize,
                 fontColor: textBox.fontColor,
                 highlightColor: textBox.highlightColor,
@@ -135,10 +135,10 @@ struct TextPlayerView: View {
             .padding(.horizontal, textBox.backgroundPadding)
             .padding(.vertical, textBox.backgroundPadding / 2)
         } 
-        else if let karaokeWords = textBox.karaokeWords, textBox.karaokeType == .wordbg {
+        else if let wordTimings = textBox.wordTimings, textBox.karaokeType == .wordbg {
             KaraokeTextByWordBackgroundOverlay(
                 text: textBox.text,
-                words: karaokeWords,
+                words: wordTimings,
                 fontSize: textBox.fontSize,
                 fontColor: textBox.fontColor,
                 highlightColor: textBox.highlightColor,
@@ -346,7 +346,7 @@ struct AttributedTextOverlay: UIViewRepresentable {
 struct KaraokeTextByLetterHighlightOverlay: View {
 
     let text: String
-    let words: [KaraokeWord]
+    let words: [WordWithTiming]
     let fontSize: CGFloat
     let fontColor: Color
     let highlightColor: Color
@@ -401,7 +401,7 @@ struct KaraokeTextByLetterHighlightOverlay: View {
 struct KaraokeTextByWordHighlightOverlay: View {
 
     let text: String
-    let words: [KaraokeWord]
+    let words: [WordWithTiming]
     let fontSize: CGFloat
     let fontColor: Color
     let highlightColor: Color
@@ -433,7 +433,7 @@ struct KaraokeTextByWordHighlightOverlay: View {
 struct KaraokeTextByWordBackgroundOverlay: View {
 
     let text: String
-    let words: [KaraokeWord]
+    let words: [WordWithTiming]
     let fontSize: CGFloat
     let fontColor: Color
     let highlightColor: Color

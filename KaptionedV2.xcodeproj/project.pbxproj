@@ -86,6 +86,7 @@
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
 		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
+		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
 /* End PBXBuildFile section */
@@ -171,6 +172,7 @@
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
+		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -464,6 +466,7 @@
 			children = (
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
 				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
+				F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
 				F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */,
@@ -692,6 +695,7 @@
 				5AF25B5929F14270005E0467 /* CropView.swift in Sources */,
 				5AE2A2A229F66EE9003D217F /* VideoExporterBottomSheetView.swift in Sources */,
 				5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */,
+				F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */,
 				5A3D13AC29F184330027E25E /* CoreDataContainer.xcdatamodeld in Sources */,
 				5AE2A2A829F6BA29003D217F /* ExporterViewModel.swift in Sources */,
 				F42364942E36567D00057C86 /* SubslistView.swift in Sources */,

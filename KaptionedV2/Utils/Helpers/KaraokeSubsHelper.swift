@@ -40,11 +40,11 @@ struct KaraokeSubsHelper {
             let words = lineData.text.split(separator: " ").map(String.init)
             let lineDuration = lineData.end - lineData.start
             let wordDuration = lineDuration / Double(words.count)
-            var karaokeWords: [KaraokeWord] = []
+            var wordTimings: [WordWithTiming] = []
             for (j, word) in words.enumerated() {
                 let wordStart = lineData.start + Double(j) * wordDuration
                 let wordEnd = wordStart + wordDuration
-                karaokeWords.append(KaraokeWord(text: word, start: wordStart, end: wordEnd))
+                wordTimings.append(WordWithTiming(text: word, start: wordStart, end: wordEnd))
             }
             let box = TextBox(
                 text: lineData.text,
@@ -62,7 +62,7 @@ struct KaraokeSubsHelper {
                 shadowX: shadowXs[i % shadowXs.count],
                 shadowY: shadowYs[i % shadowYs.count],
                 shadowOpacity: shadowOpacities[i % shadowOpacities.count],
-                karaokeWords: karaokeWords,
+                wordTimings: wordTimings,
                 karaokeType: karaokeType,
                 highlightColor: preset.highlightColor,
                 wordBGColor: preset.wordBGColor

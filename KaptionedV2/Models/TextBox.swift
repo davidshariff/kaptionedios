@@ -1,15 +1,8 @@
-//
-//  TextBox.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 28.04.2023.
-//
-
 import Foundation
 import SwiftUI
 
 
-struct KaraokeWord: Identifiable, Equatable {
+struct WordWithTiming: Identifiable, Equatable {
     let id = UUID()
     let text: String
     let start: Double
@@ -44,8 +37,9 @@ struct TextBox: Identifiable{
     var shadowY: CGFloat = 0
     var shadowOpacity: Double = 0.5
 
+    var wordTimings: [WordWithTiming]? = nil
+
     // Karaoke properties
-    var karaokeWords: [KaraokeWord]? = nil
     var karaokeType: KaraokeType = .letter
     var highlightColor: Color = KaraokePreset.letter.highlightColor
     var wordBGColor: Color = KaraokePreset.letter.wordBGColor
@@ -71,34 +65,63 @@ struct TextBox: Identifiable{
         shadowX: CGFloat = 0,
         shadowY: CGFloat = 0,
         shadowOpacity: Double = 0.5,
-        karaokeWords: [KaraokeWord]? = nil,
+        wordTimings: [WordWithTiming]? = nil,
         karaokeType: KaraokeType = .word,
         highlightColor: Color = KaraokePreset.letter.highlightColor,
         wordBGColor: Color = KaraokePreset.letter.wordBGColor,
         presetName: String? = nil
     ) {
-        self.text = text
-        self.fontSize = fontSize
-        self.lastFontSize = lastFontSize
-        self.bgColor = bgColor
-        self.fontColor = fontColor
-        self.strokeColor = strokeColor
-        self.strokeWidth = strokeWidth
-        self.timeRange = timeRange
-        self.offset = offset
-        self.lastOffset = lastOffset
-        self.backgroundPadding = backgroundPadding
-        self.cornerRadius = cornerRadius
-        self.shadowColor = shadowColor
-        self.shadowRadius = shadowRadius
-        self.shadowX = shadowX
-        self.shadowY = shadowY
-        self.shadowOpacity = shadowOpacity
-        self.karaokeWords = karaokeWords
-        self.karaokeType = karaokeType
-        self.highlightColor = highlightColor
-        self.wordBGColor = wordBGColor
-        self.presetName = presetName
+        // If presetName is provided, find and apply the preset values
+        if let presetName = presetName, let preset = SubtitleStyle.allPresets.first(where: { $0.name == presetName }) {
+            print("DEBUG: Applying preset '\(presetName)' during TextBox initialization")
+            
+            self.text = text
+            self.fontSize = preset.fontSize
+            self.lastFontSize = lastFontSize
+            self.bgColor = preset.bgColor
+            self.fontColor = preset.fontColor
+            self.strokeColor = preset.strokeColor
+            self.strokeWidth = preset.strokeWidth
+            self.timeRange = timeRange
+            self.offset = offset
+            self.lastOffset = lastOffset
+            self.backgroundPadding = preset.backgroundPadding
+            self.cornerRadius = preset.cornerRadius
+            self.shadowColor = preset.shadowColor
+            self.shadowRadius = preset.shadowRadius
+            self.shadowX = preset.shadowX
+            self.shadowY = preset.shadowY
+            self.shadowOpacity = preset.shadowOpacity
+            self.wordTimings = wordTimings
+            self.karaokeType = karaokeType
+            self.highlightColor = highlightColor
+            self.wordBGColor = wordBGColor
+            self.presetName = presetName
+        } else {
+            // Use provided values (default behavior)
+            self.text = text
+            self.fontSize = fontSize
+            self.lastFontSize = lastFontSize
+            self.bgColor = bgColor
+            self.fontColor = fontColor
+            self.strokeColor = strokeColor
+            self.strokeWidth = strokeWidth
+            self.timeRange = timeRange
+            self.offset = offset
+            self.lastOffset = lastOffset
+            self.backgroundPadding = backgroundPadding
+            self.cornerRadius = cornerRadius
+            self.shadowColor = shadowColor
+            self.shadowRadius = shadowRadius
+            self.shadowX = shadowX
+            self.shadowY = shadowY
+            self.shadowOpacity = shadowOpacity
+            self.wordTimings = wordTimings
+            self.karaokeType = karaokeType
+            self.highlightColor = highlightColor
+            self.wordBGColor = wordBGColor
+            self.presetName = presetName
+        }
     }
     
     
@@ -121,6 +144,7 @@ struct SubtitleStyle: Identifiable, Equatable {
     var shadowX: CGFloat
     var shadowY: CGFloat
     var shadowOpacity: Double
+    var wordTimings: [WordWithTiming]? = nil
     
     // Optionally, provide a method to apply this style to a TextBox
     func apply(to textBox: TextBox) -> TextBox {
@@ -138,9 +162,10 @@ struct SubtitleStyle: Identifiable, Equatable {
         box.shadowX = shadowX
         box.shadowY = shadowY
         box.shadowOpacity = shadowOpacity
+
+        box.wordTimings = wordTimings
         
         // Disable karaoke for regular subtitle styles
-        box.karaokeWords = nil
         box.karaokeType = KaraokePreset.letter.karaokeType
         box.highlightColor = KaraokePreset.letter.highlightColor
         box.wordBGColor = KaraokePreset.letter.wordBGColor

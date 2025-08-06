@@ -1,4 +1,4 @@
 ---
 alwaysApply: true
 ---
-Try to avoid UIKit where possible, and use Swift UI.
+try to avoid using UIKit is possible

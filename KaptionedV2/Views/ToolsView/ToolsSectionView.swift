@@ -116,8 +116,28 @@ struct ToolsSectionView: View {
                                     editorVM.isLoading = false
                                     switch result {
                                     case .success(let subs):
-                                        textEditor.textBoxes = subs
-                                        editorVM.setText(subs)
+                                        // Calculate and print optimal words per line for each subtitle
+                                        print("🎬 [ToolsSectionView] Transcription completed with \(subs.count) subtitle segments")
+                                        
+                                        subs.forEach { textBox in
+
+                                            TextLayoutHelper.doesTextFitInVideo(
+                                                text: textBox.text,
+                                                videoWidth: video.frameSize.width,
+                                                fontSize: textBox.fontSize
+                                            )
+
+                                        }
+                                        
+                                        // Optimize all subtitles at once
+                                        let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
+                                            textBoxes: subs,
+                                            videoWidth: video.frameSize.width,
+                                            padding: 0
+                                        )
+                                        
+                                        textEditor.textBoxes = optimizedTextBoxes
+                                        editorVM.setText(optimizedTextBoxes)
                                     case .failure(let error):
                                         editorVM.errorMessage = "Failed to generate subtitles: \(error.localizedDescription)"
                                         editorVM.showErrorAlert = true

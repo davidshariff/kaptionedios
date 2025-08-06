@@ -43,6 +43,40 @@ extension ProjectEntity{
                 textBox.cornerRadius = entity.cornerRadius
                 textBox.presetName = entity.presetName
                 
+                // Restore karaoke properties
+                textBox.isKaraokePreset = entity.isKaraokePreset
+                if let karaokeTypeString = entity.karaokeType {
+                    textBox.karaokeType = KaraokeType(rawValue: karaokeTypeString)
+                }
+                if let highlightColorString = entity.highlightColor {
+                    textBox.highlightColor = Color(hex: highlightColorString)
+                }
+                if let wordBGColorString = entity.wordBGColor {
+                    textBox.wordBGColor = Color(hex: wordBGColorString)
+                }
+                
+                // Restore word timings if they exist
+                if let wordTimingsData = entity.wordTimingsData {
+                    do {
+                        let decoder = JSONDecoder()
+                        textBox.wordTimings = try decoder.decode([WordWithTiming].self, from: wordTimingsData)
+                    } catch {
+                        print("DEBUG: Failed to decode word timings: \(error)")
+                    }
+                } else if textBox.isKaraokePreset && textBox.wordTimings == nil {
+                    // Regenerate word timings for karaoke presets if they're missing
+                    let words = textBox.text.split(separator: " ").map(String.init)
+                    let lineDuration = textBox.timeRange.upperBound - textBox.timeRange.lowerBound
+                    let wordDuration = lineDuration / Double(max(words.count, 1))
+                    var wordTimings: [WordWithTiming] = []
+                    for (j, word) in words.enumerated() {
+                        let wordStart = textBox.timeRange.lowerBound + Double(j) * wordDuration
+                        let wordEnd = wordStart + wordDuration
+                        wordTimings.append(WordWithTiming(text: word, start: wordStart, end: wordEnd))
+                    }
+                    textBox.wordTimings = wordTimings
+                }
+                
                 return textBox
             }
             return nil
@@ -103,6 +137,22 @@ extension ProjectEntity{
             entity.backgroundPadding = box.backgroundPadding
             entity.cornerRadius = box.cornerRadius
             entity.presetName = box.presetName
+            
+            // Save karaoke properties
+            entity.isKaraokePreset = box.isKaraokePreset
+            entity.karaokeType = box.karaokeType?.rawValue
+            entity.highlightColor = box.highlightColor?.toHex()
+            entity.wordBGColor = box.wordBGColor?.toHex()
+            
+            // Save word timings if they exist
+            if let wordTimings = box.wordTimings {
+                do {
+                    let encoder = JSONEncoder()
+                    entity.wordTimingsData = try encoder.encode(wordTimings)
+                } catch {
+                    print("DEBUG: Failed to encode word timings: \(error)")
+                }
+            }
             
             return entity
         }

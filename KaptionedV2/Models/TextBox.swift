@@ -2,14 +2,14 @@ import Foundation
 import SwiftUI
 
 
-struct WordWithTiming: Identifiable, Equatable {
+struct WordWithTiming: Identifiable, Equatable, Codable {
     let id = UUID()
     let text: String
     let start: Double
     let end: Double
 }
 
-enum KaraokeType: String, CaseIterable {
+enum KaraokeType: String, CaseIterable, Codable {
     case letter = "Letter"
     case word = "Word"
     case wordbg = "WordBG"
@@ -174,9 +174,21 @@ struct SubtitleStyle: Identifiable, Equatable {
         box.wordTimings = wordTimings
         
         if isKaraokePreset {
-            box.karaokeType = KaraokePreset.letter.karaokeType
-            box.highlightColor = KaraokePreset.letter.highlightColor
-            box.wordBGColor = KaraokePreset.letter.wordBGColor
+            // Get the correct karaoke preset based on the style name
+            let karaokePreset: KaraokePreset
+            switch name {
+            case "Highlight by letter":
+                karaokePreset = .letter
+            case "Highlight by word":
+                karaokePreset = .word
+            case "Background by word":
+                karaokePreset = .wordbg
+            default:
+                karaokePreset = .letter
+            }
+            box.karaokeType = karaokePreset.karaokeType
+            box.highlightColor = karaokePreset.highlightColor
+            box.wordBGColor = karaokePreset.wordBGColor
         }
         
         // Set the preset name

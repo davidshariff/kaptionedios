@@ -30,9 +30,13 @@
         <attribute name="cornerRadius" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="fontColor" optional="YES" attributeType="String"/>
         <attribute name="fontSize" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="highlightColor" optional="YES" attributeType="String"/>
+        <attribute name="isKaraokePreset" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="karaokeType" optional="YES" attributeType="String"/>
         <attribute name="lowerTime" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="offsetX" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="offsetY" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="presetName" optional="YES" attributeType="String"/>
         <attribute name="shadowColor" optional="YES" attributeType="String"/>
         <attribute name="shadowOpacity" optional="YES" attributeType="Double" defaultValueString="0.5" usesScalarValueType="YES"/>
         <attribute name="shadowRadius" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
@@ -41,8 +45,9 @@
         <attribute name="strokeColor" optional="YES" attributeType="String"/>
         <attribute name="strokeWidth" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="text" optional="YES" attributeType="String"/>
-        <attribute name="presetName" optional="YES" attributeType="String"/>
         <attribute name="upperTime" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="wordBGColor" optional="YES" attributeType="String"/>
+        <attribute name="wordTimingsData" optional="YES" attributeType="Binary"/>
         <relationship name="project" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProjectEntity" inverseName="textBoxes" inverseEntity="ProjectEntity"/>
     </entity>
 </model>

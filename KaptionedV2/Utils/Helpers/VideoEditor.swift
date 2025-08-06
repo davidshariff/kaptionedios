@@ -489,6 +489,14 @@ extension VideoEditor{
         duration: Double
     ) -> CALayer {
 
+        // Guard: Unwrap optional karaoke properties
+        guard let karaokeType = model.karaokeType,
+              let highlightColor = model.highlightColor else {
+            print("❌ Karaoke properties not available for text: \(model.text)")
+            // Return a simple text layer without karaoke effects
+            return createSimpleTextLayer(model: model, position: position, calculatedFontSize: calculatedFontSize, calculatedPadding: calculatedPadding, calculatedCornerRadius: calculatedCornerRadius, duration: duration)
+        }
+
         // 1. Set up font and calculate the width of each word (with padding for word-by-word)
         //    This is needed to lay out each word precisely and to size the overall text layer.
         let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
@@ -497,7 +505,7 @@ extension VideoEditor{
         ]
         
         // Add horizontal padding to each word for word-by-word background (for visual separation)
-        let wordHorizontalPadding: CGFloat = (model.karaokeType == .wordbg) ? 8 : 0
+        let wordHorizontalPadding: CGFloat = (karaokeType == .wordbg) ? 8 : 0
 
         // Calculate the width of each word, including padding if needed
         let wordWidths = wordTimings.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
@@ -524,13 +532,17 @@ extension VideoEditor{
 
                 // --- Word-by-word: Add rounded green background for active word ---
                 // If karaokeType is wordbg, add a background shape layer that will animate in sync with the word highlight
-                if model.karaokeType == .wordbg {
+                if karaokeType == .wordbg {
+                    guard let wordBGColor = model.wordBGColor else {
+                        print("❌ WordBGColor not available for wordbg karaoke type")
+                        continue
+                    }
                     let bgLayer = CAShapeLayer()
                     let bgCornerRadius: CGFloat = 4
                     let bgRect = wordRect // background matches the padded word rect
                     let bgPath = UIBezierPath(roundedRect: bgRect, cornerRadius: bgCornerRadius)
                     bgLayer.path = bgPath.cgPath
-                    bgLayer.fillColor = UIColor(model.wordBGColor).withAlphaComponent(0.5).cgColor
+                    bgLayer.fillColor = UIColor(wordBGColor).withAlphaComponent(0.5).cgColor
                     bgLayer.opacity = 0 // Start invisible
                     // Animate opacity in sync with highlight (appears instantly at word start)
                     let bgAnim = CABasicAnimation(keyPath: "opacity")
@@ -583,7 +595,7 @@ extension VideoEditor{
                 highlightLayer.frame = wordRect
                 highlightLayer.contentsScale = UIScreen.main.scale
                 highlightLayer.alignmentMode = .left
-                highlightLayer.foregroundColor = UIColor(model.highlightColor).cgColor
+                highlightLayer.foregroundColor = UIColor(highlightColor).cgColor
                 highlightLayer.opacity = 0
 
                 // Render the highlighted word as an image
@@ -598,7 +610,7 @@ extension VideoEditor{
                         ),
                         withAttributes: [
                             .font: font,
-                            .foregroundColor: UIColor(model.highlightColor)
+                            .foregroundColor: UIColor(highlightColor)
                         ]
                     )
                 }
@@ -612,7 +624,7 @@ extension VideoEditor{
                 highlightAnim.beginTime = word.start
 
                 // If karaokeType is letter, animate over the word's duration; otherwise, appear instantly
-                if model.karaokeType == .letter {
+                if karaokeType == .letter {
                     highlightAnim.duration = word.end - word.start
                 } else {
                     highlightAnim.duration = 0.01
@@ -691,6 +703,48 @@ extension VideoEditor{
         if timeRange.lowerBound == 0 {
             print("   No appearance animation - text should be visible from start")
         }
+    }
+    
+    // Creates a simple text layer without karaoke effects (fallback when karaoke properties are not available)
+    private func createSimpleTextLayer(
+        model: TextBox,
+        position: CGSize,
+        calculatedFontSize: CGFloat,
+        calculatedPadding: CGFloat,
+        calculatedCornerRadius: CGFloat,
+        duration: Double
+    ) -> CALayer {
+        let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
+        let textSize = (model.text as NSString).size(withAttributes: [.font: font])
+        let paddedSize = CGSize(width: textSize.width + 2 * calculatedPadding, height: textSize.height + 2 * calculatedPadding)
+        
+        let textLayer = CALayer()
+        let adjustedX = position.width - (paddedSize.width / 2)
+        let adjustedY = position.height - (paddedSize.height / 2)
+        textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
+        textLayer.backgroundColor = UIColor(model.bgColor).cgColor
+        textLayer.cornerRadius = calculatedCornerRadius
+        
+        let renderer = UIGraphicsImageRenderer(size: paddedSize)
+        let textImage = renderer.image { _ in
+            model.text.draw(
+                in: CGRect(
+                    x: calculatedPadding,
+                    y: calculatedPadding,
+                    width: textSize.width,
+                    height: textSize.height
+                ),
+                withAttributes: [
+                    .font: font,
+                    .foregroundColor: UIColor(model.fontColor)
+                ]
+            )
+        }
+        textLayer.contents = textImage.cgImage
+        textLayer.contentsScale = UIScreen.main.scale
+        
+        addAnimation(to: textLayer, with: model.timeRange, duration: duration)
+        return textLayer
     }
 }
 

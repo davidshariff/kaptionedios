@@ -32,33 +32,63 @@ struct ToolsSectionView: View {
                 titleVisibility: .visible
             ) {
                 Button("Apply", role: .destructive) {
-                    print("DEBUG: Apply button tapped")
+
                     if let style = pendingPreset {
+
                         print("DEBUG: Applying style: \(style.name)")
-                        if isKaraokePreset(style) {
+                        
+                        if style.isKaraokePreset {
+
                             print("DEBUG: Generating karaoke subtitles")
+
                             // For karaoke presets, generate new subtitles
                             if let video = editorVM.currentVideo {
+
                                 let karaokeType = getKaraokeType(for: style)
-                                // Convert current textBoxes to lines format
-                                let lines = textEditor.textBoxes.map { textBox in
-                                    (text: textBox.text, start: textBox.timeRange.lowerBound, end: textBox.timeRange.upperBound)
-                                }
+
                                 let subs = KaraokeSubsHelper.generateKaraokeSubs(
                                     for: video,
                                     karaokeType: karaokeType,
-                                    lines: lines
+                                    textBoxes: textEditor.textBoxes
                                 )
+
+                                // Update the textBoxes in the textEditor and the editorVM
                                 textEditor.textBoxes = subs
                                 editorVM.setText(subs)
                             }
-                        } else {
+
+                        } 
+                        else {
                             print("DEBUG: Applying regular preset")
                             // For regular presets, apply style to existing subtitles
-                            textEditor.textBoxes = textEditor.textBoxes.map { style.apply(to: $0) }
-                            print("DEBUG: After applying preset, first TextBox presetName: '\(textEditor.textBoxes.first?.presetName ?? "nil")'")
+                            textEditor.textBoxes = textEditor.textBoxes.map { box in
+                                var newBox = style.apply(to: box)
+                                // Get all property names from the style-applied box (these are the ones overridden by the style)
+                                let styleMirror = Mirror(reflecting: newBox)
+                                let stylePropertyNames = Set(styleMirror.children.compactMap { $0.label })
+                                // Copy all other properties from the original box to the new one, except those set by the style or explicitly reset
+                                let boxMirror = Mirror(reflecting: box)
+                                for child in boxMirror.children {
+                                    if let label = child.label {
+                                        // Skip properties that are set by the style or need to be reset
+                                        if stylePropertyNames.contains(label) ||
+                                            ["isKaraokePreset", "karaokeType", "highlightColor", "wordBGColor"].contains(label) {
+                                            continue
+                                        }
+                                        // Use KVC if available (NSObject), otherwise this is a no-op for structs
+                                        (newBox as AnyObject).setValue(child.value, forKey: label)
+                                    }
+                                }
+                                // Reset karaoke properties
+                                newBox.isKaraokePreset = false
+                                newBox.karaokeType = nil
+                                newBox.highlightColor = nil
+                                newBox.wordBGColor = nil
+                                return newBox
+                            }
                             editorVM.setText(textEditor.textBoxes)
                         }
+
                         selectedPreset = style // Track the selected preset
                     }
                     showPresetConfirm = false
@@ -110,24 +140,16 @@ struct ToolsSectionView: View {
                         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
                         
                         alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
+
                             editorVM.isLoading = true
                             TranscriptionHelper.shared.transcribeVideo(fileURL: video.url) { result in
                                 DispatchQueue.main.async {
                                     editorVM.isLoading = false
                                     switch result {
                                     case .success(let subs):
+
                                         // Calculate and print optimal words per line for each subtitle
                                         print("🎬 [ToolsSectionView] Transcription completed with \(subs.count) subtitle segments")
-                                        
-                                        subs.forEach { textBox in
-
-                                            TextLayoutHelper.doesTextFitInVideo(
-                                                text: textBox.text,
-                                                videoWidth: video.frameSize.width,
-                                                fontSize: textBox.fontSize
-                                            )
-
-                                        }
                                         
                                         // Optimize all subtitles at once
                                         let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
@@ -135,15 +157,20 @@ struct ToolsSectionView: View {
                                             videoWidth: video.frameSize.width,
                                             padding: 0
                                         )
+
+                                        print("🎬 [ToolsSectionView] Optimized textBoxes WordTimings: \(optimizedTextBoxes.first?.wordTimings)")
                                         
+                                        // Update the textBoxes in the textEditor and the editorVM
                                         textEditor.textBoxes = optimizedTextBoxes
                                         editorVM.setText(optimizedTextBoxes)
+
                                     case .failure(let error):
                                         editorVM.errorMessage = "Failed to generate subtitles: \(error.localizedDescription)"
                                         editorVM.showErrorAlert = true
                                     }
                                 }
                             }
+
                         })
                         
                         UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
@@ -262,6 +289,7 @@ extension ToolsSectionView{
 }
 
 extension ToolsSectionView {
+
     private func toolLabel(for tool: ToolEnum) -> String {
         switch tool {
         case .presets:
@@ -269,12 +297,6 @@ extension ToolsSectionView {
         case .subslist:
             return "Subtitle list"
         }
-    }
-    
-    private func isKaraokePreset(_ style: SubtitleStyle) -> Bool {
-        return style.name == "Highlight by letter" || 
-               style.name == "Highlight by word" || 
-               style.name == "Background by word"
     }
     
     private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
@@ -285,7 +307,6 @@ extension ToolsSectionView {
         default: return .word
         }
     }
-
 
 }
 

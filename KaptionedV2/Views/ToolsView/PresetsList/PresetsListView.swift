@@ -90,11 +90,7 @@ struct PresetsListView: View {
             return false 
         }
         
-        print("DEBUG: Checking preset '\(style.name)' against currentTextBox.presetName: '\(currentTextBox.presetName ?? "nil")'")
-        
         // Match based on preset name
-        let isMatch = currentTextBox.presetName == style.name
-        print("DEBUG: Match result for '\(style.name)': \(isMatch)")
-        return isMatch
+        return currentTextBox.presetName == style.name
     }
 } 

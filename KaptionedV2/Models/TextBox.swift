@@ -40,9 +40,10 @@ struct TextBox: Identifiable{
     var wordTimings: [WordWithTiming]? = nil
 
     // Karaoke properties
-    var karaokeType: KaraokeType = .letter
-    var highlightColor: Color = KaraokePreset.letter.highlightColor
-    var wordBGColor: Color = KaraokePreset.letter.wordBGColor
+    var isKaraokePreset: Bool = false
+    var karaokeType: KaraokeType? = nil
+    var highlightColor: Color? = nil
+    var wordBGColor: Color? = nil
     
     // Preset tracking
     var presetName: String? = nil
@@ -66,15 +67,14 @@ struct TextBox: Identifiable{
         shadowY: CGFloat = 0,
         shadowOpacity: Double = 0.5,
         wordTimings: [WordWithTiming]? = nil,
-        karaokeType: KaraokeType = .word,
-        highlightColor: Color = KaraokePreset.letter.highlightColor,
-        wordBGColor: Color = KaraokePreset.letter.wordBGColor,
+        isKaraokePreset: Bool = false,
+        karaokeType: KaraokeType? = nil,
+        highlightColor: Color? = nil,
+        wordBGColor: Color? = nil,
         presetName: String? = nil
     ) {
         // If presetName is provided, find and apply the preset values
         if let presetName = presetName, let preset = SubtitleStyle.allPresets.first(where: { $0.name == presetName }) {
-            print("DEBUG: Applying preset '\(presetName)' during TextBox initialization")
-            
             self.text = text
             self.fontSize = preset.fontSize
             self.lastFontSize = lastFontSize
@@ -93,11 +93,15 @@ struct TextBox: Identifiable{
             self.shadowY = preset.shadowY
             self.shadowOpacity = preset.shadowOpacity
             self.wordTimings = wordTimings
-            self.karaokeType = karaokeType
-            self.highlightColor = highlightColor
-            self.wordBGColor = wordBGColor
+            self.isKaraokePreset = isKaraokePreset
+            if isKaraokePreset {
+                self.karaokeType = karaokeType
+                self.highlightColor = highlightColor
+                self.wordBGColor = wordBGColor
+            }
             self.presetName = presetName
         } else {
+            print("DEBUG: No presetName provided during TextBox initialization 🟡")
             // Use provided values (default behavior)
             self.text = text
             self.fontSize = fontSize
@@ -117,9 +121,12 @@ struct TextBox: Identifiable{
             self.shadowY = shadowY
             self.shadowOpacity = shadowOpacity
             self.wordTimings = wordTimings
-            self.karaokeType = karaokeType
-            self.highlightColor = highlightColor
-            self.wordBGColor = wordBGColor
+            self.isKaraokePreset = isKaraokePreset
+            if isKaraokePreset {
+                self.karaokeType = karaokeType
+                self.highlightColor = highlightColor
+                self.wordBGColor = wordBGColor
+            }
             self.presetName = presetName
         }
     }
@@ -145,6 +152,7 @@ struct SubtitleStyle: Identifiable, Equatable {
     var shadowY: CGFloat
     var shadowOpacity: Double
     var wordTimings: [WordWithTiming]? = nil
+    var isKaraokePreset: Bool = false
     
     // Optionally, provide a method to apply this style to a TextBox
     func apply(to textBox: TextBox) -> TextBox {
@@ -165,14 +173,14 @@ struct SubtitleStyle: Identifiable, Equatable {
 
         box.wordTimings = wordTimings
         
-        // Disable karaoke for regular subtitle styles
-        box.karaokeType = KaraokePreset.letter.karaokeType
-        box.highlightColor = KaraokePreset.letter.highlightColor
-        box.wordBGColor = KaraokePreset.letter.wordBGColor
+        if isKaraokePreset {
+            box.karaokeType = KaraokePreset.letter.karaokeType
+            box.highlightColor = KaraokePreset.letter.highlightColor
+            box.wordBGColor = KaraokePreset.letter.wordBGColor
+        }
         
         // Set the preset name
         box.presetName = name
-        print("DEBUG: Set presetName to '\(name)' for TextBox")
         
         return box
     }
@@ -191,7 +199,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 0,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: true
         ),
         SubtitleStyle(
             name: "Highlight by word",
@@ -206,7 +215,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 0,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: true
         ),
         SubtitleStyle(
             name: "Background by word",
@@ -221,7 +231,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 0,
             shadowX: 0,
             shadowY: 0,
-            shadowOpacity: 0
+            shadowOpacity: 0,
+            isKaraokePreset: true
         ),
         SubtitleStyle(
             name: "Classic Yellow",
@@ -236,7 +247,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 0,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Modern White",
@@ -251,7 +263,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 0,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Bold Black",
@@ -266,7 +279,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 0,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Shadowed",
@@ -281,7 +295,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 8,
             shadowX: 2,
             shadowY: 2,
-            shadowOpacity: 0.8
+            shadowOpacity: 0.8,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Large Font",
@@ -296,7 +311,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 0,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Outlined",
@@ -311,7 +327,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 0,
             shadowX: 0,
             shadowY: 0,
-            shadowOpacity: 0
+            shadowOpacity: 0,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Minimalist",
@@ -326,7 +343,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 0,
             shadowX: 0,
             shadowY: 0,
-            shadowOpacity: 0
+            shadowOpacity: 0,
+            isKaraokePreset: false
         ),
         SubtitleStyle(
             name: "Retro",
@@ -341,7 +359,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 6,
             shadowX: 2,
             shadowY: 2,
-            shadowOpacity: 0.7
+            shadowOpacity: 0.7,
+            isKaraokePreset: false
         )
     ]
 }
@@ -350,20 +369,24 @@ struct KaraokePreset {
     let karaokeType: KaraokeType
     let highlightColor: Color
     let wordBGColor: Color
+    let presetName: String
 
     static let letter = KaraokePreset(
         karaokeType: .letter,
         highlightColor: .blue,
-        wordBGColor: .clear
+        wordBGColor: .clear,
+        presetName: "Highlight by letter"
     )
     static let word = KaraokePreset(
         karaokeType: .word,
         highlightColor: .orange,
-        wordBGColor: .clear
+        wordBGColor: .clear,
+        presetName: "Highlight by word"
     )
     static let wordbg = KaraokePreset(
         karaokeType: .wordbg,
         highlightColor: .yellow,
-        wordBGColor: .blue
+        wordBGColor: .blue,
+        presetName: "Background by word"
     )
 }

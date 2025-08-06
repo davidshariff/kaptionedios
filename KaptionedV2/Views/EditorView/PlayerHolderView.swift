@@ -66,27 +66,9 @@ struct PlayerHolderView: View{
         }
         .onReceive(videoPlayer.$currentTime) { _ in
             guard videoPlayer.isPlaying, let video = editorVM.currentVideo else { return }
-            //debugPlayerInfo(video: video)
         }
     }
     
-    private func debugPlayerInfo(video: Video) {
-        
-        // Debug text boxes currently on screen
-        let currentTextBoxes = textEditor.textBoxes.filter { textBox in
-            textBox.timeRange.contains(videoPlayer.currentTime)
-        }
-        
-        print("[DEBUG] TextBoxes on screen: \(currentTextBoxes.count)")
-        for (index, textBox) in currentTextBoxes.enumerated() {
-            print("  [DEBUG] TextBox \(index + 1):")
-            print("    - Text: '\(textBox.text)'")
-            print("    - Font Size: \(textBox.fontSize)")
-            print("    - Position: \(textBox.offset)")
-            print("    - Time Range: \(textBox.timeRange.lowerBound) - \(textBox.timeRange.upperBound)")
-            print("    - Is Selected: \(textEditor.isSelected(textBox.id))")
-        }
-    }
 }
 
 struct PlayerHolderView_Previews: PreviewProvider {
@@ -112,8 +94,9 @@ extension PlayerHolderView{
                                 originalVideoSize: video.frameSize
                             )
                             ZStack {
+                                
                                 // this is the text overlay player
-                                TextPlayerView(
+                                TextOnPlayerView(
                                     currentTime: videoPlayer.currentTime,
                                     viewModel: textEditor,
                                     originalVideoSize: video.frameSize

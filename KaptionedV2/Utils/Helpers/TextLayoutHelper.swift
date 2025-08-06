@@ -46,6 +46,8 @@ struct TextLayoutHelper {
     
 
     
+
+    
     /// Splits subtitle segments into smaller chunks based on optimal word count
     /// - Parameters:
     ///   - textBoxes: Array of subtitle objects from transcribeVideo
@@ -83,6 +85,26 @@ struct TextLayoutHelper {
             let fontSize = properties["fontSize"] as? CGFloat ?? 20
             let timeRange = properties["timeRange"] as? ClosedRange<Double> ?? 0...3
             let wordTimings = properties["wordTimings"] as? [WordWithTiming]
+
+            let hasWordTimings = wordTimings != nil && !(wordTimings?.isEmpty ?? true)
+            print("🔡 [TextLayoutHelper] wordTimings exists and not empty: \(hasWordTimings ? "✅" : "❌")")
+            if let wordTimings = wordTimings {
+                print("  Word timings count: \(wordTimings.count)")
+                print("  First word: '\(wordTimings.first?.text ?? "N/A")' (\(wordTimings.first?.start ?? 0)s)")
+                print("  Last word: '\(wordTimings.last?.text ?? "N/A")' (\(wordTimings.last?.end ?? 0)s)")
+                
+                // Check if word timings match the text words
+                let textWords = text.split(separator: " ").map(String.init)
+                let timingWords = wordTimings.map { $0.text }
+                
+                if textWords.count != timingWords.count {
+                    print("  ⚠️  WARNING: Text word count (\(textWords.count)) doesn't match timing word count (\(timingWords.count))")
+                    print("  Text words: \(textWords)")
+                    print("  Timing words: \(timingWords)")
+                } else {
+                    print("  ✅ Text and timing word counts match")
+                }
+            }
             
             print("📝 [TextLayoutHelper] Processing text box \(index + 1): '\(text)' (font size: \(fontSize))")
             print("  Original timing: \(timeRange.lowerBound)s - \(timeRange.upperBound)s")
@@ -115,7 +137,8 @@ struct TextLayoutHelper {
                         properties: properties,
                         text: text,
                         fontSize: fontSize,
-                        timeRange: timeRange
+                        timeRange: timeRange,
+                        wordTimings: wordTimings
                     )
                     
                     splitSegments.append(originalTextBox)
@@ -139,6 +162,7 @@ struct TextLayoutHelper {
                     // Calculate timing using word timings for accuracy
                     let chunkStart: Double
                     let chunkEnd: Double
+                    let chunkWordTimings: [WordWithTiming]?
                     
                     if let wordTimings = wordTimings, wordTimings.count >= endIndex {
                         // Use actual word timings for precise timing
@@ -146,30 +170,35 @@ struct TextLayoutHelper {
                         let lastWordIndex = endIndex - 1
                         chunkStart = wordTimings[firstWordIndex].start
                         chunkEnd = wordTimings[lastWordIndex].end
+                        
+                        // Extract word timings for this chunk
+                        chunkWordTimings = Array(wordTimings[i..<endIndex])
+                        
                         print("      Using word timings: \(chunkStart)s - \(chunkEnd)s")
+                        print("      Word timings count for chunk: \(chunkWordTimings?.count ?? 0)")
+                        print("      Chunk words: \(chunkWords)")
+                        print("      Chunk word timings: \(chunkWordTimings?.map { "'\($0.text)'" } ?? [])")
                     } else {
                         // Fallback to calculated timing if word timings not available
                         let totalDuration = timeRange.upperBound - timeRange.lowerBound
                         let chunkDuration = totalDuration / Double(totalChunks)
                         chunkStart = timeRange.lowerBound + (Double(chunkIndex - 1) * chunkDuration)
                         chunkEnd = chunkIndex == totalChunks ? timeRange.upperBound : chunkStart + chunkDuration
+                        chunkWordTimings = nil
+                        
                         print("      Using calculated timing: \(chunkStart)s - \(chunkEnd)s")
+                        print("      No word timings available for this chunk")
+                        print("      Available word timings count: \(wordTimings?.count ?? 0)")
+                        print("      Required word timings count: \(endIndex)")
                     }
                     
                     print("    Chunk \(chunkIndex):")
                     print("      Text: '\(chunkText)'")
                     print("      Word count: \(chunkWords.count)")
                     print("      Timing: \(chunkStart)s - \(chunkEnd)s")
+                    print("      Has word timings: \(chunkWordTimings != nil ? "✅" : "❌")")
                     
                     // Create new TextBox using dynamic properties - automatically handles all properties!
-                    let chunkWordTimings: [WordWithTiming]?
-                    if let wordTimings = wordTimings, wordTimings.count >= endIndex {
-                        // Extract word timings for this chunk
-                        chunkWordTimings = Array(wordTimings[i..<endIndex])
-                    } else {
-                        chunkWordTimings = nil
-                    }
-                    
                     let newTextBox = createTextBoxFromProperties(
                         properties: properties,
                         text: chunkText,
@@ -189,7 +218,8 @@ struct TextLayoutHelper {
                     properties: properties,
                     text: text,
                     fontSize: fontSize,
-                    timeRange: timeRange
+                    timeRange: timeRange,
+                    wordTimings: wordTimings
                 )
                 
                 splitSegments.append(originalTextBox)
@@ -290,6 +320,8 @@ struct TextLayoutHelper {
         
         return fits
     }
+    
+
     
     /// Calculates the maximum font size that will fit the text in the video width
     /// - Parameters:

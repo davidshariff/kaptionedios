@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-struct TextPlayerView: View {
+struct TextOnPlayerView: View {
     
     var currentTime: Double
     @ObservedObject var viewModel: TextEditorViewModel
@@ -47,7 +47,10 @@ struct TextPlayerView: View {
         ForEach(viewModel.textBoxes) { textBox in
             let isSelected = viewModel.isSelected(textBox.id)
             
+            // Display only the textbox that is currently on screen
             if textBox.timeRange.contains(currentTime) {
+                // Debug: Print current textbox on screen
+                let _ = print("📝 Current TextBox: \(textBox) | Time: \(currentTime) | Selected: \(isSelected)")
                 textBoxView(textBox: textBox, isSelected: isSelected)
             }
         }
@@ -111,43 +114,56 @@ struct TextPlayerView: View {
     
     @ViewBuilder
     private func textOverlay(textBox: TextBox, isSelected: Bool) -> some View {
-        if let wordTimings = textBox.wordTimings, textBox.karaokeType == .letter {
-            KaraokeTextByLetterHighlightOverlay(
-                text: textBox.text,
-                words: wordTimings,
-                fontSize: textBox.fontSize,
-                fontColor: textBox.fontColor,
-                highlightColor: textBox.highlightColor,
-                currentTime: currentTime
-            )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
-        } 
-        else if let wordTimings = textBox.wordTimings, textBox.karaokeType == .word {
-            KaraokeTextByWordHighlightOverlay(
-                text: textBox.text,
-                words: wordTimings,
-                fontSize: textBox.fontSize,
-                fontColor: textBox.fontColor,
-                highlightColor: textBox.highlightColor,
-                currentTime: currentTime
-            )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
-        } 
-        else if let wordTimings = textBox.wordTimings, textBox.karaokeType == .wordbg {
-            KaraokeTextByWordBackgroundOverlay(
-                text: textBox.text,
-                words: wordTimings,
-                fontSize: textBox.fontSize,
-                fontColor: textBox.fontColor,
-                highlightColor: textBox.highlightColor,
-                wordBGColor: textBox.wordBGColor,
-                currentTime: currentTime
-            )
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
-        } 
+
+        if textBox.isKaraokePreset {
+            if let wordTimings = textBox.wordTimings, 
+               let karaokeType = textBox.karaokeType,
+               let highlightColor = textBox.highlightColor,
+               karaokeType == .letter {
+                KaraokeTextByLetterHighlightOverlay(
+                    text: textBox.text,
+                    words: wordTimings,
+                    fontSize: textBox.fontSize,
+                    fontColor: textBox.fontColor,
+                    highlightColor: highlightColor,
+                    currentTime: currentTime
+                )
+                .padding(.horizontal, textBox.backgroundPadding)
+                .padding(.vertical, textBox.backgroundPadding / 2)
+            } 
+            else if let wordTimings = textBox.wordTimings, 
+                    let karaokeType = textBox.karaokeType,
+                    let highlightColor = textBox.highlightColor,
+                    karaokeType == .word {
+                KaraokeTextByWordHighlightOverlay(
+                    text: textBox.text,
+                    words: wordTimings,
+                    fontSize: textBox.fontSize,
+                    fontColor: textBox.fontColor,
+                    highlightColor: highlightColor,
+                    currentTime: currentTime
+                )
+                .padding(.horizontal, textBox.backgroundPadding)
+                .padding(.vertical, textBox.backgroundPadding / 2)
+            } 
+            else if let wordTimings = textBox.wordTimings, 
+                    let karaokeType = textBox.karaokeType,
+                    let highlightColor = textBox.highlightColor,
+                    let wordBGColor = textBox.wordBGColor,
+                    karaokeType == .wordbg {
+                KaraokeTextByWordBackgroundOverlay(
+                    text: textBox.text,
+                    words: wordTimings,
+                    fontSize: textBox.fontSize,
+                    fontColor: textBox.fontColor,
+                    highlightColor: highlightColor,
+                    wordBGColor: wordBGColor,
+                    currentTime: currentTime
+                )
+                .padding(.horizontal, textBox.backgroundPadding)
+                .padding(.vertical, textBox.backgroundPadding / 2)
+            } 
+        }
         else {
             AttributedTextOverlay(
                 attributedString: createNSAttr(textBox),
@@ -205,43 +221,33 @@ struct TextPlayerView: View {
 }
 
     
-    private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
-        let attrStr = NSMutableAttributedString(string: textBox.text)
-        let range = NSRange(location: 0, length: attrStr.length)
-        
-        attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
-        attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
-        attrStr.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor(textBox.bgColor), range: range)
-        
-        // Apply stroke if stroke color is not clear and stroke width is greater than 0
-        if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
-            attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
-            attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
-        }
-        
-        // Apply shadow if needed
-        if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {
-            let shadow = NSShadow()
-            shadow.shadowColor = UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity)
-            shadow.shadowBlurRadius = textBox.shadowRadius
-            shadow.shadowOffset = CGSize(width: textBox.shadowX, height: textBox.shadowY)
-            attrStr.addAttribute(.shadow, value: shadow, range: range)
-        }
-        
-        return attrStr
+private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
+    let attrStr = NSMutableAttributedString(string: textBox.text)
+    let range = NSRange(location: 0, length: attrStr.length)
+    
+    attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
+    attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
+    attrStr.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor(textBox.bgColor), range: range)
+    
+    // Apply stroke if stroke color is not clear and stroke width is greater than 0
+    if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+        attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
     }
-
-
-
-
-struct TextPlayerView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainEditorView(selectedVideoURl: Video.mock.url)
+    
+    // Apply shadow if needed
+    if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {
+        let shadow = NSShadow()
+        shadow.shadowColor = UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity)
+        shadow.shadowBlurRadius = textBox.shadowRadius
+        shadow.shadowOffset = CGSize(width: textBox.shadowX, height: textBox.shadowY)
+        attrStr.addAttribute(.shadow, value: shadow, range: range)
     }
+    
+    return attrStr
 }
 
-
-extension TextPlayerView{
+extension TextOnPlayerView {
     
     private func textBoxButtons(_ textBox: TextBox) -> some View{
         HStack(spacing: 10){

@@ -11,6 +11,13 @@ class TextEditorViewModel: ObservableObject{
     @Published var isEditMode: Bool = false
     @Published var selectedStyleOption: String? = nil
     
+    // Track which styles should be applied to all
+    @Published var applyTextColorToAll: Bool = false
+    @Published var applyBackgroundToAll: Bool = false
+    @Published var applyStrokeToAll: Bool = false
+    @Published var applyFontSizeToAll: Bool = false
+    @Published var applyShadowToAll: Bool = false
+    
     var onEditTextContentClosed: (() -> Void)?
     var onSave: (([TextBox]) -> Void)?
     
@@ -184,5 +191,85 @@ extension TextEditorViewModel {
         textBoxes[index].wordBGColor = preset.wordBGColor
         // Call onSave to update the main video model and trigger saving indicator
         onSave?(textBoxes)
+    }
+    
+    // MARK: - Apply to All Functions
+    private func applyToAllTextBoxes(_ update: (inout TextBox) -> Void) {
+        guard let selectedTextBox = selectedTextBox else { return }
+        
+        for i in 0..<textBoxes.count {
+            if textBoxes[i].id != selectedTextBox.id {
+                update(&textBoxes[i])
+            }
+        }
+        onSave?(textBoxes)
+    }
+    
+    func applyTextColorToAll(_ color: Color) {
+        applyToAllTextBoxes { textBox in
+            textBox.fontColor = color
+        }
+    }
+    
+    func applyBackgroundToAll(bgColor: Color, padding: CGFloat, cornerRadius: CGFloat) {
+        applyToAllTextBoxes { textBox in
+            textBox.bgColor = bgColor
+            textBox.backgroundPadding = padding
+            textBox.cornerRadius = cornerRadius
+        }
+    }
+    
+    func applyStrokeToAll(strokeColor: Color, strokeWidth: CGFloat) {
+        applyToAllTextBoxes { textBox in
+            textBox.strokeColor = strokeColor
+            textBox.strokeWidth = strokeWidth
+        }
+    }
+    
+    func applyFontSizeToAll(_ fontSize: CGFloat) {
+        applyToAllTextBoxes { textBox in
+            textBox.fontSize = fontSize
+        }
+    }
+    
+    func applyShadowToAll(shadowColor: Color, shadowRadius: CGFloat, shadowX: CGFloat, shadowY: CGFloat, shadowOpacity: Double) {
+        applyToAllTextBoxes { textBox in
+            textBox.shadowColor = shadowColor
+            textBox.shadowRadius = shadowRadius
+            textBox.shadowX = shadowX
+            textBox.shadowY = shadowY
+            textBox.shadowOpacity = shadowOpacity
+        }
+    }
+    
+    // MARK: - Auto-apply functions (called when toggles are on)
+    func autoApplyTextColor(_ color: Color) {
+        if applyTextColorToAll {
+            applyTextColorToAll(color)
+        }
+    }
+    
+    func autoApplyBackground(bgColor: Color, padding: CGFloat, cornerRadius: CGFloat) {
+        if applyBackgroundToAll {
+            applyBackgroundToAll(bgColor: bgColor, padding: padding, cornerRadius: cornerRadius)
+        }
+    }
+    
+    func autoApplyStroke(strokeColor: Color, strokeWidth: CGFloat) {
+        if applyStrokeToAll {
+            applyStrokeToAll(strokeColor: strokeColor, strokeWidth: strokeWidth)
+        }
+    }
+    
+    func autoApplyFontSize(_ fontSize: CGFloat) {
+        if applyFontSizeToAll {
+            applyFontSizeToAll(fontSize)
+        }
+    }
+    
+    func autoApplyShadow(shadowColor: Color, shadowRadius: CGFloat, shadowX: CGFloat, shadowY: CGFloat, shadowOpacity: Double) {
+        if applyShadowToAll {
+            applyShadowToAll(shadowColor: shadowColor, shadowRadius: shadowRadius, shadowX: shadowX, shadowY: shadowY, shadowOpacity: shadowOpacity)
+        }
     }
 }

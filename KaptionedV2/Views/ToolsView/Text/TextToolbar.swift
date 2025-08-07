@@ -54,6 +54,8 @@ struct TextToolbar: View {
         }
     }
     
+
+    
     // MARK: - Computed Properties
     private var styleOptions: [StyleOption] {
         [

@@ -228,6 +228,14 @@ struct TextToolbar: View {
                 .padding(.vertical, 16)
                 .padding(.bottom, 20)
                 .offset(y: toolbarOffset)
+                .onAppear {
+                    // Force animation when toolbar appears and text box is selected
+                    if textEditor.selectedTextBox != nil {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            toolbarOffset = 0
+                        }
+                    }
+                }
             }
         }
         .onChange(of: textEditor.selectedTextBox?.id) { newValue in

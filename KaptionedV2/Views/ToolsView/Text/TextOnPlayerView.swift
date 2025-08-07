@@ -7,6 +7,7 @@ struct TextOnPlayerView: View {
     @ObservedObject var viewModel: TextEditorViewModel
     var originalVideoSize: CGSize
     var videoScale: CGFloat = 1.0
+    @Binding var showEditSubtitlesMode: Bool
     @Environment(\.videoSize) private var videoSize
     
     var body: some View {
@@ -42,6 +43,7 @@ struct TextOnPlayerView: View {
             }
     }
     
+    // find the textbox that is currently on screen
     @ViewBuilder
     private var textBoxesView: some View {
         ForEach(viewModel.textBoxes) { textBox in
@@ -108,10 +110,16 @@ struct TextOnPlayerView: View {
             textOverlay(textBox: textBox, isSelected: isSelected)
         }
         .fixedSize()
-        .contentShape(Rectangle())
-        .onTapGesture {
-            editOrSelectTextBox(textBox, isSelected)
-        }
+                  .contentShape(Rectangle())
+          .onTapGesture {
+              if showEditSubtitlesMode {
+                  editOrSelectTextBox(textBox, isSelected)
+              }
+              else {
+                  showEditSubtitlesMode = true
+                  viewModel.selectedTextBox = textBox
+              }
+          }
     }
     
     @ViewBuilder

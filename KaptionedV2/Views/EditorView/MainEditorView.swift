@@ -53,7 +53,8 @@ struct MainEditorView: View {
                         availableHeight: .constant(videoPlayerHeight),
                         editorVM: editorVM, 
                         videoPlayer: videoPlayer, 
-                        textEditor: textEditor
+                        textEditor: textEditor,
+                        showEditSubtitlesMode: $showEditSubtitlesMode
                     )
                     .frame(height: videoPlayerHeight) // Dynamic height based on controls and bottom sheet
                     .animation(.easeInOut(duration: 0.5), value: videoPlayerHeight) // Smooth animation when video height changes

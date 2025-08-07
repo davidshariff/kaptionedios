@@ -43,6 +43,8 @@ struct PlayerHolderView: View{
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var textEditor: TextEditorViewModel
+    
+    @Binding var showEditSubtitlesMode: Bool
 
     var body: some View{
         VStack(spacing: 6) {
@@ -99,7 +101,8 @@ extension PlayerHolderView{
                                 TextOnPlayerView(
                                     currentTime: videoPlayer.currentTime,
                                     viewModel: textEditor,
-                                    originalVideoSize: video.frameSize
+                                    originalVideoSize: video.frameSize,
+                                    showEditSubtitlesMode: $showEditSubtitlesMode
                                 )
                                 .environment(\.videoSize, CGSize(
                                     width: proxy.size.width,

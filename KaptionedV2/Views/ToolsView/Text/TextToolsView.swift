@@ -34,11 +34,6 @@ extension TextToolsView{
                 .font(.caption)
         }
         .frame(width: 80, height: 80)
-        .overlay(alignment: .topLeading) {
-            if isSelected{
-                TrashButtonWithConfirmation(onDelete: { editor.removeTextBox() })
-            }
-        }
         .onTapGesture {
             if isSelected{
                 editor.openTextEditor(isEdit: true, textBox)

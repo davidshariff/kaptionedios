@@ -63,12 +63,30 @@ struct TextOnPlayerView: View {
     @ViewBuilder
     private func textBoxView(textBox: TextBox, isSelected: Bool) -> some View {
         ZStack(alignment: .topLeading) {
+
             textContent(textBox: textBox, isSelected: isSelected)
-            
-            if isSelected {
-                textBoxButtons(textBox)
-                    .offset(x: textBox.offset.width, y: textBox.offset.height - 30)
+            .overlay(alignment: .topLeading) {
+                if isSelected {
+                    VStack(spacing: 0) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 20, height: 20)
+                                .shadow(color: .black.opacity(0.12), radius: 3, x: 0, y: 1)
+                            Image(systemName: "arrow.up.and.down.and.arrow.left.and.right")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.purple)
+                        }
+                        .overlay(
+                            Circle()
+                                .stroke(Color.purple, lineWidth: 1.5)
+                        )
+                        Spacer(minLength: 0)
+                    }
+                    .offset(y: -16)
+                }
             }
+
         }
         // Scale the content
         .scaleEffect(calculateScaleFactor())
@@ -261,7 +279,6 @@ extension TextOnPlayerView {
     
     private func textBoxButtons(_ textBox: TextBox) -> some View{
         HStack(spacing: 10){
-            TrashButtonWithConfirmation(onDelete: { viewModel.removeTextBox() })
             Button {
                 viewModel.copy(textBox)
             } label: {
@@ -282,30 +299,6 @@ extension TextOnPlayerView {
     private func getIndex(_ id: UUID) -> Int{
         let index = viewModel.textBoxes.firstIndex(where: {$0.id == id})
         return index ?? 0
-    }
-}
-
-struct TrashButtonWithConfirmation: View {
-    @State private var showAlert = false
-    let onDelete: () -> Void
-    var body: some View {
-        Button {
-            showAlert = true
-        } label: {
-            Image(systemName: "trash")
-                .padding(5)
-                .background(Color(.systemGray2), in: Circle())
-        }
-        .alert(isPresented: $showAlert) {
-            Alert(
-                title: Text("Are you sure?"),
-                message: Text("This action cannot be undone."),
-                primaryButton: .destructive(Text("Delete")) {
-                    onDelete()
-                },
-                secondaryButton: .cancel()
-            )
-        }
     }
 }
 

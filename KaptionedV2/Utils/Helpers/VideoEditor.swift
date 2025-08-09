@@ -14,15 +14,18 @@ class VideoEditor{
     
     @Published var currentTimePublisher: TimeInterval = 0.0
     
+    // Progress callback type - using String instead of ExportStage to avoid circular import
+    typealias ProgressCallback = @MainActor (String, Double) async -> Void
     
     ///The renderer is made up of half-sequential operations:
-    func startRender(video: Video, videoQuality: VideoQuality) async throws -> URL{
+    func startRender(video: Video, videoQuality: VideoQuality, progressCallback: ProgressCallback? = nil) async throws -> URL{
         print("🚀 [VideoEditor] startRender called – quality: \(videoQuality)  resolution: \(videoQuality.size)")
         do{
-            let url = try await resizeAndLayerOperation(video: video, videoQuality: videoQuality)
-            let finalUrl = try await applyFiltersOperations(video, fromUrl: url)
-            print("✅ [VideoEditor] Finished render – output: \(finalUrl)")
-            return finalUrl
+            await progressCallback?("processing", 0.0)
+            let url = try await resizeAndLayerOperation(video: video, videoQuality: videoQuality, progressCallback: progressCallback)
+            await progressCallback?("completed", 1.0)
+            print("✅ [VideoEditor] Finished render – output: \(url)")
+            return url
         }catch{
             print("🛑 [VideoEditor] Render failed: \(error)")
             throw error
@@ -32,29 +35,42 @@ class VideoEditor{
     
     ///Cut, resizing, rotate and set quality
     private func resizeAndLayerOperation(video: Video,
-                                  videoQuality: VideoQuality) async throws -> URL{
+                                  videoQuality: VideoQuality,
+                                  progressCallback: ProgressCallback? = nil) async throws -> URL{
         
+        // Calculate complexity for progress estimation
+        let textLayerCount = video.textBoxes.count
+        let hasComplexText = video.textBoxes.contains { $0.wordTimings != nil }
+        let estimatedComplexity = textLayerCount + (hasComplexText ? 5 : 0)
+        
+        print("📊 [VideoEditor] Export complexity: \(textLayerCount) text layers, complex: \(hasComplexText)")
+        
+        // Phase 1: Setup composition (0-10%)
+        await progressCallback?("processing", 0.0)
         let composition = AVMutableComposition()
         
         let timeRange = getTimeRange(for: video.originalDuration, with: video.rangeDuration)
         let asset = video.asset
+        await progressCallback?("processing", 0.05)
         
         ///Set new timeScale
         try await setTimeScaleAndAddTracks(to: composition, from: asset, audio: video.audio, timeScale: Float64(video.rate), videoVolume: video.volume)
+        await progressCallback?("processing", 0.10)
         
         ///Get new timeScale video track
         guard let videoTrack = try await composition.loadTracks(withMediaType: .video).first else {
             throw ExporterError.unknow
         }
         
+        // Phase 2: Video preparation (10-20%)
         ///Prepair new video size
         let naturalSize = videoTrack.naturalSize
         let videoTrackPreferredTransform = try await videoTrack.load(.preferredTransform)
         let outputSize = getSizeFromOrientation(newSize: videoQuality.size, videoTrackPreferredTransform: videoTrackPreferredTransform)
+        await progressCallback?("processing", 0.15)
         
         ///Create layerInstructions and set new size, scale, mirror
         let layerInstruction = videoCompositionInstructionForTrackWithSizeAndTime(
-            
             preferredTransform: videoTrackPreferredTransform,
             naturalSize: naturalSize,
             newSize: outputSize,
@@ -62,21 +78,25 @@ class VideoEditor{
             scale: video.videoFrames?.scale ?? 1,
             isMirror: video.isMirror
         )
+        await progressCallback?("processing", 0.20)
         
+        // Phase 3: Video composition setup (20-30%)
         ///Create mutable video composition
         let videoComposition = AVMutableVideoComposition()
         ///Set rander video  size
         videoComposition.renderSize = outputSize
         ///Set frame duration 30fps
         videoComposition.frameDuration = CMTimeMake(value: 1, timescale: 30)
+        await progressCallback?("processing", 0.25)
         
+        // Phase 4: Create text layers (30-50%) - progress based on complexity
         ///Create background layer color and scale video
-        let overlayTrackID = createLayers(video.videoFrames, video: video, size: outputSize, videoComposition: videoComposition)
+        await progressCallback?("processing", 0.30)
+        let overlayTrackID = await createLayersWithProgress(video.videoFrames, video: video, size: outputSize, videoComposition: videoComposition, progressCallback: progressCallback, startProgress: 0.30, endProgress: 0.50)
         
+        // Phase 5: Final composition setup (50-60%)
         ///Set Video Composition Instruction
         let instruction = AVMutableVideoCompositionInstruction()
-
-        ///Set time range
         instruction.timeRange = timeRange
         if let overlayID = overlayTrackID {
             let overlayInstruction = AVMutableVideoCompositionLayerInstruction()
@@ -88,73 +108,102 @@ class VideoEditor{
         
         ///Set instruction in videoComposition
         videoComposition.instructions = [instruction]
+        await progressCallback?("processing", 0.60)
         
+        // Phase 6: Export session (60-100%)
         ///Create file path in temp directory
         let outputURL = createTempPath()
         
         ///Create exportSession
         let session = try exportSession(composition: composition, videoComposition: videoComposition, outputURL: outputURL, timeRange: timeRange)
-        print("⏳ [VideoEditor] Starting first pass export (resize/compose) to \(outputURL.path)")
+        print("⏳ [VideoEditor] Starting video export (resize/compose/text) to \(outputURL.path)")
         
-        await session.export()
+        // Monitor progress for export (60-100%)
+        await withTaskGroup(of: Void.self) { group in
+            // Progress monitoring task
+            group.addTask {
+                await self.monitorExportProgressWithOffset(session: session, stage: "processing", progressCallback: progressCallback, startOffset: 0.60)
+            }
+            
+            // Export task
+            group.addTask {
+                await session.export()
+            }
+        }
         
         if let error = session.error {
-            print("🛑 [VideoEditor] First pass export error: \(error)")
+            print("🛑 [VideoEditor] Export error: \(error)")
             throw error
         } else {
             if let url = session.outputURL{
-                print("✅ [VideoEditor] First pass export finished: \(url)")
+                print("✅ [VideoEditor] Export finished: \(url)")
                 return url
             }
             throw ExporterError.failed
         }
     }
     
-    
-    ///Adding filters
-    private func applyFiltersOperations(_ video: Video, fromUrl: URL) async throws -> URL {
-        
-        let filters = FilterHelper.createFilters(mainFilter: CIFilter(name: video.filterName ?? ""), video.colorCorrection)
 
-        if filters.isEmpty{
-            return fromUrl
-        }
-        let asset = AVAsset(url: fromUrl)
-        let composition = asset.setFilters(filters)
-        
-        let outputURL = createTempPath()
-        //export the video to as per your requirement conversion
-        
-        ///Create exportSession
-        guard let session = AVAssetExportSession(
-            asset: asset,
-            presetName: AVAssetExportPresetHighestQuality)
-        else {
-            print("Cannot create export session.")
-            throw ExporterError.cannotCreateExportSession
-        }
-        session.videoComposition = composition
-        session.outputFileType = .mp4
-        session.outputURL = outputURL
-        
-        print("⏳ [VideoEditor] Starting second pass export (filters) to \(outputURL.path)")
-        await session.export()
-        
-        if let error = session.error {
-            print("🛑 [VideoEditor] Second pass export error: \(error)")
-            throw error
-        } else {
-            if let url = session.outputURL{
-                print("✅ [VideoEditor] Second pass export finished: \(url)")
-                return url
-            }
-            throw ExporterError.failed
-        }
-    }
 }
 
 //MARK: - Helpers
 extension VideoEditor{
+    
+    /// Monitor export session progress with offset for final export phase
+    private func monitorExportProgressWithOffset(session: AVAssetExportSession, stage: String, progressCallback: ProgressCallback?, startOffset: Double) async {
+        guard let progressCallback = progressCallback else { return }
+        
+        var lastReportedProgress: Float = -1
+        let progressRange = 1.0 - startOffset  // Remaining progress range
+        
+        while session.status == .waiting || session.status == .exporting {
+            let currentProgress = session.progress
+            
+            // Report progress more frequently for smoother updates
+            if abs(currentProgress - lastReportedProgress) >= 0.01 { // 1% minimum change
+                let adjustedProgress = startOffset + (Double(currentProgress) * progressRange)
+                await progressCallback(stage, adjustedProgress)
+                lastReportedProgress = currentProgress
+                print("🎬 [VideoEditor] Export progress: \(Int(currentProgress * 100))% -> Overall: \(Int(adjustedProgress * 100))%")
+            }
+            
+            // Update every 50ms for smooth progress
+            try? await Task.sleep(nanoseconds: 50_000_000)
+        }
+        
+        // Ensure we report 100% completion for this stage
+        if session.status == .completed {
+            await progressCallback(stage, 1.0)
+            print("✅ [VideoEditor] Export stage '\(stage)' completed")
+        }
+    }
+    
+    /// Monitor export session progress and call progress callback
+    private func monitorExportProgress(session: AVAssetExportSession, stage: String, progressCallback: ProgressCallback?) async {
+        guard let progressCallback = progressCallback else { return }
+        
+        var lastReportedProgress: Float = -1
+        
+        while session.status == .waiting || session.status == .exporting {
+            let currentProgress = session.progress
+            
+            // Report progress more frequently for smoother updates
+            if abs(currentProgress - lastReportedProgress) >= 0.005 { // 0.5% minimum change
+                await progressCallback(stage, Double(currentProgress))
+                lastReportedProgress = currentProgress
+                print("🎬 [VideoEditor] Export progress: \(Int(currentProgress * 100))%")
+            }
+            
+            // Update every 25ms for ultra-smooth progress
+            try? await Task.sleep(nanoseconds: 25_000_000)
+        }
+        
+        // Ensure we report 100% completion for this stage
+        if session.status == .completed {
+            await progressCallback(stage, 1.0)
+            print("✅ [VideoEditor] Export stage '\(stage)' completed")
+        }
+    }
     
 
     private func exportSession(composition: AVMutableComposition, videoComposition: AVMutableVideoComposition, outputURL: URL, timeRange: CMTimeRange) throws -> AVAssetExportSession {
@@ -174,6 +223,71 @@ extension VideoEditor{
     }
     
     
+    /// Create layers with progress tracking
+    private func createLayersWithProgress(_ videoFrame: VideoFrames?, video: Video, size: CGSize, videoComposition: AVMutableVideoComposition, progressCallback: ProgressCallback?, startProgress: Double, endProgress: Double) async -> CMPersistentTrackID? {
+        
+        guard let videoFrame else { return nil }
+        
+        let color = videoFrame.frameColor
+        let scale = videoFrame.scale
+        let scaleSize = CGSize(width: size.width * scale, height: size.height * scale)
+        let centerPoint = CGPoint(x: (size.width - scaleSize.width)/2, y: (size.height - scaleSize.height)/2)
+        
+        let videoLayer = CALayer()
+        videoLayer.frame = CGRect(origin: centerPoint, size: scaleSize)
+        let bgLayer = CALayer()
+        bgLayer.frame = CGRect(origin: .zero, size: size)
+        bgLayer.backgroundColor = UIColor(color).cgColor
+        
+        let outputLayer = CALayer()
+        outputLayer.frame = CGRect(origin: .zero, size: size)
+        
+        let progressRange = endProgress - startProgress
+        let textLayerCount = video.textBoxes.count
+        
+        #if targetEnvironment(simulator)
+        // When using additionalLayer variant we must not obscure the underlying video track, so we do NOT add bgLayer or videoLayer here.
+        if !video.textBoxes.isEmpty {
+            for (index, text) in video.textBoxes.enumerated() {
+                let layerProgress = startProgress + (Double(index) / Double(textLayerCount)) * progressRange
+                await progressCallback?("processing", layerProgress)
+                
+                let position = convertSize(text.offset, fromFrame: video.geometrySize, toFrame: size)
+                let textLayer = createTextLayer(with: text, size: size, position: position.size, ratio: position.ratio, duration: video.totalDuration)
+                outputLayer.addSublayer(textLayer)
+            }
+        }
+        #else
+        // Device build keeps background/frame behaviour
+        outputLayer.addSublayer(bgLayer)
+        outputLayer.addSublayer(videoLayer)
+        if !video.textBoxes.isEmpty{
+            for (index, text) in video.textBoxes.enumerated() {
+                let layerProgress = startProgress + (Double(index) / Double(textLayerCount)) * progressRange
+                await progressCallback?("processing", layerProgress)
+                
+                let position = convertSize(text.offset, fromFrame: video.geometrySize, toFrame: size)
+                let textLayer = createTextLayer(with: text, size: size, position: position.size, ratio: position.ratio, duration: video.totalDuration)
+                outputLayer.addSublayer(textLayer)
+            }
+        }
+        #endif
+
+        #if targetEnvironment(simulator)
+        // Work-around simulator crash: use additionalLayer variant. We need to supply a unique trackID and add a matching layer instruction later.
+        let overlayTrackID: CMPersistentTrackID = CMPersistentTrackID(videoComposition.sourceTrackIDForFrameTiming == kCMPersistentTrackID_Invalid ? 1 : videoComposition.sourceTrackIDForFrameTiming + 1)
+        videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
+            additionalLayer: outputLayer,
+            asTrackID: overlayTrackID)
+        return overlayTrackID
+        #else
+        videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
+            postProcessingAsVideoLayer: videoLayer,
+            in: outputLayer)
+        return nil
+        #endif
+    }
+
     @discardableResult
     private func createLayers(_ videoFrame: VideoFrames?, video: Video, size: CGSize, videoComposition: AVMutableVideoComposition) -> CMPersistentTrackID?{
         
@@ -215,16 +329,6 @@ extension VideoEditor{
                 outputLayer.addSublayer(textLayer)
             }
         }
-        #endif
-       
-        // Debug: dump layer hierarchy to confirm text layers before export
-        #if DEBUG
-        func dump(layer: CALayer, indent: String = "") {
-            print("\(indent)- Layer: \(layer.self) frame: \(layer.frame) opacity: \(layer.opacity) sublayers: \(layer.sublayers?.count ?? 0)")
-            layer.sublayers?.forEach { dump(layer: $0, indent: indent + "  ") }
-        }
-        print("📐 [VideoEditor] Overlay layer tree before export:")
-        dump(layer: outputLayer)
         #endif
 
         #if targetEnvironment(simulator)
@@ -407,12 +511,6 @@ extension VideoEditor{
     
 
     private func createTextLayer(with model: TextBox, size: CGSize, position: CGSize, ratio: Double, duration: Double) -> CALayer {
-        print("🔤 Creating text layer:")
-        print("   Text: '\(model.text)'")
-        print("   Font size: \(model.fontSize) * \(ratio) = \(model.fontSize * ratio)")
-        print("   Position: \(position)")
-        print("   Colors: fg=\(model.fontColor), bg=\(model.bgColor), stroke=\(model.strokeColor)")
-        print("   Stroke width: \(model.strokeWidth)")
         
         let calculatedFontSize = model.fontSize * ratio
         let calculatedPadding = model.backgroundPadding * ratio
@@ -420,7 +518,6 @@ extension VideoEditor{
 
         // If wordTimings is present, render karaoke-style text highlighting
         if let wordTimings = model.wordTimings {
-            print("🎤 Detected karaoke text with \(wordTimings.count) words, creating karaoke layer")
             return createKaraokeTextLayer(
                 wordTimings: wordTimings,
                 model: model,
@@ -432,9 +529,6 @@ extension VideoEditor{
             )
         }
         
-        print("📝 Creating regular text layer (no karaoke)")
-        print("   Shadow: color=\(model.shadowColor), radius=\(model.shadowRadius), opacity=\(model.shadowOpacity)")
-
         // Create attributed string for reliable text rendering (fill only)
         let fillAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
@@ -542,12 +636,6 @@ extension VideoEditor{
         let calculatedShadowRadius = effectiveShadowRadius * ratio
         let calculatedShadowX = model.shadowX * ratio
         let calculatedShadowY = model.shadowY * ratio
-        
-        print("🎤 Creating karaoke text layer:")
-        print("   Text: '\(model.text)'")
-        print("   Shadow: color=\(model.shadowColor), radius=\(model.shadowRadius) -> \(calculatedShadowRadius), opacity=\(model.shadowOpacity)")
-        print("   Shadow offset: x=\(model.shadowX) -> \(calculatedShadowX), y=\(model.shadowY) -> \(calculatedShadowY)")
-        print("   Stroke: color=\(model.strokeColor), width=\(model.strokeWidth)")
 
         // 1. Set up font and calculate the width of each word (with padding for word-by-word)
         //    This is needed to lay out each word precisely and to size the overall text layer.
@@ -668,7 +756,6 @@ extension VideoEditor{
                     
                     // Draw shadow if needed
                     if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
-                        print("   🎤📦 Drawing BASE shadow for word '\(word.text)': radius=\(calculatedShadowRadius), opacity=\(model.shadowOpacity)")
                         let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                         cgContext.saveGState()
                         cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
@@ -680,8 +767,6 @@ extension VideoEditor{
                         // Draw fill with shadow
                         word.text.draw(in: drawRect, withAttributes: fillAttributes)
                         cgContext.restoreGState()
-                    } else {
-                        print("   🎤❌ NO shadow for word '\(word.text)': radius=\(model.shadowRadius) -> \(calculatedShadowRadius), opacity=\(model.shadowOpacity)")
                     }
                     
                     // Draw stroke without shadow if needed
@@ -823,10 +908,8 @@ extension VideoEditor{
     }
     
     private func addAnimation(to textLayer: CALayer, with timeRange: ClosedRange<Double>, duration: Double) {
-        print("🎬 Adding animations for time range: \(timeRange)")
         
         if timeRange.lowerBound > 0{
-            print("   Adding appearance animation at \(timeRange.lowerBound)")
             let appearance = CABasicAnimation(keyPath: "opacity")
             appearance.fromValue = 0
             appearance.toValue = 1
@@ -836,11 +919,9 @@ extension VideoEditor{
             appearance.isRemovedOnCompletion = false
             textLayer.add(appearance, forKey: "Appearance")
             textLayer.opacity = 0
-            print("   Set initial opacity to 0")
         }
         
         if timeRange.upperBound < duration{
-            print("   Adding disappearance animation at \(timeRange.upperBound)")
             let disappearance = CABasicAnimation(keyPath: "opacity")
             disappearance.fromValue = 1
             disappearance.toValue = 0
@@ -851,9 +932,6 @@ extension VideoEditor{
             textLayer.add(disappearance, forKey: "Disappearance")
         }
         
-        if timeRange.lowerBound == 0 {
-            print("   No appearance animation - text should be visible from start")
-        }
     }
     
     // Creates a simple text layer without karaoke effects (fallback when karaoke properties are not available)

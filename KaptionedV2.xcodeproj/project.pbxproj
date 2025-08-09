@@ -91,6 +91,7 @@
 		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
+		F4D67B712E47C46700164273 /* SubtitleGenerationLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -179,6 +180,7 @@
 		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
+		F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleGenerationLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -405,6 +407,7 @@
 		5ACFF9A629EE876900827A37 /* Buttons */ = {
 			isa = PBXGroup;
 			children = (
+				F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */,
 				5ACFF9A829EE878500827A37 /* ToolButtonView.swift */,
 				5A5E6F9A2A03A24B00F5EBF8 /* AudioButtonView.swift */,
 				5A5E6FA22A04F3BF00F5EBF8 /* RecorderButtonView.swift */,
@@ -699,6 +702,7 @@
 				5ACFF99F29ED709B00827A37 /* RangeSliderView.swift in Sources */,
 				5AE2A2A429F67B96003D217F /* SheetView.swift in Sources */,
 				5A5E6F972A039EFD00F5EBF8 /* AVAudioSession+Ext.swift in Sources */,
+				F4D67B712E47C46700164273 /* SubtitleGenerationLoader.swift in Sources */,
 				5A08FC7429EFD5E400AB877C /* NewTimelineSlider.swift in Sources */,
 				5AF25B5929F14270005E0467 /* CropView.swift in Sources */,
 				5AE2A2A229F66EE9003D217F /* VideoExporterBottomSheetView.swift in Sources */,

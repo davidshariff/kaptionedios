@@ -154,28 +154,77 @@ extension VideoEditor{
         guard let progressCallback = progressCallback else { return }
         
         var lastReportedProgress: Float = -1
+        var highestProgress: Double = 0.0  // Track highest progress to prevent backward jumps
         let progressRange = 1.0 - startOffset  // Remaining progress range
+        var simulatedProgress: Double = 0.0
+        var hasRealProgressStarted = false
+        
+        // Start monitoring immediately
+        let startTime = CFAbsoluteTimeGetCurrent()
         
         while session.status == .waiting || session.status == .exporting {
             let currentProgress = session.progress
+            let elapsedTime = CFAbsoluteTimeGetCurrent() - startTime
             
-            // Report progress more frequently for smoother updates
-            if abs(currentProgress - lastReportedProgress) >= 0.01 { // 1% minimum change
-                let adjustedProgress = startOffset + (Double(currentProgress) * progressRange)
-                await progressCallback(stage, adjustedProgress)
-                lastReportedProgress = currentProgress
-                print("🎬 [VideoEditor] Export progress: \(Int(currentProgress * 100))% -> Overall: \(Int(adjustedProgress * 100))%")
+            // Determine effective progress, ensuring it never goes backward
+            let effectiveProgress: Double
+            
+            if currentProgress > 0.01 && !hasRealProgressStarted {
+                // Real progress has started - transition smoothly from simulated
+                hasRealProgressStarted = true
+                effectiveProgress = max(Double(currentProgress), highestProgress)
+            } else if hasRealProgressStarted {
+                // Use real progress, but ensure it doesn't go backward
+                effectiveProgress = max(Double(currentProgress), highestProgress)
+            } else {
+                // Still simulating - gradual progress up to 30%
+                simulatedProgress = min(0.3, elapsedTime * 0.08) // Slower simulation
+                effectiveProgress = max(simulatedProgress, highestProgress)
             }
             
-            // Update every 50ms for smooth progress
-            try? await Task.sleep(nanoseconds: 50_000_000)
+            // Update highest progress to prevent backward movement
+            if effectiveProgress > highestProgress {
+                highestProgress = effectiveProgress
+            }
+            
+            // Report progress more frequently for smoother updates
+            if abs(Float(highestProgress) - lastReportedProgress) >= 0.005 { // 0.5% minimum change
+                let adjustedProgress = startOffset + (highestProgress * progressRange)
+                await progressCallback(stage, adjustedProgress)
+                lastReportedProgress = Float(highestProgress)
+                
+                let progressType = hasRealProgressStarted ? "Real" : "Sim"
+                print("🎬 [VideoEditor] Export progress (\(progressType)): \(Int(highestProgress * 100))% -> Overall: \(Int(adjustedProgress * 100))%")
+            }
+            
+            // Update every 25ms for very smooth progress
+            try? await Task.sleep(nanoseconds: 25_000_000)
         }
         
-        // Ensure we report 100% completion for this stage
-        if session.status == .completed {
-            await progressCallback(stage, 1.0)
-            print("✅ [VideoEditor] Export stage '\(stage)' completed")
+        // Gradually complete the remaining progress
+        let finalStartProgress = startOffset + (highestProgress * progressRange)
+        await smoothProgressToCompletion(from: finalStartProgress, stage: stage, progressCallback: progressCallback)
+    }
+    
+    /// Smoothly animate progress from current to 100%
+    private func smoothProgressToCompletion(from startProgress: Double, stage: String, progressCallback: ProgressCallback?) async {
+        guard let progressCallback = progressCallback else { return }
+        
+        let remainingProgress = 1.0 - startProgress
+        let steps = 20 // Number of steps to reach 100%
+        let stepSize = remainingProgress / Double(steps)
+        
+        for i in 1...steps {
+            let progress = startProgress + (stepSize * Double(i))
+            await progressCallback(stage, progress)
+            print("🎬 [VideoEditor] Completing: \(Int(progress * 100))%")
+            
+            // Slower steps at the end for smooth completion
+            let delay = i < steps ? 50_000_000 : 100_000_000 // 50ms or 100ms
+            try? await Task.sleep(nanoseconds: UInt64(delay))
         }
+        
+        print("✅ [VideoEditor] Export stage '\(stage)' completed")
     }
     
     /// Monitor export session progress and call progress callback
@@ -880,10 +929,6 @@ extension VideoEditor{
     }
     
     func convertSize(_ size: CGSize, fromFrame frameSize1: CGSize, toFrame frameSize2: CGSize) -> (size: CGSize, ratio: Double) {
-        print("📍 Converting size:")
-        print("   Original size: \(size)")
-        print("   From frame: \(frameSize1)")
-        print("   To frame: \(frameSize2)")
         
         let widthRatio = frameSize2.width / frameSize1.width
         let heightRatio = frameSize2.height / frameSize1.height
@@ -900,9 +945,6 @@ extension VideoEditor{
             // Offset text - apply the scaled offset from center
             newSize = CGSize(width: (frameSize2.width / 2) + newSizeWidth, height: (frameSize2.height / 2) + -newSizeHeight)
         }
-        print("   Ratios: width=\(widthRatio), height=\(heightRatio), max=\(ratio)")
-        print("   Scaled size: width=\(newSizeWidth), height=\(newSizeHeight)")
-        print("   Final position: \(newSize)")
         
         return (CGSize(width: newSize.width, height: newSize.height), ratio)
     }

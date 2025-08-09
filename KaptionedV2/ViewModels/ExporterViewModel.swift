@@ -105,8 +105,10 @@ class ExporterViewModel: ObservableObject{
             newProgress = 1.0
         }
         
-        // Apply progress directly for more accuracy
-        overallProgress = newProgress
+        // Ensure progress never goes backward
+        if newProgress > overallProgress {
+            overallProgress = newProgress
+        }
         
         print("📊 [ExporterVM] Stage: \(stage), Progress: \(Int(progress * 100))%, Overall: \(Int(overallProgress * 100))%")
     }
@@ -237,7 +239,7 @@ class ExporterViewModel: ObservableObject{
             case .preparing:
                 return "gear"
             case .firstPass:
-                return "text.badge.plus"
+                return "captions.bubble"
             case .secondPass:
                 return "camera.filters"
             case .saving:

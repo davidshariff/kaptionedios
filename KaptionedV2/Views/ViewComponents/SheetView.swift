@@ -12,10 +12,12 @@ struct SheetView<Content: View>: View {
     @State private var showSheet: Bool = false
     @State private var slideGesture: CGSize
     var bgOpacity: CGFloat
+    var allowDismiss: Bool
     let content: Content
-    init(isPresented: Binding<Bool>, bgOpacity: CGFloat = 0.01,  @ViewBuilder content: () -> Content){
+    init(isPresented: Binding<Bool>, bgOpacity: CGFloat = 0.01, allowDismiss: Bool = true, @ViewBuilder content: () -> Content){
         self._isPresented = isPresented
         self.bgOpacity = bgOpacity
+        self.allowDismiss = allowDismiss
         self._slideGesture = State(initialValue: CGSize.zero)
         self.content = content()
         
@@ -24,7 +26,9 @@ struct SheetView<Content: View>: View {
         ZStack(alignment: .bottom){
             Color.black.opacity(bgOpacity)
                 .onTapGesture {
-                    closeSheet()
+                    if allowDismiss {
+                        closeSheet()
+                    }
                 }
                 .onAppear{
                     withAnimation(.spring().delay(0.1)){
@@ -54,12 +58,19 @@ extension SheetView{
                     .fill(Color(.systemGray4))
                     .frame(width: 80, height: 6)
                 Spacer()
-                Button {
-                    closeSheet()
-                } label: {
+                if allowDismiss {
+                    Button {
+                        closeSheet()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .imageScale(.medium)
+                            .foregroundColor(.white)
+                    }
+                } else {
+                    // Invisible spacer to maintain layout
                     Image(systemName: "xmark")
                         .imageScale(.medium)
-                        .foregroundColor(.white)
+                        .foregroundColor(.clear)
                 }
             }
             .padding(.top, 10)
@@ -73,15 +84,18 @@ extension SheetView{
         .background(Color(.systemGray6))
         .clipShape(CustomCorners(corners: [.topLeft, .topRight], radius: 12))
         .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: -5)
-        .gesture(DragGesture().onChanged{ value in
-            self.slideGesture = value.translation
-        }
+        .gesture(
+            allowDismiss ? 
+            DragGesture().onChanged{ value in
+                self.slideGesture = value.translation
+            }
             .onEnded{ value in
                 if self.slideGesture.height > -10 {
                     closeSheet()
                 }
                 self.slideGesture = .zero
-            })
+            } : nil
+        )
     }
     
     private func closeSheet(){

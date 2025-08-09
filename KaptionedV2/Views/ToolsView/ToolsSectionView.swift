@@ -45,11 +45,16 @@ struct ToolsSectionView: View {
                             if let video = editorVM.currentVideo {
 
                                 let karaokeType = getKaraokeType(for: style)
+                                
+                                print("DEBUG: Applying karaoke preset with custom colors - highlight: \(style.customHighlightColor?.description ?? "nil"), wordBG: \(style.customWordBGColor?.description ?? "nil"), font: \(style.customFontColor?.description ?? "nil")")
 
                                 let subs = KaraokeSubsHelper.generateKaraokeSubs(
                                     for: video,
                                     karaokeType: karaokeType,
-                                    textBoxes: textEditor.textBoxes
+                                    textBoxes: textEditor.textBoxes,
+                                    customHighlightColor: style.customHighlightColor,
+                                    customWordBGColor: style.customWordBGColor,
+                                    customFontColor: style.customFontColor
                                 )
 
                                 // Update the textBoxes in the textEditor and the editorVM

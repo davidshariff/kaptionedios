@@ -6,6 +6,8 @@ struct PresetsListView: View {
     var onSelect: (SubtitleStyle) -> Void
     var currentTextBox: TextBox? = nil
     
+    @State private var selectedKaraokePreset: SubtitleStyle? = nil
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -30,7 +32,13 @@ struct PresetsListView: View {
                 LazyVStack(spacing: 12) {
                     ForEach(SubtitleStyle.allPresets) { style in
                         Button(action: {
-                            onSelect(style)
+                            if style.isKaraokePreset {
+                                print("DEBUG: Selected karaoke preset: \(style.name)")
+                                selectedKaraokePreset = style
+                                print("DEBUG: selectedKaraokePreset set to: \(selectedKaraokePreset?.name ?? "nil")")
+                            } else {
+                                onSelect(style)
+                            }
                         }) {
                             HStack {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -81,6 +89,23 @@ struct PresetsListView: View {
                 print("DEBUG: No currentTextBox provided")
             }
         }
+        .sheet(item: $selectedKaraokePreset) { karaokePreset in
+            KaraokeColorSelectionView(
+                isPresented: Binding(
+                    get: { selectedKaraokePreset != nil },
+                    set: { newValue in
+                        if !newValue {
+                            selectedKaraokePreset = nil
+                        }
+                    }
+                ),
+                selectedPreset: karaokePreset,
+                onConfirm: { highlightColor, wordBGColor, fontColor in
+                    handleKaraokePresetSelection(karaokePreset, highlightColor: highlightColor, wordBGColor: wordBGColor, fontColor: fontColor)
+                    selectedKaraokePreset = nil // Close the sheet
+                }
+            )
+        }
     }
     
     // Helper function to determine if a preset matches the current TextBox style
@@ -93,4 +118,54 @@ struct PresetsListView: View {
         // Match based on preset name
         return currentTextBox.presetName == style.name
     }
-} 
+    
+    // Helper function to handle karaoke preset selection with custom colors
+    private func handleKaraokePresetSelection(_ preset: SubtitleStyle, highlightColor: Color, wordBGColor: Color, fontColor: Color) {
+        print("DEBUG: Handling karaoke preset selection for '\(preset.name)' with highlight: \(highlightColor), wordBG: \(wordBGColor), font: \(fontColor)")
+        
+        // Create a custom SubtitleStyle with the selected karaoke colors
+        var customizedPreset = SubtitleStyle(
+            name: preset.name,
+            fontSize: preset.fontSize,
+            bgColor: preset.bgColor,
+            fontColor: preset.fontColor,
+            strokeColor: preset.strokeColor,
+            strokeWidth: preset.strokeWidth,
+            backgroundPadding: preset.backgroundPadding,
+            cornerRadius: preset.cornerRadius,
+            shadowColor: preset.shadowColor,
+            shadowRadius: preset.shadowRadius,
+            shadowX: preset.shadowX,
+            shadowY: preset.shadowY,
+            shadowOpacity: preset.shadowOpacity,
+            isKaraokePreset: true
+        )
+        
+        // Store the custom colors in the customized preset
+        customizedPreset.customHighlightColor = highlightColor
+        customizedPreset.customWordBGColor = wordBGColor
+        customizedPreset.customFontColor = fontColor
+        
+        print("DEBUG: Created customized preset with custom colors - highlight: \(customizedPreset.customHighlightColor?.description ?? "nil"), wordBG: \(customizedPreset.customWordBGColor?.description ?? "nil"), font: \(customizedPreset.customFontColor?.description ?? "nil")")
+        
+        // Call the original onSelect with the customized preset
+        onSelect(customizedPreset)
+        
+        // Close the main presets view
+        isPresented = false
+    }
+    
+    // Helper function to get karaoke type based on preset name
+    private func getKaraokeType(for presetName: String) -> KaraokeType {
+        switch presetName {
+        case "Highlight by letter":
+            return .letter
+        case "Highlight by word":
+            return .word
+        case "Background by word":
+            return .wordbg
+        default:
+            return .letter
+        }
+    }
+}

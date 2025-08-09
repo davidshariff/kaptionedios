@@ -4,8 +4,13 @@ struct KaraokeSubsHelper {
     static func generateKaraokeSubs(
         for video: Video,
         karaokeType: KaraokeType = .letter,
-        textBoxes: [TextBox] = []
+        textBoxes: [TextBox] = [],
+        customHighlightColor: Color? = nil,
+        customWordBGColor: Color? = nil,
+        customFontColor: Color? = nil
     ) -> [TextBox] {
+        print("DEBUG: KaraokeSubsHelper - received custom colors - highlight: \(customHighlightColor?.description ?? "nil"), wordBG: \(customWordBGColor?.description ?? "nil"), font: \(customFontColor?.description ?? "nil")")
+        
         // Get the appropriate karaoke preset based on the type
         let preset: KaraokePreset
         switch karaokeType {
@@ -32,7 +37,7 @@ struct KaraokeSubsHelper {
                 fontSize: textBox.fontSize,
                 lastFontSize: textBox.lastFontSize,
                 bgColor: textBox.bgColor,
-                fontColor: textBox.fontColor,
+                fontColor: customFontColor ?? textBox.fontColor,
                 strokeColor: textBox.strokeColor,
                 strokeWidth: textBox.strokeWidth,
                 timeRange: textBox.timeRange,
@@ -48,8 +53,8 @@ struct KaraokeSubsHelper {
                 wordTimings: wordTimings,
                 isKaraokePreset: true,
                 karaokeType: karaokeType,
-                highlightColor: preset.highlightColor,
-                wordBGColor: preset.wordBGColor,
+                highlightColor: customHighlightColor ?? preset.highlightColor,
+                wordBGColor: customWordBGColor ?? preset.wordBGColor,
                 presetName: preset.presetName
             )
             boxes.append(box)

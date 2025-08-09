@@ -79,7 +79,7 @@ struct TextBox: Identifiable{
             self.fontSize = preset.fontSize
             self.lastFontSize = lastFontSize
             self.bgColor = preset.bgColor
-            self.fontColor = preset.fontColor
+            self.fontColor = fontColor // Use provided fontColor instead of preset.fontColor
             self.strokeColor = preset.strokeColor
             self.strokeWidth = preset.strokeWidth
             self.timeRange = timeRange
@@ -154,13 +154,18 @@ struct SubtitleStyle: Identifiable, Equatable {
     var wordTimings: [WordWithTiming]? = nil
     var isKaraokePreset: Bool = false
     
+    // Custom karaoke colors (used when user customizes karaoke presets)
+    var customHighlightColor: Color? = nil
+    var customWordBGColor: Color? = nil
+    var customFontColor: Color? = nil
+    
     // Optionally, provide a method to apply this style to a TextBox
     func apply(to textBox: TextBox) -> TextBox {
         print("DEBUG: Applying preset '\(name)' to TextBox")
         var box = textBox
         box.fontSize = fontSize
         box.bgColor = bgColor
-        box.fontColor = fontColor
+        box.fontColor = customFontColor ?? fontColor
         box.strokeColor = strokeColor
         box.strokeWidth = strokeWidth
         box.backgroundPadding = backgroundPadding
@@ -186,9 +191,12 @@ struct SubtitleStyle: Identifiable, Equatable {
             default:
                 karaokePreset = .letter
             }
+            box.isKaraokePreset = true
             box.karaokeType = karaokePreset.karaokeType
-            box.highlightColor = karaokePreset.highlightColor
-            box.wordBGColor = karaokePreset.wordBGColor
+            
+            // Use custom colors if available, otherwise use default preset colors
+            box.highlightColor = customHighlightColor ?? karaokePreset.highlightColor
+            box.wordBGColor = customWordBGColor ?? karaokePreset.wordBGColor
         }
         
         // Set the preset name

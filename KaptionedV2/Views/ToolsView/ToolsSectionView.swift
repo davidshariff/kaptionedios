@@ -138,47 +138,8 @@ struct ToolsSectionView: View {
             if let video = editorVM.currentVideo {
                 VStack(spacing: 4) {
                     ToolButtonView(label: "Generate", image: "wand.and.stars", isChange: false) {
-                        let alert = UIAlertController(title: "Generate Subtitles?", 
-                            message: "This will replace any existing subtitles. Continue?",
-                            preferredStyle: .alert)
-                        
-                        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-                        
-                        alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
-
-                            editorVM.isLoading = true
-                            TranscriptionHelper.shared.transcribeVideo(fileURL: video.url) { result in
-                                DispatchQueue.main.async {
-                                    editorVM.isLoading = false
-                                    switch result {
-                                    case .success(let subs):
-
-                                        // Calculate and print optimal words per line for each subtitle
-                                        print("🎬 [ToolsSectionView] Transcription completed with \(subs.count) subtitle segments")
-                                        
-                                        // Optimize all subtitles at once
-                                        let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
-                                            textBoxes: subs,
-                                            videoWidth: video.frameSize.width,
-                                            padding: 0
-                                        )
-
-                                        print("🎬 [ToolsSectionView] Optimized textBoxes WordTimings: \(optimizedTextBoxes.first?.wordTimings)")
-                                        
-                                        // Update the textBoxes in the textEditor and the editorVM
-                                        textEditor.textBoxes = optimizedTextBoxes
-                                        editorVM.setText(optimizedTextBoxes)
-
-                                    case .failure(let error):
-                                        editorVM.errorMessage = "Failed to generate subtitles: \(error.localizedDescription)"
-                                        editorVM.showErrorAlert = true
-                                    }
-                                }
-                            }
-
-                        })
-                        
-                        UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
+                        // Use the shared subtitle generation method with confirmation
+                        editorVM.generateSubtitles(showConfirmation: true)
                     }
                     Text("Generate Subs")
                         .font(.caption2)

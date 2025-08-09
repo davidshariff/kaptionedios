@@ -110,6 +110,12 @@ struct MainEditorView: View {
                              isSaving = false
                          }
                      }
+                     
+                     // Set callback for automatic text box updates
+                     editorVM.onTextBoxesUpdated = { textBoxes in
+                         print("DEBUG: onTextBoxesUpdated callback triggered with \(textBoxes.count) text boxes")
+                         textEditor.textBoxes = textBoxes
+                     }
 
                 }
                 // Update video player height when video player size changes

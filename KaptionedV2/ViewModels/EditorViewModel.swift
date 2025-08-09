@@ -19,6 +19,7 @@ class EditorViewModel: ObservableObject{
     @Published var showWordTimeline: Bool = true
     
     var onSaving: (() -> Void)?
+    var onTextBoxesUpdated: (([TextBox]) -> Void)?
     
     private var projectEntity: ProjectEntity?
     
@@ -42,6 +43,9 @@ class EditorViewModel: ObservableObject{
         currentVideo = .init(url: url)
         currentVideo?.updateThumbnails(geo)
         createProject()
+        
+        // Automatically generate subtitles for new videos
+        generateSubtitlesAutomatically()
     }
     
     func setProject(_ project: ProjectEntity, geo: GeometryProxy){
@@ -81,7 +85,7 @@ extension EditorViewModel{
     private func createProject(){
         guard let currentVideo else { return }
         let context = PersistenceController.shared.viewContext
-        ProjectEntity.create(video: currentVideo, context: context)
+        projectEntity = ProjectEntity.create(video: currentVideo, context: context)
     }
     
     func updateProject(){
@@ -177,6 +181,84 @@ extension EditorViewModel{
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
             self.removeTool()
         }
+    }
+    
+    /// Generates subtitles for the current video
+    /// This method can be used both for manual generation (via Generate button) and automatic generation (for new videos)
+    /// - Parameter showConfirmation: Whether to show a confirmation dialog before generating
+    /// - Parameter completion: Optional completion handler called after generation completes
+    func generateSubtitles(showConfirmation: Bool = false, completion: (() -> Void)? = nil) {
+        guard let video = currentVideo else { 
+            completion?()
+            return 
+        }
+        
+        let performGeneration = {
+            print("🎬 [EditorViewModel] Starting subtitle generation")
+            
+            self.isLoading = true
+            TranscriptionHelper.shared.transcribeVideo(fileURL: video.url) { [weak self] result in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    
+                    self.isLoading = false
+                    switch result {
+                    case .success(let subs):
+                        print("🎬 [EditorViewModel] Transcription completed with \(subs.count) subtitle segments")
+                        
+                        // Optimize all subtitles at once
+                        let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
+                            textBoxes: subs,
+                            videoWidth: video.frameSize.width,
+                            padding: 0
+                        )
+                        
+                        print("🎬 [EditorViewModel] Optimized textBoxes count: \(optimizedTextBoxes.count)")
+                        
+                        // Update the text boxes - this will automatically save to the project
+                        self.setText(optimizedTextBoxes)
+                        
+                        // Notify the TextEditorViewModel about the new text boxes
+                        self.onTextBoxesUpdated?(optimizedTextBoxes)
+                        
+                        completion?()
+                        
+                    case .failure(let error):
+                        print("❌ [EditorViewModel] Transcription failed: \(error.localizedDescription)")
+                        self.errorMessage = "Failed to generate subtitles: \(error.localizedDescription)"
+                        self.showErrorAlert = true
+                        completion?()
+                    }
+                }
+            }
+        }
+        
+        if showConfirmation {
+            // Show confirmation dialog for manual generation
+            let alert = UIAlertController(
+                title: "Generate Subtitles?", 
+                message: "This will replace any existing subtitles. Continue?",
+                preferredStyle: .alert
+            )
+            
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
+                completion?()
+            })
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
+                performGeneration()
+            })
+            
+            UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
+        } else {
+            // Direct generation for automatic subtitle generation
+            performGeneration()
+        }
+    }
+    
+    /// Automatically generates subtitles for new videos without confirmation
+    func generateSubtitlesAutomatically() {
+        generateSubtitles(showConfirmation: false)
     }
 }
 

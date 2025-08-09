@@ -131,8 +131,7 @@ struct TextOnPlayerView: View {
             view.fixedSize()
         }
         .if(textBox.isKaraokePreset) { view in
-            view.fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: videoSize.width * 0.8) // Constrain width to allow wrapping
+            view.fixedSize() // Same as regular text - no auto-wrapping
         }
         .contentShape(Rectangle())
         .onTapGesture {

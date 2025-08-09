@@ -107,23 +107,109 @@ The `TextBox` model supports rich styling that gets rendered natively:
 
 - **Text styling**: Font size, color, stroke, shadow
 - **Background styling**: Background color, padding, corner radius
-- **Karaoke effects**: Word-by-word highlighting
+- **Multi-line text**: Automatic line breaks with center alignment
+- **Karaoke effects**: Word-by-word highlighting with multi-line support
 - **Animations**: Fade in/out with precise timing
+
+#### 📝 Regular Text Multi-Line Implementation
+
+**Player Preview (SwiftUI)**:
+- Uses `UIViewRepresentable` with `UILabel` for native text rendering
+- `numberOfLines = 0` and `lineBreakMode = .byWordWrapping` for automatic wrapping
+- Detects explicit line breaks (`\n`) and applies center alignment automatically
+
+```swift
+// AttributedTextOverlay handles regular text
+func makeUIView(context: Context) -> UILabel {
+    let label = UILabel()
+    label.numberOfLines = 0
+    label.lineBreakMode = .byWordWrapping
+    
+    let hasExplicitLineBreaks = attributedString.string.contains("\n")
+    label.textAlignment = hasExplicitLineBreaks ? .center : .natural
+    return label
+}
+```
+
+**Export Pipeline (Core Graphics)**:
+- Uses `NSAttributedString` with `NSMutableParagraphStyle` for text formatting
+- Applies center alignment and word wrapping for multi-line text
+- Uses `draw(in: CGRect)` instead of `draw(at: CGPoint)` to respect paragraph alignment
+
+```swift
+// Regular text export with center alignment
+let paragraphStyle = NSMutableParagraphStyle()
+paragraphStyle.alignment = .center
+paragraphStyle.lineBreakMode = .byWordWrapping
+
+let drawingRect = CGRect(x: padding, y: padding, width: width, height: height)
+attributedString.draw(in: drawingRect) // Respects paragraph alignment
+```
 
 ### 🎤 Karaoke Subtitle System
 
-The app has sophisticated karaoke support with two modes:
+The app has sophisticated karaoke support with three modes:
 
-1. **Word-by-word**: `KaraokeType.word` - Highlights each word
-2. **Word background**: `KaraokeType.wordbg` - Adds background highlighting per word
+1. **Letter-by-letter**: `KaraokeType.letter` - Highlights each letter progressively
+2. **Word-by-word**: `KaraokeType.word` - Highlights each word
+3. **Word background**: `KaraokeType.wordbg` - Adds background highlighting per word
+
+#### 🎯 Multi-Line Karaoke Implementation
+
+**Player Preview (SwiftUI)**:
+- Uses custom `KaraokeTextLayout` to handle explicit line breaks (`\n`)
+- Implements `KaraokeWrappingLayout` (iOS 16+ Layout protocol) for word positioning
+- Center-aligns multi-line karaoke text automatically
+- Consistent behavior: only explicit line breaks create new lines (no auto-wrapping)
 
 ```swift
-// Creates animated highlight layers for each word
+// KaraokeTextLayout handles explicit line breaks
+struct KaraokeTextLayout<Content: View>: View {
+    private func organizeWordsIntoLines() -> [[WordWithTiming]] {
+        let textLines = originalText.components(separatedBy: .newlines)
+        // Maps words to their corresponding text lines
+    }
+    
+    var body: some View {
+        let lines = organizeWordsIntoLines()
+        let hasMultipleLines = lines.count > 1
+        
+        VStack(alignment: hasMultipleLines ? .center : .leading, spacing: lineSpacing) {
+            ForEach(0..<lines.count, id: \.self) { lineIndex in
+                KaraokeLineLayout(words: lines[lineIndex], ...)
+            }
+        }
+    }
+}
+```
+
+**Export Pipeline (Core Graphics)**:
+- Custom `calculateKaraokeWordPositions()` function for precise word placement
+- Handles coordinate system differences (Y-axis inversion) between SwiftUI and Core Graphics
+- Frame-accurate timing with `CMTime` synchronization
+- Center-aligned multi-line rendering matching preview exactly
+
+```swift
+// Creates animated highlight layers for each word with precise positioning
 let highlightLayer = CATextLayer()
 highlightLayer.foregroundColor = UIColor(model.highlightColor).cgColor
 let highlightAnim = CABasicAnimation(keyPath: "opacity")
 highlightAnim.beginTime = word.start  // Frame-accurate timing
 highlightAnim.duration = word.end - word.start
+highlightLayer.frame = CGRect(x: wordPosition.x, y: wordPosition.y, ...)
+```
+
+#### 🔄 Text Parsing & Word Timing
+
+**Consistent Word Splitting**: Both preview and export use `text.split { $0.isWhitespace }` to handle all whitespace characters (spaces, tabs, line breaks) uniformly.
+
+**WordWithTiming Structure**:
+```swift
+struct WordWithTiming {
+    let word: String
+    let start: Double  // Start time in seconds
+    let end: Double    // End time in seconds
+}
 ```
 
 ### 🎬 Export Pipeline
@@ -149,6 +235,22 @@ The preview matches the final output because:
 1. **Same render tree**: The same `CALayer` hierarchy used in preview is burned during export
 2. **Native rendering**: Uses Core Animation's hardware-accelerated rendering
 3. **Real-time sync**: Text timing is synchronized with video playback using the same timing system
+
+#### 🎯 Text Rendering Consistency
+
+**Karaoke Text**: Perfect preview-export consistency achieved through:
+- Identical word positioning algorithms in SwiftUI (`KaraokeTextLayout`) and Core Graphics
+- Same text parsing logic (`text.split { $0.isWhitespace }`) in both contexts
+- Coordinate system normalization (Y-axis inversion handling)
+- Frame-accurate word timing preservation
+
+**Regular Text**: WYSIWYG guaranteed by:
+- Same `NSAttributedString` rendering in preview (`UILabel`) and export (Core Graphics)
+- Identical paragraph styling and alignment detection
+- Consistent multi-line behavior using `draw(in: CGRect)` for proper alignment
+- Matching font, stroke, shadow, and background rendering
+
+**Key Principle**: Both karaoke and regular text use **explicit line breaks only** - no auto-wrapping differences between preview and export.
 
 ### 🚀 Performance Benefits
 

@@ -581,12 +581,6 @@ extension VideoEditor{
         // Check if text has explicit line breaks for center alignment
         let hasExplicitLineBreaks = model.text.contains("\n")
         
-        // DEBUG: Print regular text alignment info
-        if hasExplicitLineBreaks {
-            print("🔍 DEBUG REGULAR TEXT - Text: '\(model.text)'")
-            print("🔍 DEBUG REGULAR TEXT - Has line breaks: \(hasExplicitLineBreaks)")
-        }
-        
         // Create attributed string for reliable text rendering (fill only)
         var fillAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
@@ -600,7 +594,6 @@ extension VideoEditor{
             paragraphStyle.alignment = .center
             paragraphStyle.lineBreakMode = .byWordWrapping
             fillAttributes[.paragraphStyle] = paragraphStyle
-            print("🔍 DEBUG REGULAR TEXT - Applied center alignment paragraph style")
         }
         
         let fillAttributedString = NSAttributedString(string: model.text, attributes: fillAttributes)
@@ -624,7 +617,6 @@ extension VideoEditor{
                 paragraphStyle.alignment = .center
                 paragraphStyle.lineBreakMode = .byWordWrapping
                 strokeAttributes[.paragraphStyle] = paragraphStyle
-                print("🔍 DEBUG REGULAR TEXT - Applied center alignment to stroke text")
             }
             
             strokeAttributedString = NSAttributedString(string: model.text, attributes: strokeAttributes)
@@ -672,7 +664,7 @@ extension VideoEditor{
             if let strokeAttr = strokeAttributedString {
                 if hasExplicitLineBreaks {
                     strokeAttr.draw(in: drawingRect)
-                    print("🔍 DEBUG REGULAR TEXT - Drew stroke text in rect: \(drawingRect)")
+
                 } else {
                     strokeAttr.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
                 }
@@ -686,7 +678,7 @@ extension VideoEditor{
                 cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: effectiveRegularShadowRadius, color: shadowColor.cgColor)
                 if hasExplicitLineBreaks {
                     fillAttributedString.draw(in: drawingRect)
-                    print("🔍 DEBUG REGULAR TEXT - Drew shadow text in rect: \(drawingRect)")
+
                 } else {
                     fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
                 }
@@ -695,7 +687,7 @@ extension VideoEditor{
             // Draw main text (without shadow)
             if hasExplicitLineBreaks {
                 fillAttributedString.draw(in: drawingRect)
-                print("🔍 DEBUG REGULAR TEXT - Drew main text in rect: \(drawingRect)")
+
             } else {
                 fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
             }
@@ -1132,14 +1124,8 @@ extension VideoEditor{
         // Just position words sequentially, breaking lines based on original text structure
         let textLines = originalText.components(separatedBy: .newlines)
         
-        // DEBUG: Print word order information
-        print("🔍 DEBUG - Original text: '\(originalText)'")
-        print("🔍 DEBUG - Text lines: \(textLines)")
         let originalTextWords = originalText.split { $0.isWhitespace }.map(String.init)
-        print("🔍 DEBUG - Original text words: \(originalTextWords)")
         let timingWords = wordTimings.map { $0.text }
-        print("🔍 DEBUG - WordTimings words: \(timingWords)")
-        print("🔍 DEBUG - Words match: \(originalTextWords == timingWords)")
         
         // Create a mapping to understand the relationship between text order and timing order
         // The key insight: wordTimings preserves the original timing sequence, 
@@ -1187,10 +1173,6 @@ extension VideoEditor{
         // EXPERIMENTAL: Try reversing Y positions to fix coordinate system
         lineYPositions.reverse()
         
-        // DEBUG: Print line Y positions
-        print("🔍 DEBUG - Line Y positions: \(lineYPositions)")
-        print("🔍 DEBUG - Line word counts: \(lineWordCounts)")
-        
         // Create positions array that matches the original wordTimings order
         positions = Array(repeating: WordPosition(x: 0, y: 0, width: 0, height: 0), count: finalWordTimings.count)
         
@@ -1235,22 +1217,12 @@ extension VideoEditor{
                     }
                 }
                 
-                print("🔍 DEBUG - Word \(wordTimingIndex) '\(wordTiming.text)' → line \(targetLineIndex), position \(targetWordInLineIndex) at (\(x), \(y))")
-                
                 positions[wordTimingIndex] = WordPosition(
                     x: x,
                     y: y,
                     width: finalWordWidths[wordTimingIndex],
                     height: lineHeight
                 )
-            }
-        }
-        
-        // DEBUG: Print final positions
-        print("🔍 DEBUG - Final word positions:")
-        for (i, position) in positions.enumerated() {
-            if i < finalWordTimings.count {
-                print("  Word \(i): '\(finalWordTimings[i].text)' at (\(position.x), \(position.y)) timing: \(finalWordTimings[i].start)-\(finalWordTimings[i].end)")
             }
         }
         

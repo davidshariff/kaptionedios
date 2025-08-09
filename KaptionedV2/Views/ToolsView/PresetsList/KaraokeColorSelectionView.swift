@@ -5,21 +5,21 @@ struct KaraokeColorSelectionView: View {
     @Binding var isPresented: Bool
     let selectedPreset: SubtitleStyle
     let onConfirm: (Color, Color, Color) -> Void
-    
+
     @State private var selectedHighlightColor: Color
     @State private var selectedWordBGColor: Color
     @State private var selectedFontColor: Color
-    
+
     private let colorOptions: [Color] = [
         .blue, .red, .green, .orange, .yellow, .purple, .pink, .cyan,
         .mint, .teal, .indigo, .brown, .gray, .black, .white, .clear
     ]
-    
+
     init(isPresented: Binding<Bool>, selectedPreset: SubtitleStyle, onConfirm: @escaping (Color, Color, Color) -> Void) {
         self._isPresented = isPresented
         self.selectedPreset = selectedPreset
         self.onConfirm = onConfirm
-        
+
         // Initialize with default colors based on preset type
         switch selectedPreset.name {
         case "Highlight by letter":
@@ -40,13 +40,13 @@ struct KaraokeColorSelectionView: View {
             self._selectedFontColor = State(initialValue: selectedPreset.fontColor)
         }
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             // Header
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Customize Karaoke Colors")
+                    Text("Customize Animation Colors")
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)
@@ -54,9 +54,9 @@ struct KaraokeColorSelectionView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                
+
                 Spacer()
-                
+
                 Button {
                     isPresented = false
                 } label: {
@@ -68,7 +68,7 @@ struct KaraokeColorSelectionView: View {
             }
             .padding(.horizontal)
             .padding(.top)
-            
+
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     // Preview
@@ -76,10 +76,10 @@ struct KaraokeColorSelectionView: View {
                         Text("Preview")
                             .font(.headline)
                             .foregroundColor(.primary)
-                        
+
                         HStack {
                             Spacer()
-                            
+
                             RoundedRectangle(cornerRadius: selectedPreset.cornerRadius)
                                 .fill(selectedPreset.bgColor)
                                 .frame(width: 120, height: 40)
@@ -88,6 +88,8 @@ struct KaraokeColorSelectionView: View {
                                         Text("Sam")
                                             .font(.system(size: selectedPreset.fontSize * 0.4))
                                             .foregroundColor(getPreviewHighlightColor())
+                                            .padding(.horizontal, getPreviewWordBGColor() != .clear ? 4 : 0)
+                                            .padding(.vertical, getPreviewWordBGColor() != .clear ? 2 : 0)
                                             .background(getPreviewWordBGColor())
                                             .cornerRadius(2)
                                         Text("ple")
@@ -95,20 +97,22 @@ struct KaraokeColorSelectionView: View {
                                             .foregroundColor(selectedFontColor)
                                     }
                                 )
-                            
+
                             Spacer()
                         }
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
                     }
-                    
+
                     // Highlight Color Selection
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Highlight Color")
                             .font(.headline)
                             .foregroundColor(.primary)
-                        
+                        Text("Color of the active word.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 8) {
                             ForEach(colorOptions, id: \.self) { color in
                                 Button(action: {
@@ -123,7 +127,7 @@ struct KaraokeColorSelectionView: View {
                                         )
                                         .overlay(
                                             // Show diagonal line for clear color
-                                            color == .clear ? 
+                                            color == .clear ?
                                             Path { path in
                                                 path.move(to: CGPoint(x: 4, y: 28))
                                                 path.addLine(to: CGPoint(x: 28, y: 4))
@@ -136,48 +140,17 @@ struct KaraokeColorSelectionView: View {
                             }
                         }
                     }
-                    
-                    // Font Color Selection
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Font Color")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                        
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 8) {
-                            ForEach(colorOptions, id: \.self) { color in
-                                Button(action: {
-                                    selectedFontColor = color
-                                }) {
-                                    Circle()
-                                        .fill(color == .clear ? Color.white : color)
-                                        .frame(width: 32, height: 32)
-                                        .overlay(
-                                            Circle()
-                                                .stroke(selectedFontColor == color ? Color.blue : Color.gray.opacity(0.3), lineWidth: selectedFontColor == color ? 3 : 1)
-                                        )
-                                        .overlay(
-                                            // Show diagonal line for clear color
-                                            color == .clear ? 
-                                            Path { path in
-                                                path.move(to: CGPoint(x: 4, y: 28))
-                                                path.addLine(to: CGPoint(x: 28, y: 4))
-                                            }
-                                            .stroke(Color.red, lineWidth: 2)
-                                            : nil
-                                        )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                    }
-                    
+
                     // Word Background Color Selection (only for wordbg type)
                     if selectedPreset.name == "Background by word" {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Word Background Color")
                                 .font(.headline)
                                 .foregroundColor(.primary)
-                            
+                            Text("Background color of the active word.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+
                             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 8) {
                                 ForEach(colorOptions, id: \.self) { color in
                                     Button(action: {
@@ -192,7 +165,7 @@ struct KaraokeColorSelectionView: View {
                                             )
                                             .overlay(
                                                 // Show diagonal line for clear color
-                                                color == .clear ? 
+                                                color == .clear ?
                                                 Path { path in
                                                     path.move(to: CGPoint(x: 4, y: 28))
                                                     path.addLine(to: CGPoint(x: 28, y: 4))
@@ -206,27 +179,72 @@ struct KaraokeColorSelectionView: View {
                             }
                         }
                     }
-                    
+
+                    // Font Color Selection
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Font Color")
+                            .font(.headline)
+                            .foregroundColor(.primary)
+                        Text("Color of words not highlighted.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 8), spacing: 8) {
+                            ForEach(colorOptions, id: \.self) { color in
+                                Button(action: {
+                                    selectedFontColor = color
+                                }) {
+                                    Circle()
+                                        .fill(color == .clear ? Color.white : color)
+                                        .frame(width: 32, height: 32)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(selectedFontColor == color ? Color.blue : Color.gray.opacity(0.3), lineWidth: selectedFontColor == color ? 3 : 1)
+                                        )
+                                        .overlay(
+                                            // Show diagonal line for clear color
+                                            color == .clear ?
+                                            Path { path in
+                                                path.move(to: CGPoint(x: 4, y: 28))
+                                                path.addLine(to: CGPoint(x: 28, y: 4))
+                                            }
+                                            .stroke(Color.red, lineWidth: 2)
+                                            : nil
+                                        )
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+
                     // Buttons
                     HStack(spacing: 12) {
-                        Button("Cancel") {
+                        Button(action: {
+                            print("DEBUG: Cancel button tapped")
                             isPresented = false
+                        }) {
+                            Text("Cancel")
+                                .foregroundColor(.primary)
+                                .font(.system(size: 16, weight: .medium))
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                                .background(Color(.systemGray5))
+                                .cornerRadius(8)
                         }
-                        .foregroundColor(.primary)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color(.systemGray5))
-                        .cornerRadius(8)
+                        .buttonStyle(PlainButtonStyle())
                         
-                        Button("Apply") {
+                        Button(action: {
+                            print("DEBUG: Apply button tapped")
                             onConfirm(selectedHighlightColor, selectedWordBGColor, selectedFontColor)
                             isPresented = false
+                        }) {
+                            Text("Apply")
+                                .foregroundColor(.white)
+                                .font(.system(size: 16, weight: .medium))
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                                .background(Color.blue)
+                                .cornerRadius(8)
                         }
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(8)
+                        .buttonStyle(PlainButtonStyle())
                     }
                     .padding(.top)
                 }
@@ -239,16 +257,11 @@ struct KaraokeColorSelectionView: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
-    
+
     private func getPreviewHighlightColor() -> Color {
-        switch selectedPreset.name {
-        case "Background by word":
-            return selectedFontColor
-        default:
-            return selectedHighlightColor
-        }
+        return selectedHighlightColor
     }
-    
+
     private func getPreviewWordBGColor() -> Color {
         switch selectedPreset.name {
         case "Background by word":

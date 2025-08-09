@@ -14,6 +14,8 @@ struct RootView: View {
     @State private var selectedVideoURL: URL?
     @State private var showLoader: Bool = false
     @State private var showEditor: Bool = false
+    @State private var showDeleteConfirmation: Bool = false
+    @State private var projectToDelete: ProjectEntity?
     let columns = [
         GridItem(.adaptive(minimum: 150)),
         GridItem(.adaptive(minimum: 150)),
@@ -68,6 +70,23 @@ struct RootView: View {
                     .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
                 }
             }
+            .confirmationDialog(
+                "Delete Project",
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    if let project = projectToDelete {
+                        rootVM.removeProject(project)
+                        projectToDelete = nil
+                    }
+                }
+                Button("Cancel", role: .cancel) {
+                    projectToDelete = nil
+                }
+            } message: {
+                Text("Are you sure you want to delete this project? This action cannot be undone.")
+            }
         }
     }
 }
@@ -110,7 +129,8 @@ extension RootView{
         .overlay {
             VStack{
                 Button {
-                    rootVM.removeProject(project)
+                    projectToDelete = project
+                    showDeleteConfirmation = true
                 } label: {
                     Image(systemName: "trash.fill")
                         .foregroundColor(.white)

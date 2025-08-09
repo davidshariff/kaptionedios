@@ -272,4 +272,43 @@ extension TextEditorViewModel {
             applyShadowToAll(shadowColor: shadowColor, shadowRadius: shadowRadius, shadowX: shadowX, shadowY: shadowY, shadowOpacity: shadowOpacity)
         }
     }
+    
+    // MARK: - Immediate Apply Functions (for when toggle is turned on)
+    func immediatelyApplyCurrentTextColor() {
+        guard let selectedTextBox = selectedTextBox else { return }
+        applyTextColorToAll(selectedTextBox.fontColor)
+    }
+    
+    func immediatelyApplyCurrentBackground() {
+        guard let selectedTextBox = selectedTextBox else { return }
+        applyBackgroundToAll(
+            bgColor: selectedTextBox.bgColor,
+            padding: selectedTextBox.backgroundPadding,
+            cornerRadius: selectedTextBox.cornerRadius
+        )
+    }
+    
+    func immediatelyApplyCurrentStroke() {
+        guard let selectedTextBox = selectedTextBox else { return }
+        applyStrokeToAll(
+            strokeColor: selectedTextBox.strokeColor,
+            strokeWidth: selectedTextBox.strokeWidth
+        )
+    }
+    
+    func immediatelyApplyCurrentFontSize() {
+        guard let selectedTextBox = selectedTextBox else { return }
+        applyFontSizeToAll(selectedTextBox.fontSize)
+    }
+    
+    func immediatelyApplyCurrentShadow() {
+        guard let selectedTextBox = selectedTextBox else { return }
+        applyShadowToAll(
+            shadowColor: selectedTextBox.shadowColor,
+            shadowRadius: selectedTextBox.shadowRadius,
+            shadowX: selectedTextBox.shadowX,
+            shadowY: selectedTextBox.shadowY,
+            shadowOpacity: selectedTextBox.shadowOpacity
+        )
+    }
 }

@@ -803,23 +803,24 @@ extension VideoEditor{
                         height: wordRect.height
                     )
                     
-                    // Draw shadow if needed
+                    // Draw shadow if needed - apply to stroke layer when stroke exists, otherwise to fill layer
                     if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
                         let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                         cgContext.saveGState()
                         cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
                         
-                        // Draw stroke with shadow if needed
                         if let strokeAttrs = strokeAttributes {
+                            // If stroke exists, only apply shadow to stroke layer
                             word.text.draw(in: drawRect, withAttributes: strokeAttrs)
+                        } else {
+                            // If no stroke, apply shadow to fill layer
+                            word.text.draw(in: drawRect, withAttributes: fillAttributes)
                         }
-                        // Draw fill with shadow
-                        word.text.draw(in: drawRect, withAttributes: fillAttributes)
                         cgContext.restoreGState()
                     }
                     
-                    // Draw stroke without shadow if needed
-                    if let strokeAttrs = strokeAttributes {
+                    // Draw stroke without shadow if needed (only if shadow was applied to stroke)
+                    if let strokeAttrs = strokeAttributes, calculatedShadowRadius <= 0 || model.shadowOpacity <= 0 {
                         word.text.draw(in: drawRect, withAttributes: strokeAttrs)
                     }
                     
@@ -876,23 +877,24 @@ extension VideoEditor{
                         height: wordRect.height
                     )
                     
-                    // Draw shadow if needed
+                    // Draw shadow if needed - apply to stroke layer when stroke exists, otherwise to fill layer
                     if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
                         let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                         cgContext.saveGState()
                         cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
                         
-                        // Draw stroke with shadow if needed
                         if let strokeAttrs = highlightStrokeAttributes {
+                            // If stroke exists, only apply shadow to stroke layer
                             word.text.draw(in: highlightDrawRect, withAttributes: strokeAttrs)
+                        } else {
+                            // If no stroke, apply shadow to fill layer
+                            word.text.draw(in: highlightDrawRect, withAttributes: highlightFillAttributes)
                         }
-                        // Draw fill with shadow
-                        word.text.draw(in: highlightDrawRect, withAttributes: highlightFillAttributes)
                         cgContext.restoreGState()
                     }
                     
-                    // Draw stroke without shadow if needed
-                    if let strokeAttrs = highlightStrokeAttributes {
+                    // Draw stroke without shadow if needed (only if shadow was applied to stroke)
+                    if let strokeAttrs = highlightStrokeAttributes, calculatedShadowRadius <= 0 || model.shadowOpacity <= 0 {
                         word.text.draw(in: highlightDrawRect, withAttributes: strokeAttrs)
                     }
                     

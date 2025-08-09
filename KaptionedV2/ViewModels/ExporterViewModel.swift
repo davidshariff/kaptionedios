@@ -239,7 +239,7 @@ class ExporterViewModel: ObservableObject{
             case .preparing:
                 return "gear"
             case .firstPass:
-                return "captions.bubble"
+                return "gearshape"
             case .encoding:
                 return "video.badge.plus"
             case .saving:

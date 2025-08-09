@@ -590,7 +590,7 @@ struct StrokeText: View {
     
     var body: some View {
         ZStack {
-            // Stroke layer (background)
+            // Stroke layer (background) - Apply shadow here when stroke is enabled
             if let strokeAttr = createKaraokeStrokeAttr() {
                 AttributedTextOverlay(
                     attributedString: strokeAttr,
@@ -598,24 +598,24 @@ struct StrokeText: View {
                     isSelected: false,
                     bgColor: .clear,
                     cornerRadius: 0,
-                    shadowColor: UIColor.clear,
-                    shadowRadius: 0,
-                    shadowX: 0,
-                    shadowY: 0
+                    shadowColor: UIColor(shadowColor).withAlphaComponent(shadowOpacity),
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY
                 )
             }
             
-            // Main text layer (foreground)
+            // Main text layer (foreground) - Only apply shadow if no stroke
             AttributedTextOverlay(
                 attributedString: createKaraokeFillAttr(),
                 offset: .zero,
                 isSelected: false,
                 bgColor: .clear,
                 cornerRadius: 0,
-                shadowColor: UIColor(shadowColor).withAlphaComponent(shadowOpacity),
-                shadowRadius: shadowRadius,
-                shadowX: shadowX,
-                shadowY: shadowY
+                shadowColor: strokeColor == .clear ? UIColor(shadowColor).withAlphaComponent(shadowOpacity) : UIColor.clear,
+                shadowRadius: strokeColor == .clear ? shadowRadius : 0,
+                shadowX: strokeColor == .clear ? shadowX : 0,
+                shadowY: strokeColor == .clear ? shadowY : 0
             )
         }
     }

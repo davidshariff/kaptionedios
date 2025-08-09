@@ -229,14 +229,22 @@ extension VideoExporterBottomSheetView{
                     .fill(isCompleted ? Color.blue.opacity(0.2) : Color.gray.opacity(0.1))
                     .frame(width: 32, height: 32)
                 
-                // Active ring
+                // Active ring with pulse effect - only when active
                 if isActive {
                     Circle()
                         .stroke(Color.blue, lineWidth: 2)
                         .frame(width: 32, height: 32)
-                        .scaleEffect(1.1)
-                        .opacity(0.8)
-                        .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isActive)
+                        .scaleEffect(1.2)
+                        .opacity(0.6)
+                        .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: isActive)
+                    
+                    // Outer pulse ring - only when active
+                    Circle()
+                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                        .frame(width: 32, height: 32)
+                        .scaleEffect(1.5)
+                        .opacity(0.3)
+                        .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true).delay(0.3), value: isActive)
                 }
                 
                 // Icon or checkmark
@@ -260,6 +268,8 @@ extension VideoExporterBottomSheetView{
                 .lineLimit(2)
         }
         .frame(maxWidth: .infinity)
+        .scaleEffect(isActive ? 1.05 : 1.0)
+        .animation(isActive ? .easeInOut(duration: 1.0).repeatForever(autoreverses: true) : .easeInOut(duration: 0.3), value: isActive)
     }
     
     private func getStageDisplayName(_ stage: ExporterViewModel.ExportStage) -> String {

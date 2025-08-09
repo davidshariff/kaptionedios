@@ -266,7 +266,7 @@ extension VideoExporterBottomSheetView{
         switch stage {
         case .preparing: return "Setup"
         case .firstPass: return "Processing"
-        case .secondPass: return "Filters"
+        case .encoding: return "Finalizing"
         case .saving: return "Saving"
         case .completed: return "Done"
         }

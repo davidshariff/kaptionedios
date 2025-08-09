@@ -97,7 +97,7 @@ class ExporterViewModel: ObservableObject{
             newProgress = 0.0
         case .firstPass:  // This is our main processing stage
             newProgress = 0.05 + (progress * 0.90)  // 5-95% (main export work)
-        case .secondPass:
+        case .encoding:
             newProgress = 0.95  // Not used anymore
         case .saving:
             newProgress = 0.95 + (progress * 0.05)  // 95-100%
@@ -215,7 +215,7 @@ class ExporterViewModel: ObservableObject{
     enum ExportStage: String, CaseIterable {
         case preparing = "Preparing..."
         case firstPass = "Processing Video"
-        case secondPass = "Applying Filters"  // Keep for UI compatibility but not used
+        case encoding = "Encoding Video"
         case saving = "Saving..."
         case completed = "Complete"
         
@@ -225,8 +225,8 @@ class ExporterViewModel: ObservableObject{
                 return "Getting everything ready"
             case .firstPass:
                 return "Compositing video with text overlays and effects"
-            case .secondPass:
-                return "Applying color filters and effects"  // Not used
+            case .encoding:
+                return "Encoding final video output"
             case .saving:
                 return "Finalizing and saving video"
             case .completed:
@@ -240,8 +240,8 @@ class ExporterViewModel: ObservableObject{
                 return "gear"
             case .firstPass:
                 return "captions.bubble"
-            case .secondPass:
-                return "camera.filters"
+            case .encoding:
+                return "video.badge.plus"
             case .saving:
                 return "square.and.arrow.down"
             case .completed:

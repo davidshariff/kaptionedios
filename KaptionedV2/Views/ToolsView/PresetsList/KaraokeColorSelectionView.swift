@@ -5,6 +5,7 @@ struct KaraokeColorSelectionView: View {
     @Binding var isPresented: Bool
     let selectedPreset: SubtitleStyle
     let onConfirm: (Color, Color, Color) -> Void
+    let currentSubtitleText: String?
 
     @State private var selectedHighlightColor: Color
     @State private var selectedWordBGColor: Color
@@ -15,9 +16,10 @@ struct KaraokeColorSelectionView: View {
         .mint, .teal, .indigo, .brown, .gray, .black, .white, .clear
     ]
 
-    init(isPresented: Binding<Bool>, selectedPreset: SubtitleStyle, onConfirm: @escaping (Color, Color, Color) -> Void) {
+    init(isPresented: Binding<Bool>, selectedPreset: SubtitleStyle, currentSubtitleText: String?, onConfirm: @escaping (Color, Color, Color) -> Void) {
         self._isPresented = isPresented
         self.selectedPreset = selectedPreset
+        self.currentSubtitleText = currentSubtitleText
         self.onConfirm = onConfirm
 
         // Initialize with default colors based on preset type
@@ -85,16 +87,25 @@ struct KaraokeColorSelectionView: View {
                                 .frame(width: 120, height: 40)
                                 .overlay(
                                     HStack(spacing: 2) {
-                                        Text("Sam")
-                                            .font(.system(size: selectedPreset.fontSize * 0.4))
-                                            .foregroundColor(getPreviewHighlightColor())
-                                            .padding(.horizontal, getPreviewWordBGColor() != .clear ? 4 : 0)
-                                            .padding(.vertical, getPreviewWordBGColor() != .clear ? 2 : 0)
-                                            .background(getPreviewWordBGColor())
-                                            .cornerRadius(2)
-                                        Text("ple")
-                                            .font(.system(size: selectedPreset.fontSize * 0.4))
-                                            .foregroundColor(selectedFontColor)
+                                        if previewWords.count >= 1 {
+                                            Text(previewWords[0])
+                                                .font(.system(size: selectedPreset.fontSize * 0.4))
+                                                .foregroundColor(getPreviewHighlightColor())
+                                                .padding(.horizontal, getPreviewWordBGColor() != .clear ? 4 : 0)
+                                                .padding(.vertical, getPreviewWordBGColor() != .clear ? 2 : 0)
+                                                .background(getPreviewWordBGColor())
+                                                .cornerRadius(2)
+                                        }
+                                        if previewWords.count >= 2 {
+                                            Text(previewWords[1])
+                                                .font(.system(size: selectedPreset.fontSize * 0.4))
+                                                .foregroundColor(selectedFontColor)
+                                        } else if previewWords.count == 1 && previewWords[0].count > 3 {
+                                            // If only one word, show part of it as unhighlighted
+                                            Text(String(previewWords[0].dropFirst(min(3, previewWords[0].count))))
+                                                .font(.system(size: selectedPreset.fontSize * 0.4))
+                                                .foregroundColor(selectedFontColor)
+                                        }
                                     }
                                 )
 
@@ -258,6 +269,15 @@ struct KaraokeColorSelectionView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
+        private var previewText: String {
+        print("DEBUG: KaraokeColorSelectionView - currentSubtitleText: '\(currentSubtitleText ?? "nil")'")
+        return currentSubtitleText?.isEmpty == false ? currentSubtitleText! : "Your Subtitle"
+    }
+    
+    private var previewWords: [String] {
+        return previewText.split(separator: " ").map(String.init)
+    }
+    
     private func getPreviewHighlightColor() -> Color {
         return selectedHighlightColor
     }
@@ -276,6 +296,7 @@ struct KaraokeColorSelectionView: View {
     KaraokeColorSelectionView(
         isPresented: .constant(true),
         selectedPreset: SubtitleStyle.allPresets.first(where: { $0.name == "Highlight by word" })!,
+        currentSubtitleText: "Sample text for preview",
         onConfirm: { _, _, _ in }
     )
 }

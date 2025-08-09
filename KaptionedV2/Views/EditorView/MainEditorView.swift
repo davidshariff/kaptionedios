@@ -213,7 +213,9 @@ struct MainEditorView: View {
                             pendingPreset = style
                             showPresetConfirm = true
                         },
-                        currentTextBox: textEditor.selectedTextBox ?? textEditor.textBoxes.first
+                        currentTextBox: textEditor.selectedTextBox ?? textEditor.textBoxes.first,
+                        allTextBoxes: textEditor.textBoxes,
+                        currentTime: videoPlayer.currentTime
                     )
                     .frame(maxWidth: .infinity, maxHeight: availableHeightExcludingPlayer) // Dynamic height based on available space
                     .transition(.move(edge: .bottom).combined(with: .opacity))

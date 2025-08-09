@@ -5,6 +5,8 @@ struct PresetsListView: View {
     @Binding var pendingPreset: SubtitleStyle?
     var onSelect: (SubtitleStyle) -> Void
     var currentTextBox: TextBox? = nil
+    var allTextBoxes: [TextBox] = []
+    var currentTime: Double = 0
     
     @State private var selectedKaraokePreset: SubtitleStyle? = nil
     
@@ -100,6 +102,7 @@ struct PresetsListView: View {
                     }
                 ),
                 selectedPreset: karaokePreset,
+                currentSubtitleText: getCurrentSubtitleText(),
                 onConfirm: { highlightColor, wordBGColor, fontColor in
                     handleKaraokePresetSelection(karaokePreset, highlightColor: highlightColor, wordBGColor: wordBGColor, fontColor: fontColor)
                     selectedKaraokePreset = nil // Close the sheet
@@ -153,6 +156,28 @@ struct PresetsListView: View {
         
         // Close the main presets view
         isPresented = false
+    }
+    
+    // Helper function to get the subtitle text that should be showing at current time
+    private func getCurrentSubtitleText() -> String? {
+        print("DEBUG: PresetsListView - Finding subtitle for currentTime: \(currentTime)")
+        
+        // Find the textbox that contains the current time
+        for textBox in allTextBoxes {
+            if textBox.timeRange.contains(currentTime) {
+                print("DEBUG: PresetsListView - Found active subtitle: '\(textBox.text)'")
+                return textBox.text
+            }
+        }
+        
+        // Fallback to currentTextBox if no time-based match
+        if let currentText = currentTextBox?.text, !currentText.isEmpty {
+            print("DEBUG: PresetsListView - Using currentTextBox: '\(currentText)'")
+            return currentText
+        }
+        
+        print("DEBUG: PresetsListView - No subtitle found, using nil")
+        return nil
     }
     
     // Helper function to get karaoke type based on preset name

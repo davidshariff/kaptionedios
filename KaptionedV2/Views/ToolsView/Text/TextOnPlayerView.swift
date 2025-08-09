@@ -54,7 +54,7 @@ struct TextOnPlayerView: View {
             let isInTimeRange = textBox.timeRange.lowerBound <= currentTime && currentTime < textBox.timeRange.upperBound
             if isInTimeRange {
                 // Debug: Print current textbox on screen
-                let _ = print("📝 Current TextBox: \(textBox) | Time: \(currentTime) | Selected: \(isSelected)")
+                // let _ = print("📝 Current TextBox: \(textBox) | Time: \(currentTime) | Selected: \(isSelected)")
                 textBoxView(textBox: textBox, isSelected: isSelected)
             }
         }

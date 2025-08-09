@@ -172,12 +172,10 @@ struct PresetsListView: View {
     
     // Helper function to get the subtitle text that should be showing at current time
     private func getCurrentSubtitleText() -> String? {
-        print("DEBUG: PresetsListView - Finding subtitle for currentTime: \(currentTime)")
         
         // Find the textbox that contains the current time
         for textBox in allTextBoxes {
             if textBox.timeRange.contains(currentTime) {
-                print("DEBUG: PresetsListView - Found active subtitle: '\(textBox.text)'")
                 return textBox.text
             }
         }
@@ -188,7 +186,6 @@ struct PresetsListView: View {
             return currentText
         }
         
-        print("DEBUG: PresetsListView - No subtitle found, using nil")
         return nil
     }
     

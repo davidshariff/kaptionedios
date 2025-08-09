@@ -546,7 +546,7 @@ struct TimelineTextBox: View {
                 }
                 .onAppear {
                     // Debug positioning
-                    print("📝 TimelineTextBox - Text: '\(textBox.text)', Position: \(absoluteTextPosition), BoxWidth: \(boxWidth), WordPosition: \(wordPosition), Offset: \(offset.wrappedValue)")
+                    // print("📝 TimelineTextBox - Text: '\(textBox.text)', Position: \(absoluteTextPosition), BoxWidth: \(boxWidth), WordPosition: \(wordPosition), Offset: \(offset.wrappedValue)")
                 }
             }
         }

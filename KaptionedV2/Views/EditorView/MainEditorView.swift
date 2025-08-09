@@ -116,6 +116,17 @@ struct MainEditorView: View {
                          print("DEBUG: onTextBoxesUpdated callback triggered with \(textBoxes.count) text boxes")
                          textEditor.textBoxes = textBoxes
                      }
+                     
+                     // Set callback for auto-starting video after subtitle generation
+                     editorVM.onSubtitlesGenerated = {
+                         print("🎬 [MainEditorView] Subtitles generated, auto-starting video")
+                         // Add a small delay to ensure everything is loaded
+                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                             if let video = editorVM.currentVideo {
+                                 videoPlayer.action(video)
+                             }
+                         }
+                     }
 
                 }
                 // Update video player height when video player size changes

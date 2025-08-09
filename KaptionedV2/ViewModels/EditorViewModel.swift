@@ -20,6 +20,7 @@ class EditorViewModel: ObservableObject{
     
     var onSaving: (() -> Void)?
     var onTextBoxesUpdated: (([TextBox]) -> Void)?
+    var onSubtitlesGenerated: (() -> Void)?
     
     private var projectEntity: ProjectEntity?
     
@@ -220,6 +221,9 @@ extension EditorViewModel{
                         
                         // Notify the TextEditorViewModel about the new text boxes
                         self.onTextBoxesUpdated?(optimizedTextBoxes)
+                        
+                        // Notify that subtitles have been generated
+                        self.onSubtitlesGenerated?()
                         
                         completion?()
                         

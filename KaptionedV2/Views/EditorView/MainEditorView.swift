@@ -28,6 +28,7 @@ struct MainEditorView: View {
     @State var rulerStartInParentX: CGFloat = 0 // State for ruler start position in parent
     @State var externalDragOffset: CGFloat = 0 // State for external drag offset from text boxes
     @State var externalZoomOffset: CGFloat = 0 // State for external zoom offset from text boxes
+    @State var styleSheetOffset: CGFloat = 1000 // State for style sheet slide-up animation
     
 
     
@@ -226,11 +227,36 @@ struct MainEditorView: View {
                 CrossOverlayView()
                     .zIndex(1500)
             }
+            
+
+            
+            // Style Editor View as overlay
+            if textEditor.selectedStyleOptionToEdit != nil {
+                GeometryReader { geometry in
+                    VStack {
+                        Spacer()
+                        StyleEditorView(
+                            textEditor: textEditor,
+                            selectedStyleOptionToEdit: $textEditor.selectedStyleOptionToEdit
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: geometry.size.height * 0.5)
+                        //.background(Color.blue.opacity(0.5))
+                        .zIndex(3000)
+                        .offset(y: styleSheetOffset)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.8), value: styleSheetOffset)
+                        .onAppear {
+                            styleSheetOffset = 0
+                        }
+                        .onDisappear {
+                            styleSheetOffset = 1000
+                        }
+                    }
+                }
+            }
 
         }
         .background(Color.black)
         .navigationBarHidden(true)
-
 
         .confirmationDialog("Are you sure?", isPresented: $showBackConfirmation) {
             Button("Yes", role: .destructive) {
@@ -412,62 +438,64 @@ extension MainEditorView{
 
             // Edit subtitles mode section
             if let video = editorVM.currentVideo, showEditSubtitlesMode {
-                // Show word timeline only when in edit subtitles mode
-                ZStack {
-                    VStack(spacing: 0) {
 
-                        // Top row with time/duration on the left and close button on the right
-                        if !textEditor.showEditTextContent && editorVM.showWordTimeline {
-                            ZStack {
-                                HStack {
-                                    // Time / Duration on the left
-                                    if let video = editorVM.currentVideo {
-                                        Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
-                                            .font(.caption)
-                                            .fontWeight(.bold)
-                                            .foregroundColor(.white)
-                                            .padding(.top, 8)
-                                            .padding(.leading, 8)
-                                    }
-                                    
-                                    Spacer()
-                                    
-                                    // Close button on the right
-                                    Button {
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            showEditSubtitlesMode = false
-                                            textEditor.selectedTextBox = nil
-                                            textEditor.cancelTextEditor()
-                                        }
-                                    } label: {
-                                        Image(systemName: "xmark")
-                                            .font(.title2)
-                                            .foregroundColor(.white)
-                                            .padding(8)
-                                            .background(Color.gray.opacity(0.3), in: Circle())
-                                    }
-                                    .padding(.top, 8)
-                                    .padding(.trailing, 8)
+                // Show word timeline only when in edit subtitles mode
+                VStack(spacing: 0) {
+                    // Top row with time/duration on the left and close button on the right
+                    if !textEditor.showEditTextContent && editorVM.showWordTimeline {
+                        ZStack {
+                            
+                            HStack {
+                                // Time / Duration on the left
+                                if let video = editorVM.currentVideo {
+                                    Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .padding(.top, 8)
+                                        .padding(.leading, 8)
                                 }
                                 
-                                // Play/Pause button absolutely centered
-                                if let video = editorVM.currentVideo {
-                                    Button {
-                                        videoPlayer.action(video)
-                                    } label: {
-                                        Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
-                                            .font(.title2)
-                                            .foregroundColor(.white)
+                                Spacer()
+                                
+                                // Close button on the right
+                                Button {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        showEditSubtitlesMode = false
+                                        textEditor.selectedTextBox = nil
+                                        textEditor.cancelTextEditor()
                                     }
-                                    .padding(.top, 8)
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                        .padding(8)
+                                        .background(Color.gray.opacity(0.3), in: Circle())
                                 }
+                                .padding(.top, 8)
+                                .padding(.trailing, 8)
                             }
-                            .frame(height: 40)
-                            .padding(.bottom, 8)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                            
+                            // Play/Pause button absolutely centered
+                            if let video = editorVM.currentVideo {
+                                Button {
+                                    videoPlayer.action(video)
+                                } label: {
+                                    Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
+                                        .font(.title2)
+                                        .foregroundColor(.white)
+                                }
+                                .padding(.top, 8)
+                            }
                         }
+                        .frame(height: 40)
+                        .padding(.bottom, 8)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
 
-                        if !textEditor.showEditTextContent && editorVM.showWordTimeline {
+                    if !textEditor.showEditTextContent && editorVM.showWordTimeline {
+                        ZStack {
+                            
                             WordTimelineSlider(
                                 value: $videoPlayer.currentTime,
                                 selectedTextBox: $textEditor.selectedTextBox,
@@ -499,7 +527,7 @@ extension MainEditorView{
                                             videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                                         }
                                     )
-                                    .frame(maxHeight: .infinity)
+                                    .frame(maxHeight: CGFloat.infinity)
                                 },
                                 actionView: {
                                     Rectangle()
@@ -522,15 +550,13 @@ extension MainEditorView{
                                     }
                                 }
                             )
-                            .frame(height: 80)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
+                        .frame(height: 80)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
 
-                        if textEditor.showEditor {
-                            TextEditorView(viewModel: textEditor, onSave: editorVM.setText)
-                        }
-
-                        Spacer()
+                    if textEditor.showEditor {
+                        TextEditorView(viewModel: textEditor, onSave: editorVM.setText)
                     }
                     
                     // Toolbar at the bottom
@@ -543,15 +569,23 @@ extension MainEditorView{
                         },
                         currentTime: videoPlayer.currentTime
                     )
-                    
-                    // Style Editor View
-                    StyleEditorView(
-                        textEditor: textEditor,
-                        selectedStyleOption: $textEditor.selectedStyleOption
-                    )
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
                 .animation(.easeInOut(duration: 0.3), value: showEditSubtitlesMode)
+                // Disable the editor when the style editor is open
+                .disabled(textEditor.selectedStyleOptionToEdit != nil)
+                .overlay {
+                    if textEditor.selectedStyleOptionToEdit != nil {
+                        Rectangle()
+                            .fill(Color.black.opacity(0.6))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .transition(.opacity.animation(.easeInOut(duration: 0.5)))
+                            .zIndex(10)
+                            .onTapGesture {
+                                textEditor.selectedStyleOptionToEdit = nil
+                            }
+                    }
+                }
             }
         }
     }

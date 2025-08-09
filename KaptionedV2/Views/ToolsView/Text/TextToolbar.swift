@@ -61,27 +61,27 @@ struct TextToolbar: View {
         [
             StyleOption(title: "Text\nColor", iconName: "paintpalette") {
                 seekToSelectedTextBox()
-                textEditor.selectedStyleOption = "Text\nColor"
+                textEditor.selectedStyleOptionToEdit = "Text\nColor"
                 print("Text Color tapped")
             },
             StyleOption(title: "Background", iconName: "rectangle.fill") {
                 seekToSelectedTextBox()
-                textEditor.selectedStyleOption = "Background"
+                textEditor.selectedStyleOptionToEdit = "Background"
                 print("Background tapped")
             },
             StyleOption(title: "Stroke", iconName: "circle.dashed") {
                 seekToSelectedTextBox()
-                textEditor.selectedStyleOption = "Stroke"
+                textEditor.selectedStyleOptionToEdit = "Stroke"
                 print("Stroke tapped")
             },
             StyleOption(title: "Font\nSize", iconName: "textformat.size") {
                 seekToSelectedTextBox()
-                textEditor.selectedStyleOption = "Font\nSize"
+                textEditor.selectedStyleOptionToEdit = "Font\nSize"
                 print("Font Size tapped")
             },
             StyleOption(title: "Shadow", iconName: "shadow") {
                 seekToSelectedTextBox()
-                textEditor.selectedStyleOption = "Shadow"
+                textEditor.selectedStyleOptionToEdit = "Shadow"
                 print("Shadow tapped")
             }
         ]
@@ -102,7 +102,7 @@ struct TextToolbar: View {
                         isStyleMode = false
                         videoPlayerSize = .half
                         showWordTimeline = true
-                        textEditor.selectedStyleOption = nil
+                        textEditor.selectedStyleOptionToEdit = nil
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
@@ -123,7 +123,7 @@ struct TextToolbar: View {
                         ForEach(styleOptions, id: \.title) { option in
                             StyleButton(
                                 option: option,
-                                isSelected: textEditor.selectedStyleOption == option.title
+                                isSelected: textEditor.selectedStyleOptionToEdit == option.title
                             )
                         }
                     }

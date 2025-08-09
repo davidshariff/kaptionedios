@@ -105,7 +105,7 @@ struct ApplyToAllToggle: View {
                 .toggleStyle(SwitchToggleStyle(tint: .blue))
                 .foregroundColor(.white)
                 .font(.subheadline)
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 0)
                 .padding(.vertical, 8)
                 .background(Color.black.opacity(0.3))
                 .cornerRadius(8)
@@ -179,96 +179,101 @@ struct BaseStylePickerView<Content: View>: View {
             // Content
             content
         }
-        .background(Color.black.opacity(0.9))
-        .cornerRadius(16)
+        .background(Color.black.opacity(0.8))
+        .clipShape(RoundedCorner(radius: 16, corners: [.topLeft, .topRight]))
+        .shadow(color: .black.opacity(0.5), radius: 20, x: 0, y: 10)
     }
 }
 
 struct StyleEditorView: View {
     @ObservedObject var textEditor: TextEditorViewModel
-    @Binding var selectedStyleOption: String?
+    @Binding var selectedStyleOptionToEdit: String?
     @State private var showColorPicker = false
     
     var body: some View {
-        if let selectedStyleOption = selectedStyleOption {
-            switch selectedStyleOption {
-            case "Background":
-                BackgroundColorPickerView(
-                    selectedColor: $textEditor.currentTextBox.bgColor,
-                    textEditor: textEditor,
-                    onDismiss: {
-                        self.selectedStyleOption = nil
+        if let selectedStyleOptionToEdit = selectedStyleOptionToEdit {
+            VStack(spacing: 0) {
+                Spacer()
+                
+                switch selectedStyleOptionToEdit {
+                case "Background":
+                    BackgroundColorPickerView(
+                        selectedColor: $textEditor.currentTextBox.bgColor,
+                        textEditor: textEditor,
+                        onDismiss: {
+                            self.selectedStyleOptionToEdit = nil
+                        }
+                    )
+                    .onAppear {
+                        // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
+                        if let selectedTextBox = textEditor.selectedTextBox {
+                            textEditor.currentTextBox = selectedTextBox
+                        }
                     }
-                )
-                .onAppear {
-                    // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
-                    if let selectedTextBox = textEditor.selectedTextBox {
-                        textEditor.currentTextBox = selectedTextBox
+                case "Text\nColor":
+                    TextColorPickerView(
+                        selectedColor: $textEditor.currentTextBox.fontColor,
+                        textEditor: textEditor,
+                        onDismiss: {
+                            self.selectedStyleOptionToEdit = nil
+                        }
+                    )
+                    .onAppear {
+                        // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
+                        if let selectedTextBox = textEditor.selectedTextBox {
+                            textEditor.currentTextBox = selectedTextBox
+                        }
                     }
+                case "Stroke":
+                    StrokeColorPickerView(
+                        selectedColor: $textEditor.currentTextBox.strokeColor,
+                        strokeWidth: $textEditor.currentTextBox.strokeWidth,
+                        textEditor: textEditor,
+                        onDismiss: {
+                            self.selectedStyleOptionToEdit = nil
+                        }
+                    )
+                    .onAppear {
+                        // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
+                        if let selectedTextBox = textEditor.selectedTextBox {
+                            textEditor.currentTextBox = selectedTextBox
+                        }
+                    }
+                case "Font\nSize":
+                    FontSizePickerView(
+                        fontSize: $textEditor.currentTextBox.fontSize,
+                        textEditor: textEditor,
+                        onDismiss: {
+                            self.selectedStyleOptionToEdit = nil
+                        }
+                    )
+                    .onAppear {
+                        // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
+                        if let selectedTextBox = textEditor.selectedTextBox {
+                            textEditor.currentTextBox = selectedTextBox
+                        }
+                    }
+                case "Shadow":
+                    ShadowPickerView(
+                        shadowColor: $textEditor.currentTextBox.shadowColor,
+                        shadowRadius: $textEditor.currentTextBox.shadowRadius,
+                        shadowX: $textEditor.currentTextBox.shadowX,
+                        shadowY: $textEditor.currentTextBox.shadowY,
+                        shadowOpacity: $textEditor.currentTextBox.shadowOpacity,
+                        textEditor: textEditor,
+                        onDismiss: {
+                            self.selectedStyleOptionToEdit = nil
+                        }
+                    )
+                    .onAppear {
+                        // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
+                        if let selectedTextBox = textEditor.selectedTextBox {
+                            textEditor.currentTextBox = selectedTextBox
+                        }
+                    }
+                default:
+                    EmptyView()
                 }
-            case "Text\nColor":
-                TextColorPickerView(
-                    selectedColor: $textEditor.currentTextBox.fontColor,
-                    textEditor: textEditor,
-                    onDismiss: {
-                        self.selectedStyleOption = nil
-                    }
-                )
-                .onAppear {
-                    // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
-                    if let selectedTextBox = textEditor.selectedTextBox {
-                        textEditor.currentTextBox = selectedTextBox
-                    }
-                }
-            case "Stroke":
-                StrokeColorPickerView(
-                    selectedColor: $textEditor.currentTextBox.strokeColor,
-                    strokeWidth: $textEditor.currentTextBox.strokeWidth,
-                    textEditor: textEditor,
-                    onDismiss: {
-                        self.selectedStyleOption = nil
-                    }
-                )
-                .onAppear {
-                    // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
-                    if let selectedTextBox = textEditor.selectedTextBox {
-                        textEditor.currentTextBox = selectedTextBox
-                    }
-                }
-            case "Font\nSize":
-                FontSizePickerView(
-                    fontSize: $textEditor.currentTextBox.fontSize,
-                    textEditor: textEditor,
-                    onDismiss: {
-                        self.selectedStyleOption = nil
-                    }
-                )
-                .onAppear {
-                    // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
-                    if let selectedTextBox = textEditor.selectedTextBox {
-                        textEditor.currentTextBox = selectedTextBox
-                    }
-                }
-            case "Shadow":
-                ShadowPickerView(
-                    shadowColor: $textEditor.currentTextBox.shadowColor,
-                    shadowRadius: $textEditor.currentTextBox.shadowRadius,
-                    shadowX: $textEditor.currentTextBox.shadowX,
-                    shadowY: $textEditor.currentTextBox.shadowY,
-                    shadowOpacity: $textEditor.currentTextBox.shadowOpacity,
-                    textEditor: textEditor,
-                    onDismiss: {
-                        self.selectedStyleOption = nil
-                    }
-                )
-                .onAppear {
-                    // Ensure currentTextBox is synchronized with selectedTextBox when entering style mode
-                    if let selectedTextBox = textEditor.selectedTextBox {
-                        textEditor.currentTextBox = selectedTextBox
-                    }
-                }
-            default:
-                EmptyView()
             }
         } else {
             EmptyView()
@@ -398,8 +403,6 @@ struct FontSizePickerView: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
-            
-            Spacer()
         }
     }
 }

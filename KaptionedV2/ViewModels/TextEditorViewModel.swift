@@ -9,7 +9,7 @@ class TextEditorViewModel: ObservableObject{
     @Published var currentTextBox: TextBox = TextBox()
     @Published var selectedTextBox: TextBox?
     @Published var isEditMode: Bool = false
-    @Published var selectedStyleOption: String? = nil
+    @Published var selectedStyleOptionToEdit: String? = nil
     
     // Track which styles should be applied to all
     @Published var applyTextColorToAll: Bool = false

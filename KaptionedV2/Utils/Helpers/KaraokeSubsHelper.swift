@@ -21,7 +21,7 @@ struct KaraokeSubsHelper {
         }
         var boxes: [TextBox] = []
         for textBox in textBoxes {
-            let words = textBox.text.split(separator: " ").map(String.init)
+            let words = textBox.text.split { $0.isWhitespace }.map(String.init)
             let lineDuration = textBox.timeRange.upperBound - textBox.timeRange.lowerBound
             let wordDuration = lineDuration / Double(words.count)
             var wordTimings: [WordWithTiming] = []

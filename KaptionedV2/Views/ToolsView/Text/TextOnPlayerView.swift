@@ -127,17 +127,23 @@ struct TextOnPlayerView: View {
             
             textOverlay(textBox: textBox, isSelected: isSelected)
         }
-        .fixedSize()
-                  .contentShape(Rectangle())
-          .onTapGesture {
-              if showEditSubtitlesMode {
-                  editOrSelectTextBox(textBox, isSelected)
-              }
-              else {
-                  showEditSubtitlesMode = true
-                  viewModel.selectedTextBox = textBox
-              }
-          }
+        .if(!textBox.isKaraokePreset) { view in
+            view.fixedSize()
+        }
+        .if(textBox.isKaraokePreset) { view in
+            view.fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: videoSize.width * 0.8) // Constrain width to allow wrapping
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if showEditSubtitlesMode {
+                editOrSelectTextBox(textBox, isSelected)
+            }
+            else {
+                showEditSubtitlesMode = true
+                viewModel.selectedTextBox = textBox
+            }
+        }
     }
     
     @ViewBuilder
@@ -337,6 +343,10 @@ struct AttributedTextOverlay: UIViewRepresentable {
         label.layer.cornerRadius = cornerRadius
         label.layer.masksToBounds = true
         
+        // Check if text has explicit line breaks for center alignment
+        let hasExplicitLineBreaks = attributedString.string.contains("\n")
+        label.textAlignment = hasExplicitLineBreaks ? .center : .natural
+        
         // Enable high-quality text rendering for smooth strokes
         label.layer.shouldRasterize = false
         label.layer.contentsScale = UIScreen.main.scale
@@ -352,6 +362,11 @@ struct AttributedTextOverlay: UIViewRepresentable {
 
     func updateUIView(_ uiView: UILabel, context: Context) {
         uiView.attributedText = attributedString
+        
+        // Check if text has explicit line breaks for center alignment
+        let hasExplicitLineBreaks = attributedString.string.contains("\n")
+        uiView.textAlignment = hasExplicitLineBreaks ? .center : .natural
+        
         uiView.sizeToFit()
         uiView.frame = CGRect(origin: .zero, size: uiView.intrinsicContentSize)
         uiView.backgroundColor = bgColor
@@ -397,41 +412,44 @@ struct KaraokeTextByWordHighlightOverlay: View {
     let currentTime: Double
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(words) { word in
-                let isActive = currentTime >= word.start && currentTime < word.end
-                let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
-                
-                ZStack(alignment: .leading) {
-                    // Base text with stroke and shadow support
-                    StrokeText(
-                        text: word.text,
-                        fontSize: fontSize,
-                        fontColor: fontColor,
-                        strokeColor: strokeColor,
-                        strokeWidth: strokeWidth,
-                        shadowColor: shadowColor,
-                        shadowRadius: shadowRadius,
-                        shadowX: shadowX,
-                        shadowY: shadowY,
-                        shadowOpacity: shadowOpacity
-                    )
-                    // Animated text with stroke and shadow support
-                    StrokeText(
-                        text: word.text,
-                        fontSize: fontSize,
-                        fontColor: highlightColor,
-                        strokeColor: strokeColor,
-                        strokeWidth: strokeWidth,
-                        shadowColor: shadowColor,
-                        shadowRadius: shadowRadius,
-                        shadowX: shadowX,
-                        shadowY: shadowY,
-                        shadowOpacity: shadowOpacity
-                    )
-                    .opacity(progress)
-                    .animation(.linear(duration: 0.05), value: progress)
-                }
+        KaraokeTextLayout(
+            originalText: text,
+            words: words,
+            spacing: 4,
+            lineSpacing: 2
+        ) { word in
+            let isActive = currentTime >= word.start && currentTime < word.end
+            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            
+            ZStack(alignment: .leading) {
+                // Base text with stroke and shadow support
+                StrokeText(
+                    text: word.text,
+                    fontSize: fontSize,
+                    fontColor: fontColor,
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    shadowColor: shadowColor,
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY,
+                    shadowOpacity: shadowOpacity
+                )
+                // Animated text with stroke and shadow support
+                StrokeText(
+                    text: word.text,
+                    fontSize: fontSize,
+                    fontColor: highlightColor,
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    shadowColor: shadowColor,
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY,
+                    shadowOpacity: shadowOpacity
+                )
+                .opacity(progress)
+                .animation(.linear(duration: 0.05), value: progress)
             }
         }
     }
@@ -455,52 +473,55 @@ struct KaraokeTextByWordBackgroundOverlay: View {
     let currentTime: Double
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(words) { word in
-                let isActive = currentTime >= word.start && currentTime < word.end
-                let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
-                
-                ZStack(alignment: .leading) {
-                    // Base text with stroke and shadow support
-                    StrokeText(
-                        text: word.text,
-                        fontSize: fontSize,
-                        fontColor: fontColor,
-                        strokeColor: strokeColor,
-                        strokeWidth: strokeWidth,
-                        shadowColor: shadowColor,
-                        shadowRadius: shadowRadius,
-                        shadowX: shadowX,
-                        shadowY: shadowY,
-                        shadowOpacity: shadowOpacity
-                    )
-                    .padding(.horizontal, 4)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.clear)
-                    )
-                    // Animated text with stroke and shadow support
-                    StrokeText(
-                        text: word.text,
-                        fontSize: fontSize,
-                        fontColor: highlightColor,
-                        strokeColor: strokeColor,
-                        strokeWidth: strokeWidth,
-                        shadowColor: shadowColor,
-                        shadowRadius: shadowRadius,
-                        shadowX: shadowX,
-                        shadowY: shadowY,
-                        shadowOpacity: shadowOpacity
-                    )
-                    .padding(.horizontal, 4)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(wordBGColor.opacity(0.5))
-                            .opacity(progress)
-                    )
-                    .opacity(progress)
-                    .animation(.linear(duration: 0.05), value: progress)
-                }
+        KaraokeTextLayout(
+            originalText: text,
+            words: words,
+            spacing: 4,
+            lineSpacing: 2
+        ) { word in
+            let isActive = currentTime >= word.start && currentTime < word.end
+            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            
+            ZStack(alignment: .leading) {
+                // Base text with stroke and shadow support
+                StrokeText(
+                    text: word.text,
+                    fontSize: fontSize,
+                    fontColor: fontColor,
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    shadowColor: shadowColor,
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY,
+                    shadowOpacity: shadowOpacity
+                )
+                .padding(.horizontal, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.clear)
+                )
+                // Animated text with stroke and shadow support
+                StrokeText(
+                    text: word.text,
+                    fontSize: fontSize,
+                    fontColor: highlightColor,
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    shadowColor: shadowColor,
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY,
+                    shadowOpacity: shadowOpacity
+                )
+                .padding(.horizontal, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(wordBGColor.opacity(0.5))
+                        .opacity(progress)
+                )
+                .opacity(progress)
+                .animation(.linear(duration: 0.05), value: progress)
             }
         }
     }
@@ -578,5 +599,186 @@ struct StrokeText: View {
         attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(fontColor), range: range)
         
         return attrStr
+    }
+}
+
+// Karaoke text layout that handles explicit line breaks and word wrapping
+struct KaraokeTextLayout<Content: View>: View {
+    let originalText: String
+    let words: [WordWithTiming]
+    let spacing: CGFloat
+    let lineSpacing: CGFloat
+    let content: (WordWithTiming) -> Content
+    
+    init(
+        originalText: String,
+        words: [WordWithTiming],
+        spacing: CGFloat = 4,
+        lineSpacing: CGFloat = 2,
+        @ViewBuilder content: @escaping (WordWithTiming) -> Content
+    ) {
+        self.originalText = originalText
+        self.words = words
+        self.spacing = spacing
+        self.lineSpacing = lineSpacing
+        self.content = content
+    }
+    
+    var body: some View {
+        let lines = organizeWordsIntoLines()
+        let hasMultipleLines = lines.count > 1
+        
+        VStack(alignment: hasMultipleLines ? .center : .leading, spacing: lineSpacing) {
+            ForEach(0..<lines.count, id: \.self) { lineIndex in
+                KaraokeLineLayout(
+                    words: lines[lineIndex],
+                    spacing: spacing,
+                    content: content
+                )
+            }
+        }
+    }
+    
+    private func organizeWordsIntoLines() -> [[WordWithTiming]] {
+        // Split original text into lines to detect explicit line breaks
+        let textLines = originalText.components(separatedBy: .newlines)
+        
+        if textLines.count <= 1 {
+            // No explicit line breaks, return all words as one line
+            return [words]
+        }
+        
+        // Map words to their corresponding text lines
+        var result: [[WordWithTiming]] = []
+        var wordIndex = 0
+        
+        for textLine in textLines {
+            let lineWords = textLine.split { $0.isWhitespace }.map(String.init)
+            var currentLineWords: [WordWithTiming] = []
+            
+            for _ in lineWords {
+                if wordIndex < words.count {
+                    currentLineWords.append(words[wordIndex])
+                    wordIndex += 1
+                }
+            }
+            
+            if !currentLineWords.isEmpty {
+                result.append(currentLineWords)
+            }
+        }
+        
+        // Add any remaining words to the last line (safety fallback)
+        while wordIndex < words.count {
+            if !result.isEmpty {
+                result[result.count - 1].append(words[wordIndex])
+            } else {
+                result.append([words[wordIndex]])
+            }
+            wordIndex += 1
+        }
+        
+        return result.isEmpty ? [words] : result
+    }
+}
+
+// View for a single line of karaoke words with automatic wrapping
+struct KaraokeLineLayout<Content: View>: View {
+    let words: [WordWithTiming]
+    let spacing: CGFloat
+    let content: (WordWithTiming) -> Content
+    
+    var body: some View {
+        KaraokeWrappingLayout(spacing: spacing, lineSpacing: 2) {
+            ForEach(0..<words.count, id: \.self) { index in
+                content(words[index])
+            }
+        }
+    }
+}
+
+// Custom wrapping layout for karaoke words that supports line breaks
+struct KaraokeWrappingLayout: Layout {
+    let spacing: CGFloat
+    let lineSpacing: CGFloat
+    
+    init(spacing: CGFloat = 4, lineSpacing: CGFloat = 2) {
+        self.spacing = spacing
+        self.lineSpacing = lineSpacing
+    }
+    
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var currentRowWidth: CGFloat = 0
+        var totalHeight: CGFloat = 0
+        var maxRowHeight: CGFloat = 0
+        var maxOverallWidth: CGFloat = 0
+        
+        for (index, subview) in subviews.enumerated() {
+            let subviewSize = subview.sizeThatFits(.unspecified)
+            
+            // Check if we need to wrap to next line due to width constraints
+            let needsNewLine = index > 0 && (currentRowWidth + spacing + subviewSize.width > maxWidth)
+            
+            if needsNewLine {
+                maxOverallWidth = max(maxOverallWidth, currentRowWidth)
+                totalHeight += maxRowHeight + lineSpacing
+                currentRowWidth = subviewSize.width
+                maxRowHeight = subviewSize.height
+            } else {
+                if index > 0 {
+                    currentRowWidth += spacing
+                }
+                currentRowWidth += subviewSize.width
+                maxRowHeight = max(maxRowHeight, subviewSize.height)
+            }
+        }
+        
+        // Add the height of the last row
+        totalHeight += maxRowHeight
+        maxOverallWidth = max(maxOverallWidth, currentRowWidth)
+        
+        return CGSize(width: min(maxOverallWidth, maxWidth), height: totalHeight)
+    }
+    
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var currentX: CGFloat = bounds.minX
+        var currentY: CGFloat = bounds.minY
+        var maxRowHeight: CGFloat = 0
+        
+        for (index, subview) in subviews.enumerated() {
+            let subviewSize = subview.sizeThatFits(.unspecified)
+            
+            // Check if we need to wrap to next line due to width constraints
+            let needsNewLine = index > 0 && (currentX + subviewSize.width > bounds.maxX)
+            
+            if needsNewLine {
+                // Move to next line
+                currentY += maxRowHeight + lineSpacing
+                currentX = bounds.minX
+                maxRowHeight = 0
+            }
+            
+            // Place the subview
+            subview.place(
+                at: CGPoint(x: currentX, y: currentY),
+                proposal: ProposedViewSize(subviewSize)
+            )
+            
+            // Update position for next subview
+            currentX += subviewSize.width + spacing
+            maxRowHeight = max(maxRowHeight, subviewSize.height)
+        }
+    }
+}
+
+// Extension to conditionally apply view modifiers
+extension View {
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
     }
 } 

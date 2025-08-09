@@ -578,12 +578,22 @@ extension VideoEditor{
             )
         }
         
+        // Check if text has explicit line breaks for center alignment
+        let hasExplicitLineBreaks = model.text.contains("\n")
+        
         // Create attributed string for reliable text rendering (fill only)
-        let fillAttributes: [NSAttributedString.Key: Any] = [
+        var fillAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
             .foregroundColor: UIColor(model.fontColor),
             .backgroundColor: UIColor.clear // We'll draw the background manually
         ]
+        
+        // Add center alignment for multi-line text
+        if hasExplicitLineBreaks {
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.alignment = .center
+            fillAttributes[.paragraphStyle] = paragraphStyle
+        }
         
         let fillAttributedString = NSAttributedString(string: model.text, attributes: fillAttributes)
         
@@ -593,12 +603,20 @@ extension VideoEditor{
             // Scale stroke width relative to font size for better proportions
             let scaledStrokeWidth = min(model.strokeWidth, calculatedFontSize * 0.15) // Max 15% of font size
             
-            let strokeAttributes: [NSAttributedString.Key: Any] = [
+            var strokeAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
                 .foregroundColor: UIColor.clear, // Transparent fill
                 .strokeColor: UIColor(model.strokeColor),
                 .strokeWidth: scaledStrokeWidth // Positive for stroke-only
             ]
+            
+            // Add center alignment for multi-line text
+            if hasExplicitLineBreaks {
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.alignment = .center
+                strokeAttributes[.paragraphStyle] = paragraphStyle
+            }
+            
             strokeAttributedString = NSAttributedString(string: model.text, attributes: strokeAttributes)
         }
         
@@ -686,8 +704,7 @@ extension VideoEditor{
         let calculatedShadowX = model.shadowX * ratio
         let calculatedShadowY = model.shadowY * ratio
 
-        // 1. Set up font and calculate the width of each word (with padding for word-by-word)
-        //    This is needed to lay out each word precisely and to size the overall text layer.
+        // 1. Set up font and calculate the layout for karaoke words (supporting multi-line)
         let font = UIFont.systemFont(ofSize: calculatedFontSize, weight: .bold)
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font
@@ -695,13 +712,34 @@ extension VideoEditor{
         
         // Add horizontal padding to each word for word-by-word background (for visual separation)
         let wordHorizontalPadding: CGFloat = (karaokeType == .wordbg) ? 8 : 0
-
-        // Calculate the width of each word, including padding if needed
+        
+        // Check if original text has explicit line breaks
+        let hasExplicitLineBreaks = model.text.contains("\n")
+        
+        // Calculate word layout considering line breaks
         let wordWidths = wordTimings.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
-        // Total width is the sum of all word widths plus spacing between words
-        let totalWidth = wordWidths.reduce(0, +) + CGFloat(wordTimings.count - 1) * 8 // 8pt spacing between words
-        // The padded size includes extra padding around the text for background/border
-        let paddedSize = CGSize(width: totalWidth + 2 * calculatedPadding, height: font.lineHeight + 2 * calculatedPadding)
+        
+        // Organize words into lines based on original text structure
+        let wordLines = organizeKaraokeWordsIntoLines(
+            originalText: model.text,
+            wordTimings: wordTimings,
+            wordWidths: wordWidths,
+            hasExplicitLineBreaks: hasExplicitLineBreaks
+        )
+        
+        // Calculate total dimensions
+        let lineHeight = font.lineHeight
+        let lineSpacing: CGFloat = 4
+        let maxLineWidth = wordLines.map { line in
+            line.words.enumerated().reduce(0) { width, element in
+                let (index, _) = element
+                let wordWidth = line.wordWidths[index]
+                return width + wordWidth + (index > 0 ? 8 : 0) // 8pt spacing between words
+            }
+        }.max() ?? 0
+        
+        let totalHeight = CGFloat(wordLines.count) * lineHeight + CGFloat(max(0, wordLines.count - 1)) * lineSpacing
+        let paddedSize = CGSize(width: maxLineWidth + 2 * calculatedPadding, height: totalHeight + 2 * calculatedPadding)
         let textLayer = CALayer()
         // Center the text layer at the given position
         let adjustedX = position.width - (paddedSize.width / 2)
@@ -725,11 +763,26 @@ extension VideoEditor{
             cgContext.setAllowsFontSmoothing(true)
             cgContext.setAllowsFontSubpixelPositioning(true)
             cgContext.setAllowsFontSubpixelQuantization(true)
-            var x: CGFloat = calculatedPadding
-            // Loop through each word to lay out and animate them individually
-            for (i, word) in wordTimings.enumerated() {
-                // Calculate the frame for this word (with horizontal padding for word-by-word)
-                let wordRect = CGRect(x: x, y: calculatedPadding, width: wordWidths[i], height: font.lineHeight)
+            // Loop through each line and word to lay out and animate them individually
+            var currentY: CGFloat = calculatedPadding
+            var globalWordIndex = 0
+            
+            for lineData in wordLines {
+                // Calculate line width for center alignment
+                let lineWidth = lineData.wordWidths.enumerated().reduce(0) { width, element in
+                    let (index, wordWidth) = element
+                    return width + wordWidth + (index > 0 ? 8 : 0) // 8pt spacing between words
+                }
+                
+                // Start X position for this line (center aligned if multi-line)
+                var x: CGFloat = hasExplicitLineBreaks 
+                    ? calculatedPadding + (paddedSize.width - 2 * calculatedPadding - lineWidth) / 2
+                    : calculatedPadding
+                
+                for (lineWordIndex, word) in lineData.words.enumerated() {
+                    let wordWidth = lineData.wordWidths[lineWordIndex]
+                    // Calculate the frame for this word (with horizontal padding for word-by-word)
+                    let wordRect = CGRect(x: x, y: currentY, width: wordWidth, height: font.lineHeight)
 
                 // --- Word-by-word: Add rounded green background for active word ---
                 // If karaokeType is wordbg, add a background shape layer that will animate in sync with the word highlight
@@ -916,8 +969,12 @@ extension VideoEditor{
                 highlightAnim.isRemovedOnCompletion = false
                 highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")
                 // Move x to the next word position (add spacing)
-                x += wordWidths[i] + 8
+                x += wordWidth + 8
+                globalWordIndex += 1
+                }
                 
+                // Move to next line
+                currentY += lineHeight + lineSpacing
             }
         }
         textLayer.contentsScale = UIScreen.main.scale * 2.0
@@ -1027,6 +1084,65 @@ extension VideoEditor{
         
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         return textLayer
+    }
+    
+    // Helper struct for organizing karaoke words into lines
+    private struct KaraokeLineData {
+        let words: [WordWithTiming]
+        let wordWidths: [CGFloat]
+    }
+    
+    // Helper function to organize karaoke words into lines based on original text structure
+    private func organizeKaraokeWordsIntoLines(
+        originalText: String,
+        wordTimings: [WordWithTiming],
+        wordWidths: [CGFloat],
+        hasExplicitLineBreaks: Bool
+    ) -> [KaraokeLineData] {
+        
+        if !hasExplicitLineBreaks {
+            // Single line - return all words
+            return [KaraokeLineData(words: wordTimings, wordWidths: wordWidths)]
+        }
+        
+        // Split original text into lines to detect explicit line breaks
+        let textLines = originalText.components(separatedBy: .newlines)
+        
+        var result: [KaraokeLineData] = []
+        var wordIndex = 0
+        
+        for textLine in textLines {
+            let lineWords = textLine.split { $0.isWhitespace }.map(String.init)
+            var currentLineWords: [WordWithTiming] = []
+            var currentLineWidths: [CGFloat] = []
+            
+            for _ in lineWords {
+                if wordIndex < wordTimings.count {
+                    currentLineWords.append(wordTimings[wordIndex])
+                    currentLineWidths.append(wordWidths[wordIndex])
+                    wordIndex += 1
+                }
+            }
+            
+            if !currentLineWords.isEmpty {
+                result.append(KaraokeLineData(words: currentLineWords, wordWidths: currentLineWidths))
+            }
+        }
+        
+        // Add any remaining words to the last line (safety fallback)
+        while wordIndex < wordTimings.count {
+            if !result.isEmpty {
+                result[result.count - 1] = KaraokeLineData(
+                    words: result[result.count - 1].words + [wordTimings[wordIndex]],
+                    wordWidths: result[result.count - 1].wordWidths + [wordWidths[wordIndex]]
+                )
+            } else {
+                result.append(KaraokeLineData(words: [wordTimings[wordIndex]], wordWidths: [wordWidths[wordIndex]]))
+            }
+            wordIndex += 1
+        }
+        
+        return result.isEmpty ? [KaraokeLineData(words: wordTimings, wordWidths: wordWidths)] : result
     }
 }
 

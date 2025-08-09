@@ -127,8 +127,8 @@ struct TextLayoutHelper {
                 
                 print("  Max words per line: \(maxWordsPerLine)")
                 
-                // Split text into words
-                let words = text.split(separator: " ").map(String.init)
+                // Split text into words (including line breaks as separators)
+                let words = text.split { $0.isWhitespace }.map(String.init)
                 
                 if words.count <= maxWordsPerLine {
                     print("  No splitting needed (word count <= \(maxWordsPerLine))")

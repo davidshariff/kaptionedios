@@ -107,9 +107,16 @@ struct KaraokeColorSelectionView: View {
                                 highlightColor: selectedHighlightColor,
                                 wordBGColor: selectedWordBGColor,
                                 fontColor: selectedFontColor,
-                                animateKaraoke: true
+                                animateKaraoke: true,
+                                fontSize: 18
                             )
-                            .frame(width: 120, height: 40)
+                            .onAppear {
+                                print("DEBUG KaraokeColorSelectionView: PresetPreviewView appeared with highlightColor=\(selectedHighlightColor)")
+                            }
+                            .onChange(of: selectedHighlightColor) { newColor in
+                                print("DEBUG KaraokeColorSelectionView: selectedHighlightColor changed to \(newColor)")
+                            }
+                            .frame(width: 200, height: 60)
 
                             Spacer()
                         }

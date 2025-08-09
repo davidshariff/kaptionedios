@@ -8,6 +8,7 @@ struct PresetPreviewView: View {
     let wordBGColor: Color?
     let fontColor: Color?
     let animateKaraoke: Bool
+    let fontSize: CGFloat
     
     @State private var animationIndex: Int = 0
     @State private var animationTimer: Timer?
@@ -16,13 +17,14 @@ struct PresetPreviewView: View {
         return previewText.split(separator: " ").map(String.init)
     }
     
-    init(preset: SubtitleStyle, previewText: String = "Sample Text", highlightColor: Color? = nil, wordBGColor: Color? = nil, fontColor: Color? = nil, animateKaraoke: Bool = false) {
+    init(preset: SubtitleStyle, previewText: String = "Sample Text", highlightColor: Color? = nil, wordBGColor: Color? = nil, fontColor: Color? = nil, animateKaraoke: Bool = false, fontSize: CGFloat = 12) {
         self.preset = preset
         self.previewText = previewText
         self.highlightColor = highlightColor
         self.wordBGColor = wordBGColor
         self.fontColor = fontColor
         self.animateKaraoke = animateKaraoke
+        self.fontSize = fontSize
     }
     
     var body: some View {
@@ -30,12 +32,12 @@ struct PresetPreviewView: View {
             .fill(preset.bgColor)
             .frame(height: 32)
             .overlay(
-                HStack(spacing: 1) {
+                HStack(spacing: 4) {
                     if preset.isKaraokePreset && previewWords.count > 1 {
                         // Karaoke preview with word-by-word animation
                         ForEach(Array(previewWords.enumerated()), id: \.offset) { index, word in
                             Text(word)
-                                .font(.system(size: preset.fontSize * 0.3))
+                                .font(.system(size: fontSize))
                                 .foregroundColor(getWordColor(for: index))
                                 .background(
                                     RoundedRectangle(cornerRadius: 1)
@@ -49,7 +51,7 @@ struct PresetPreviewView: View {
                     } else {
                         // Regular preview
                         Text(previewText)
-                            .font(.system(size: preset.fontSize * 0.3))
+                            .font(.system(size: fontSize))
                             .foregroundColor(fontColor ?? preset.fontColor)
                             .shadow(color: preset.shadowColor.opacity(preset.shadowOpacity), radius: preset.shadowRadius, x: preset.shadowX, y: preset.shadowY)
                     }
@@ -67,19 +69,34 @@ struct PresetPreviewView: View {
     
     // Animation helper functions
     private func getWordColor(for index: Int) -> Color {
+        print("DEBUG PresetPreviewView.getWordColor: preset.name='\(preset.name)', index=\(index), animationIndex=\(animationIndex)")
+        print("DEBUG PresetPreviewView.getWordColor: highlightColor=\(String(describing: highlightColor)), fontColor=\(String(describing: fontColor))")
+        
         if preset.name == "Background by word" {
-            // For background by word, always use font color for text
-            return fontColor ?? preset.fontColor
-        } else {
-            // For highlight by word/letter, use highlight color for active word
+            // For background by word, use highlight color for active word text, font color for inactive
             let activeHighlightColor = highlightColor ?? getDefaultHighlightColor()
-            let activeFontColor = fontColor ?? preset.fontColor
-            return index == animationIndex ? activeHighlightColor : activeFontColor
+            let inactiveFontColor = fontColor ?? preset.fontColor
+            let result = index == animationIndex ? activeHighlightColor : inactiveFontColor
+            print("DEBUG PresetPreviewView.getWordColor: Background by word -> active=\(index == animationIndex), result=\(result)")
+            return result
+        } else if preset.name == "Highlight by word" {
+            // For highlight by word, use highlight color for active word, font color for inactive
+            let activeHighlightColor = highlightColor ?? getDefaultHighlightColor()
+            let inactiveFontColor = fontColor ?? preset.fontColor
+            let result = index == animationIndex ? activeHighlightColor : inactiveFontColor
+            print("DEBUG PresetPreviewView.getWordColor: Highlight by word -> active=\(index == animationIndex), result=\(result)")
+            return result
+        } else {
+            // For other presets, just use font color
+            let result = fontColor ?? preset.fontColor
+            print("DEBUG PresetPreviewView.getWordColor: Other preset -> \(result)")
+            return result
         }
     }
     
     private func getWordBackground(for index: Int) -> Color {
         if preset.name == "Background by word" && index == animationIndex {
+            // For background by word, use wordBGColor for the background
             return wordBGColor ?? getDefaultWordBGColor()
         }
         return .clear

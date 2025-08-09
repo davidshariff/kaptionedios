@@ -10,6 +10,8 @@ struct KaraokeColorSelectionView: View {
     @State private var selectedHighlightColor: Color
     @State private var selectedWordBGColor: Color
     @State private var selectedFontColor: Color
+    @State private var animationIndex: Int = 0
+    @State private var animationTimer: Timer?
 
     private let colorOptions: [Color] = [
         .blue, .red, .green, .orange, .yellow, .purple, .pink, .cyan,
@@ -47,14 +49,37 @@ struct KaraokeColorSelectionView: View {
         VStack(alignment: .leading, spacing: 20) {
             // Header
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Customize Animation Colors")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    Text("for \"\(selectedPreset.name)\"")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                HStack(alignment: .center, spacing: 12) {
+                    ZStack {
+                        Circle()
+                            .fill(LinearGradient(
+                                gradient: Gradient(colors: [selectedPreset.bgColor.opacity(0.7), selectedPreset.fontColor.opacity(0.7)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ))
+                            .frame(width: 38, height: 38)
+                        Image(systemName: "music.note.list")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.18), radius: 2, x: 0, y: 1)
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Customize Animation Colors")
+                            .font(.title3)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        HStack(spacing: 4) {
+                            Text("Preset:")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("\"\(selectedPreset.name)\"")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(selectedPreset.fontColor)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                        }
+                    }
                 }
 
                 Spacer()
@@ -87,24 +112,18 @@ struct KaraokeColorSelectionView: View {
                                 .frame(width: 120, height: 40)
                                 .overlay(
                                     HStack(spacing: 2) {
-                                        if previewWords.count >= 1 {
-                                            Text(previewWords[0])
+                                        ForEach(Array(previewWords.enumerated()), id: \.offset) { index, word in
+                                            Text(word)
                                                 .font(.system(size: selectedPreset.fontSize * 0.4))
-                                                .foregroundColor(getPreviewHighlightColor())
-                                                .padding(.horizontal, getPreviewWordBGColor() != .clear ? 4 : 0)
-                                                .padding(.vertical, getPreviewWordBGColor() != .clear ? 2 : 0)
-                                                .background(getPreviewWordBGColor())
-                                                .cornerRadius(2)
-                                        }
-                                        if previewWords.count >= 2 {
-                                            Text(previewWords[1])
-                                                .font(.system(size: selectedPreset.fontSize * 0.4))
-                                                .foregroundColor(selectedFontColor)
-                                        } else if previewWords.count == 1 && previewWords[0].count > 3 {
-                                            // If only one word, show part of it as unhighlighted
-                                            Text(String(previewWords[0].dropFirst(min(3, previewWords[0].count))))
-                                                .font(.system(size: selectedPreset.fontSize * 0.4))
-                                                .foregroundColor(selectedFontColor)
+                                                .foregroundColor(getWordColor(for: index))
+                                                .background(
+                                                    RoundedRectangle(cornerRadius: 2)
+                                                        .fill(getWordBackground(for: index))
+                                                        .padding(.horizontal, -2)
+                                                        .padding(.vertical, -2)
+                                                        .opacity(getWordBackground(for: index) == .clear ? 0 : 1)
+                                                )
+                                                .animation(.easeInOut(duration: 0.3), value: animationIndex)
                                         }
                                     }
                                 )
@@ -267,6 +286,12 @@ struct KaraokeColorSelectionView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
+        .onAppear {
+            startAnimation()
+        }
+        .onDisappear {
+            stopAnimation()
+        }
     }
 
         private var previewText: String {
@@ -289,6 +314,41 @@ struct KaraokeColorSelectionView: View {
         default:
             return .clear
         }
+    }
+    
+    // Animation helper functions
+    private func getWordColor(for index: Int) -> Color {
+        if selectedPreset.name == "Background by word" {
+            // For background by word, always use font color for text
+            return selectedFontColor
+        } else {
+            // For highlight by word/letter, use highlight color for active word
+            return index == animationIndex ? selectedHighlightColor : selectedFontColor
+        }
+    }
+    
+    private func getWordBackground(for index: Int) -> Color {
+        if selectedPreset.name == "Background by word" && index == animationIndex {
+            return selectedWordBGColor
+        }
+        return .clear
+    }
+    
+
+    
+    private func startAnimation() {
+        guard previewWords.count > 1 else { return }
+        
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.6, repeats: true) { _ in
+            withAnimation(.easeInOut(duration: 0.3)) {
+                animationIndex = (animationIndex + 1) % previewWords.count
+            }
+        }
+    }
+    
+    private func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
     }
 }
 

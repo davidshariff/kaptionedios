@@ -431,22 +431,35 @@ extension VideoEditor{
             )
         }
 
-        // Create attributed string for reliable text rendering
-        var attributes: [NSAttributedString.Key: Any] = [
+        // Create attributed string for reliable text rendering (fill only)
+        let fillAttributes: [NSAttributedString.Key: Any] = [
             .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
             .foregroundColor: UIColor(model.fontColor),
             .backgroundColor: UIColor.clear // We'll draw the background manually
         ]
         
-        // Apply stroke if stroke color is not clear and stroke width is greater than 0
+        let fillAttributedString = NSAttributedString(string: model.text, attributes: fillAttributes)
+        
+        // Create stroke attributed string if needed
+        var strokeAttributedString: NSAttributedString?
         if model.strokeColor != .clear && model.strokeWidth > 0 {
-            attributes[.strokeColor] = UIColor(model.strokeColor)
-            attributes[.strokeWidth] = -model.strokeWidth
+            // Scale stroke width relative to font size for better proportions
+            let scaledStrokeWidth = min(model.strokeWidth, calculatedFontSize * 0.15) // Max 15% of font size
+            
+            let strokeAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: calculatedFontSize, weight: .medium),
+                .foregroundColor: UIColor.clear, // Transparent fill
+                .strokeColor: UIColor(model.strokeColor),
+                .strokeWidth: scaledStrokeWidth // Positive for stroke-only
+            ]
+            strokeAttributedString = NSAttributedString(string: model.text, attributes: strokeAttributes)
         }
         
-        let attributedString = NSAttributedString(string: model.text, attributes: attributes)
-        let textSize = attributedString.size()
-        let paddedSize = CGSize(width: textSize.width + 2 * calculatedPadding, height: textSize.height + 2 * calculatedPadding)
+        // Use the larger of fill or stroke size for layout
+        let textSize = fillAttributedString.size()
+        let strokeSize = strokeAttributedString?.size() ?? textSize
+        let maxSize = CGSize(width: max(textSize.width, strokeSize.width), height: max(textSize.height, strokeSize.height))
+        let paddedSize = CGSize(width: maxSize.width + 2 * calculatedPadding, height: maxSize.height + 2 * calculatedPadding)
         
         // Create layer with background - adjust position to center the text
         let textLayer = CALayer()
@@ -456,22 +469,40 @@ extension VideoEditor{
         textLayer.backgroundColor = UIColor(model.bgColor).cgColor
         textLayer.cornerRadius = calculatedCornerRadius
         
-        // Render text to image and set as contents
-        let renderer = UIGraphicsImageRenderer(size: paddedSize)
+        // Render text to image and set as contents with high quality
+        let rendererFormat = UIGraphicsImageRendererFormat()
+        rendererFormat.scale = UIScreen.main.scale * 2.0 // Higher scale for crisp text
+        rendererFormat.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: paddedSize, format: rendererFormat)
         let textImage = renderer.image { context in
+            // Enable high-quality text rendering
+            let cgContext = context.cgContext
+            cgContext.setShouldAntialias(true)
+            cgContext.setShouldSmoothFonts(true)
+            cgContext.setAllowsAntialiasing(true)
+            cgContext.setAllowsFontSmoothing(true)
+            cgContext.setAllowsFontSubpixelPositioning(true)
+            cgContext.setAllowsFontSubpixelQuantization(true)
+            
+            // Draw stroke layer first (background)
+            if let strokeAttr = strokeAttributedString {
+                strokeAttr.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+            }
+            
             // Draw shadow if needed
             if model.shadowRadius > 0 && model.shadowOpacity > 0 {
                 let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
-                context.cgContext.saveGState()
-                context.cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: model.shadowRadius, color: shadowColor.cgColor)
-                attributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
-                context.cgContext.restoreGState()
+                cgContext.saveGState()
+                cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: model.shadowRadius, color: shadowColor.cgColor)
+                fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+                cgContext.restoreGState()
             }
             // Draw main text (without shadow)
-            attributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+            fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
         }
         textLayer.contents = textImage.cgImage
-        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.contentsScale = UIScreen.main.scale * 2.0 // Match the renderer scale
         
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         
@@ -563,13 +594,26 @@ extension VideoEditor{
                 baseLayer.font = font
                 baseLayer.fontSize = calculatedFontSize
                 baseLayer.frame = wordRect
-                baseLayer.contentsScale = UIScreen.main.scale
+                baseLayer.contentsScale = UIScreen.main.scale * 2.0
                 baseLayer.alignmentMode = .left
                 baseLayer.foregroundColor = UIColor(model.fontColor).cgColor
 
                 // Render the word as an image for best quality
-                let baseRenderer = UIGraphicsImageRenderer(size: wordRect.size)
-                let baseImage = baseRenderer.image { _ in
+                let baseRendererFormat = UIGraphicsImageRendererFormat()
+                baseRendererFormat.scale = UIScreen.main.scale * 2.0
+                baseRendererFormat.opaque = false
+                
+                let baseRenderer = UIGraphicsImageRenderer(size: wordRect.size, format: baseRendererFormat)
+                let baseImage = baseRenderer.image { context in
+                    // Enable high-quality text rendering
+                    let cgContext = context.cgContext
+                    cgContext.setShouldAntialias(true)
+                    cgContext.setShouldSmoothFonts(true)
+                    cgContext.setAllowsAntialiasing(true)
+                    cgContext.setAllowsFontSmoothing(true)
+                    cgContext.setAllowsFontSubpixelPositioning(true)
+                    cgContext.setAllowsFontSubpixelQuantization(true)
+                    
                     word.text.draw(
                         in: CGRect(
                             x: wordHorizontalPadding,
@@ -593,14 +637,27 @@ extension VideoEditor{
                 highlightLayer.font = font
                 highlightLayer.fontSize = calculatedFontSize
                 highlightLayer.frame = wordRect
-                highlightLayer.contentsScale = UIScreen.main.scale
+                highlightLayer.contentsScale = UIScreen.main.scale * 2.0
                 highlightLayer.alignmentMode = .left
                 highlightLayer.foregroundColor = UIColor(highlightColor).cgColor
                 highlightLayer.opacity = 0
 
                 // Render the highlighted word as an image
-                let highlightRenderer = UIGraphicsImageRenderer(size: wordRect.size)
-                let highlightImage = highlightRenderer.image { _ in
+                let highlightRendererFormat = UIGraphicsImageRendererFormat()
+                highlightRendererFormat.scale = UIScreen.main.scale * 2.0
+                highlightRendererFormat.opaque = false
+                
+                let highlightRenderer = UIGraphicsImageRenderer(size: wordRect.size, format: highlightRendererFormat)
+                let highlightImage = highlightRenderer.image { context in
+                    // Enable high-quality text rendering
+                    let cgContext = context.cgContext
+                    cgContext.setShouldAntialias(true)
+                    cgContext.setShouldSmoothFonts(true)
+                    cgContext.setAllowsAntialiasing(true)
+                    cgContext.setAllowsFontSmoothing(true)
+                    cgContext.setAllowsFontSubpixelPositioning(true)
+                    cgContext.setAllowsFontSubpixelQuantization(true)
+                    
                     word.text.draw(
                         in: CGRect(
                             x: wordHorizontalPadding,
@@ -725,8 +782,21 @@ extension VideoEditor{
         textLayer.backgroundColor = UIColor(model.bgColor).cgColor
         textLayer.cornerRadius = calculatedCornerRadius
         
-        let renderer = UIGraphicsImageRenderer(size: paddedSize)
-        let textImage = renderer.image { _ in
+        let rendererFormat = UIGraphicsImageRendererFormat()
+        rendererFormat.scale = UIScreen.main.scale * 2.0
+        rendererFormat.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: paddedSize, format: rendererFormat)
+        let textImage = renderer.image { context in
+            // Enable high-quality text rendering
+            let cgContext = context.cgContext
+            cgContext.setShouldAntialias(true)
+            cgContext.setShouldSmoothFonts(true)
+            cgContext.setAllowsAntialiasing(true)
+            cgContext.setAllowsFontSmoothing(true)
+            cgContext.setAllowsFontSubpixelPositioning(true)
+            cgContext.setAllowsFontSubpixelQuantization(true)
+            
             model.text.draw(
                 in: CGRect(
                     x: calculatedPadding,
@@ -741,7 +811,7 @@ extension VideoEditor{
             )
         }
         textLayer.contents = textImage.cgImage
-        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.contentsScale = UIScreen.main.scale * 2.0
         
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         return textLayer

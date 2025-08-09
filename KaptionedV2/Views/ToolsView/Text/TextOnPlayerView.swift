@@ -193,17 +193,35 @@ struct TextOnPlayerView: View {
             } 
         }
         else {
-            AttributedTextOverlay(
-                attributedString: createNSAttr(textBox),
-                offset: .zero,
-                isSelected: isSelected,
-                bgColor: .clear,
-                cornerRadius: textBox.cornerRadius,
-                shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
-                shadowRadius: textBox.shadowRadius,
-                shadowX: textBox.shadowX,
-                shadowY: textBox.shadowY
-            )
+            ZStack {
+                // Stroke layer (background)
+                if let strokeAttr = createStrokeAttr(textBox) {
+                    AttributedTextOverlay(
+                        attributedString: strokeAttr,
+                        offset: .zero,
+                        isSelected: false, // No selection border on stroke layer
+                        bgColor: .clear,
+                        cornerRadius: textBox.cornerRadius,
+                        shadowColor: UIColor.clear, // No shadow on stroke layer
+                        shadowRadius: 0,
+                        shadowX: 0,
+                        shadowY: 0
+                    )
+                }
+                
+                // Main text layer (foreground)
+                AttributedTextOverlay(
+                    attributedString: createNSAttr(textBox),
+                    offset: .zero,
+                    isSelected: isSelected,
+                    bgColor: .clear,
+                    cornerRadius: textBox.cornerRadius,
+                    shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
+                    shadowRadius: textBox.shadowRadius,
+                    shadowX: textBox.shadowX,
+                    shadowY: textBox.shadowY
+                )
+            }
             .padding(.horizontal, textBox.backgroundPadding)
             .padding(.vertical, textBox.backgroundPadding / 2)
         }
@@ -232,20 +250,6 @@ struct TextOnPlayerView: View {
             }
     }
     
-    private func createAttr(_ textBox: TextBox) -> AttributedString{
-        var result = AttributedString(textBox.text)
-        result.font = .systemFont(ofSize: textBox.fontSize, weight: .medium)
-        result.foregroundColor = UIColor(textBox.fontColor)
-        result.backgroundColor = UIColor(textBox.bgColor)
-        
-        // Apply stroke if stroke color is not clear and stroke width is greater than 0
-        if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
-            result.strokeColor = UIColor(textBox.strokeColor)
-            result.strokeWidth = -textBox.strokeWidth
-        }
-        
-        return result
-    }
 }
 
     
@@ -257,12 +261,6 @@ private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
     attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
     attrStr.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor(textBox.bgColor), range: range)
     
-    // Apply stroke if stroke color is not clear and stroke width is greater than 0
-    if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
-        attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
-        attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -textBox.strokeWidth, range: range)
-    }
-    
     // Apply shadow if needed
     if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {
         let shadow = NSShadow()
@@ -271,6 +269,24 @@ private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
         shadow.shadowOffset = CGSize(width: textBox.shadowX, height: textBox.shadowY)
         attrStr.addAttribute(.shadow, value: shadow, range: range)
     }
+    
+    return attrStr
+}
+
+// Create stroke-only attributed string for the background layer
+private func createStrokeAttr(_ textBox: TextBox) -> NSAttributedString? {
+    guard textBox.strokeColor != .clear && textBox.strokeWidth > 0 else { return nil }
+    
+    let attrStr = NSMutableAttributedString(string: textBox.text)
+    let range = NSRange(location: 0, length: attrStr.length)
+    
+    // Scale stroke width relative to font size for better proportions
+    let scaledStrokeWidth = min(textBox.strokeWidth, textBox.fontSize * 0.15) // Max 15% of font size
+    
+    attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
+    attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.clear, range: range) // Transparent fill
+    attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
+    attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: scaledStrokeWidth, range: range) // Positive for stroke-only
     
     return attrStr
 }
@@ -321,6 +337,12 @@ struct AttributedTextOverlay: UIViewRepresentable {
         label.backgroundColor = bgColor
         label.layer.cornerRadius = cornerRadius
         label.layer.masksToBounds = true
+        
+        // Enable high-quality text rendering for smooth strokes
+        label.layer.shouldRasterize = false
+        label.layer.contentsScale = UIScreen.main.scale
+        label.layer.allowsEdgeAntialiasing = true
+        
         // Apply shadow
         label.layer.shadowColor = shadowColor.cgColor
         label.layer.shadowRadius = shadowRadius
@@ -336,6 +358,12 @@ struct AttributedTextOverlay: UIViewRepresentable {
         uiView.backgroundColor = bgColor
         uiView.layer.cornerRadius = cornerRadius
         uiView.layer.masksToBounds = true
+        
+        // Ensure high-quality rendering is maintained
+        uiView.layer.shouldRasterize = false
+        uiView.layer.contentsScale = UIScreen.main.scale
+        uiView.layer.allowsEdgeAntialiasing = true
+        
         // Selection border
         if isSelected {
             uiView.layer.borderColor = UIColor.cyan.cgColor

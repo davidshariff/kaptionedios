@@ -3,7 +3,7 @@ import SwiftUI
 struct KaraokeSubsHelper {
     static func generateKaraokeSubs(
         for video: Video,
-        karaokeType: KaraokeType = .letter,
+        karaokeType: KaraokeType = .word,
         textBoxes: [TextBox] = [],
         customHighlightColor: Color? = nil,
         customWordBGColor: Color? = nil,
@@ -14,8 +14,6 @@ struct KaraokeSubsHelper {
         // Get the appropriate karaoke preset based on the type
         let preset: KaraokePreset
         switch karaokeType {
-        case .letter:
-            preset = KaraokePreset.letter
         case .word:
             preset = KaraokePreset.word
         case .wordbg:

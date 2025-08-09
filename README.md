@@ -107,16 +107,15 @@ The `TextBox` model supports rich styling that gets rendered natively:
 
 - **Text styling**: Font size, color, stroke, shadow
 - **Background styling**: Background color, padding, corner radius
-- **Karaoke effects**: Word-by-word or letter-by-letter highlighting
+- **Karaoke effects**: Word-by-word highlighting
 - **Animations**: Fade in/out with precise timing
 
 ### 🎤 Karaoke Subtitle System
 
-The app has sophisticated karaoke support with three modes:
+The app has sophisticated karaoke support with two modes:
 
-1. **Letter-by-letter**: `KaraokeType.letter` - Highlights each letter progressively
-2. **Word-by-word**: `KaraokeType.word` - Highlights each word
-3. **Word background**: `KaraokeType.wordbg` - Adds background highlighting per word
+1. **Word-by-word**: `KaraokeType.word` - Highlights each word
+2. **Word background**: `KaraokeType.wordbg` - Adds background highlighting per word
 
 ```swift
 // Creates animated highlight layers for each word

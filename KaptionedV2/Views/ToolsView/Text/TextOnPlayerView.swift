@@ -145,21 +145,6 @@ struct TextOnPlayerView: View {
 
         if textBox.isKaraokePreset {
             if let wordTimings = textBox.wordTimings, 
-               let karaokeType = textBox.karaokeType,
-               let highlightColor = textBox.highlightColor,
-               karaokeType == .letter {
-                KaraokeTextByLetterHighlightOverlay(
-                    text: textBox.text,
-                    words: wordTimings,
-                    fontSize: textBox.fontSize,
-                    fontColor: textBox.fontColor,
-                    highlightColor: highlightColor,
-                    currentTime: currentTime
-                )
-                .padding(.horizontal, textBox.backgroundPadding)
-                .padding(.vertical, textBox.backgroundPadding / 2)
-            } 
-            else if let wordTimings = textBox.wordTimings, 
                     let karaokeType = textBox.karaokeType,
                     let highlightColor = textBox.highlightColor,
                     karaokeType == .word {
@@ -394,60 +379,6 @@ struct AttributedTextOverlay: UIViewRepresentable {
 } 
 
 // KaraokeTextOverlay SwiftUI view
-struct KaraokeTextByLetterHighlightOverlay: View {
-
-    let text: String
-    let words: [WordWithTiming]
-    let fontSize: CGFloat
-    let fontColor: Color
-    let highlightColor: Color
-    let currentTime: Double
-
-    var body: some View {
-        // Letter-by-letter highlighting
-        HStack(spacing: 2) {
-            ForEach(Array(text.enumerated()), id: \.offset) { index, character in
-                let letterStart = getLetterStartTime(for: index)
-                let letterEnd = getLetterEndTime(for: index)
-                let isActive = currentTime >= letterStart && currentTime < letterEnd
-                let progress: CGFloat = isActive ? CGFloat((currentTime - letterStart) / (letterEnd - letterStart)) : (currentTime >= letterEnd ? 1 : 0)
-                
-                ZStack(alignment: .leading) {
-                    // Base text (entire string)
-                    Text(String(character))
-                        .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(fontColor)
-                    // Animated text
-                    Text(String(character))
-                        .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(highlightColor)
-                        .mask(
-                            GeometryReader { geo in
-                                let width = geo.size.width * progress
-                                Rectangle()
-                                    .frame(width: width, height: geo.size.height)
-                                    .animation(.linear(duration: 0.05), value: progress)
-                            }
-                        )
-                }
-            }
-        }
-    }
-    
-    private func getLetterStartTime(for index: Int) -> Double {
-        let totalLetters = text.count
-        let totalDuration = words.last?.end ?? 0
-        let letterDuration = totalDuration / Double(totalLetters)
-        return Double(index) * letterDuration
-    }
-    
-    private func getLetterEndTime(for index: Int) -> Double {
-        let totalLetters = text.count
-        let totalDuration = words.last?.end ?? 0
-        let letterDuration = totalDuration / Double(totalLetters)
-        return Double(index + 1) * letterDuration
-    }
-}
 
 struct KaraokeTextByWordHighlightOverlay: View {
 

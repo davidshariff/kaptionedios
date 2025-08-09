@@ -195,14 +195,12 @@ struct PresetsListView: View {
     // Helper function to get karaoke type based on preset name
     private func getKaraokeType(for presetName: String) -> KaraokeType {
         switch presetName {
-        case "Highlight by letter":
-            return .letter
         case "Highlight by word":
             return .word
         case "Background by word":
             return .wordbg
         default:
-            return .letter
+            return .word
         }
     }
 }

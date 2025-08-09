@@ -87,14 +87,12 @@ struct PresetPreviewView: View {
     
     private func getDefaultHighlightColor() -> Color {
         switch preset.name {
-        case "Highlight by letter":
-            return .blue
         case "Highlight by word":
             return .orange
         case "Background by word":
             return .yellow
         default:
-            return .blue
+            return .orange
         }
     }
     

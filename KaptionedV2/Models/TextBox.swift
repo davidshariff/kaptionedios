@@ -10,7 +10,6 @@ struct WordWithTiming: Identifiable, Equatable, Codable {
 }
 
 enum KaraokeType: String, CaseIterable, Codable {
-    case letter = "Letter"
     case word = "Word"
     case wordbg = "WordBG"
 }
@@ -182,14 +181,12 @@ struct SubtitleStyle: Identifiable, Equatable {
             // Get the correct karaoke preset based on the style name
             let karaokePreset: KaraokePreset
             switch name {
-            case "Highlight by letter":
-                karaokePreset = .letter
             case "Highlight by word":
                 karaokePreset = .word
             case "Background by word":
                 karaokePreset = .wordbg
             default:
-                karaokePreset = .letter
+                karaokePreset = .word
             }
             box.isKaraokePreset = true
             box.karaokeType = karaokePreset.karaokeType
@@ -206,22 +203,6 @@ struct SubtitleStyle: Identifiable, Equatable {
     }
 
     static let allPresets: [SubtitleStyle] = [
-        SubtitleStyle(
-            name: "Highlight by letter",
-            fontSize: 32,
-            bgColor: .clear,
-            fontColor: .yellow,
-            strokeColor: .black,
-            strokeWidth: 2,
-            backgroundPadding: 8,
-            cornerRadius: 8,
-            shadowColor: .black,
-            shadowRadius: 6,
-            shadowX: 0,
-            shadowY: 2,
-            shadowOpacity: 0.7,
-            isKaraokePreset: true
-        ),
         SubtitleStyle(
             name: "Highlight by word",
             fontSize: 32,
@@ -391,12 +372,6 @@ struct KaraokePreset {
     let wordBGColor: Color
     let presetName: String
 
-    static let letter = KaraokePreset(
-        karaokeType: .letter,
-        highlightColor: .blue,
-        wordBGColor: .clear,
-        presetName: "Highlight by letter"
-    )
     static let word = KaraokePreset(
         karaokeType: .word,
         highlightColor: .orange,

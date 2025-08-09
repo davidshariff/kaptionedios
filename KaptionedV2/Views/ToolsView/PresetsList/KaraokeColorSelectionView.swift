@@ -24,10 +24,6 @@ struct KaraokeColorSelectionView: View {
 
         // Initialize with default colors based on preset type
         switch selectedPreset.name {
-        case "Highlight by letter":
-            self._selectedHighlightColor = State(initialValue: .blue)
-            self._selectedWordBGColor = State(initialValue: .clear)
-            self._selectedFontColor = State(initialValue: selectedPreset.fontColor)
         case "Highlight by word":
             self._selectedHighlightColor = State(initialValue: .orange)
             self._selectedWordBGColor = State(initialValue: .clear)

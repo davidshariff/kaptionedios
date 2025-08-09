@@ -910,12 +910,8 @@ extension VideoEditor{
                 highlightAnim.toValue = 1
                 highlightAnim.beginTime = word.start
 
-                // If karaokeType is letter, animate over the word's duration; otherwise, appear instantly
-                if karaokeType == .letter {
-                    highlightAnim.duration = word.end - word.start
-                } else {
-                    highlightAnim.duration = 0.01
-                }
+                // Karaoke animation - appear instantly for word-based highlighting
+                highlightAnim.duration = 0.01
                 highlightAnim.fillMode = .forwards
                 highlightAnim.isRemovedOnCompletion = false
                 highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")

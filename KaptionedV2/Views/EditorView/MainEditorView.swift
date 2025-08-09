@@ -293,14 +293,12 @@ struct MainEditorView: View {
     
     // Helper functions for preset handling
     private func isKaraokePreset(_ style: SubtitleStyle) -> Bool {
-        return style.name == "Highlight by letter" || 
-               style.name == "Highlight by word" || 
+        return style.name == "Highlight by word" || 
                style.name == "Background by word"
     }
     
     private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
         switch style.name {
-        case "Highlight by letter": return .letter
         case "Highlight by word": return .word
         case "Background by word": return .wordbg
         default: return .word

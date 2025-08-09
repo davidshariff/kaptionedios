@@ -214,7 +214,7 @@ struct TextToolbar: View {
                         .padding(.horizontal, 4)
                         .padding(.vertical, 8)
                     }
-                    .background(Color.red.opacity(0.3))
+                    .background(Color.red.opacity(0.5))
                     .cornerRadius(12)
                     .shadow(color: .white.opacity(0.3), radius: 4, x: 0, y: 2)
                     .alert("Delete Text", isPresented: $showDeleteConfirmation) {

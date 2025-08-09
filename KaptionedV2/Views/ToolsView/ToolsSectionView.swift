@@ -306,7 +306,6 @@ extension ToolsSectionView {
     
     private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
         switch style.name {
-        case "Highlight by letter": return .letter
         case "Highlight by word": return .word
         case "Background by word": return .wordbg
         default: return .word

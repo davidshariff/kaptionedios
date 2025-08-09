@@ -1,10 +1,3 @@
-//
-//  RootView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 20.04.2023.
-//
-
 import SwiftUI
 import PhotosUI
 
@@ -24,18 +17,26 @@ struct RootView: View {
         NavigationStack {
             ZStack {
                 ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading) {
-                        Text("My projects")
-                            .font(.headline)
-                        LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
-                            newProjectButton
-                            
-                            ForEach(rootVM.projects) { project in
+                    VStack(alignment: .leading, spacing: 20) {
+                        
+                        if rootVM.projects.isEmpty {
+                            // Empty state with welcome design
+                            emptyStateView
+                        } else {
+
+                            Text("My projects")
+                                .font(.headline)
+
+                            // Regular grid with projects
+                            LazyVGrid(columns: columns, alignment: .center, spacing: 10) {
+                                newProjectButton
                                 
-                                NavigationLink {
-                                    MainEditorView(project: project)
-                                } label: {
-                                    cellView(project)
+                                ForEach(rootVM.projects) { project in
+                                    NavigationLink {
+                                        MainEditorView(project: project)
+                                    } label: {
+                                        cellView(project)
+                                    }
                                 }
                             }
                         }
@@ -47,9 +48,11 @@ struct RootView: View {
                 MainEditorView(selectedVideoURl: selectedVideoURL)
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Text("Kaptioned")
-                        .font(.title2.bold())
+                if !rootVM.projects.isEmpty {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Text("Kaptioned")
+                            .font(.title2.bold())
+                    }
                 }
             }
             .onChange(of: item) { newItem in
@@ -99,6 +102,159 @@ struct RootView_Previews2: PreviewProvider {
 
 extension RootView{
     
+    private func optimalFontSize() -> CGFloat {
+        // All tip texts
+        let tipTexts = [
+            "Automatic caption generation",
+            "Stunning text styles for social media",
+            "Perfect for TikTok, Instagram & YouTube"
+        ]
+        
+        // Find the longest text
+        let longestText = tipTexts.max(by: { $0.count < $1.count }) ?? ""
+        
+        // Estimate available width (screen width minus padding, icon space, etc.)
+        let estimatedAvailableWidth: CGFloat = 280 // Conservative estimate
+        let maxFontSize: CGFloat = 16
+        let minFontSize: CGFloat = 10
+        
+        // Calculate approximate characters per line
+        let charsPerLine = estimatedAvailableWidth / (maxFontSize * 0.6)
+        
+        if CGFloat(longestText.count) <= charsPerLine {
+            return maxFontSize
+        } else {
+            // Scale down proportionally based on longest text
+            let scaleFactor = charsPerLine / CGFloat(longestText.count)
+            let calculatedSize = maxFontSize * scaleFactor
+            return max(calculatedSize, minFontSize)
+        }
+    }
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 30) {
+            // Hero section with welcome message
+            VStack(spacing: 16) {
+                // Large icon with gradient background
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.blue.opacity(0.2), .purple.opacity(0.1)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 120, height: 120)
+                    
+                    Image(systemName: "video.badge.plus")
+                        .font(.system(size: 40, weight: .light))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+                
+                VStack(spacing: 8) {
+                    Text("Welcome to Kaptioned")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Automatically generate stunning captions for your videos")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
+                }
+            }
+            
+            // Enhanced new project button for empty state
+            VStack(spacing: 12) {
+                PhotosPicker(selection: $item, matching: .videos) {
+                    VStack(spacing: 16) {
+                        // Icon with animated background
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.blue.opacity(0.1))
+                                .frame(width: 60, height: 60)
+                            
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 30))
+                                .foregroundColor(.blue)
+                        }
+                        
+                        VStack(spacing: 4) {
+                            Text("Create New Project")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                            
+                            Text("Import a video to get started")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 24)
+                    .padding(.horizontal, 20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemGray6))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                }
+                
+                // Helpful tips
+                VStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "captions.bubble")
+                            .foregroundColor(.blue)
+                            .font(.title3)
+                            .frame(width: 24, height: 24)
+                        Text("Automatic caption generation")
+                            .font(.system(size: optimalFontSize()))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                    
+                    HStack(spacing: 12) {
+                        Image(systemName: "sparkles")
+                            .foregroundColor(.purple)
+                            .font(.title3)
+                            .frame(width: 24, height: 24)
+                        Text("Stunning text styles for social media")
+                            .font(.system(size: optimalFontSize()))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                    
+                    HStack(spacing: 12) {
+                        Image(systemName: "video.fill")
+                            .foregroundColor(.green)
+                            .font(.title3)
+                            .frame(width: 24, height: 24)
+                        Text("Perfect for TikTok, Instagram & YouTube")
+                            .font(.system(size: optimalFontSize()))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.systemGray6).opacity(0.5))
+                )
+            }
+        }
+        .padding(.top, 40)
+    }
     
     private var newProjectButton: some View{
         

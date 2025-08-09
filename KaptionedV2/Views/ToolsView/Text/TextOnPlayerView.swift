@@ -169,6 +169,13 @@ struct TextOnPlayerView: View {
                     fontSize: textBox.fontSize,
                     fontColor: textBox.fontColor,
                     highlightColor: highlightColor,
+                    strokeColor: textBox.strokeColor,
+                    strokeWidth: textBox.strokeWidth,
+                    shadowColor: textBox.shadowColor,
+                    shadowRadius: textBox.shadowRadius,
+                    shadowX: textBox.shadowX,
+                    shadowY: textBox.shadowY,
+                    shadowOpacity: textBox.shadowOpacity,
                     currentTime: currentTime
                 )
                 .padding(.horizontal, textBox.backgroundPadding)
@@ -186,6 +193,13 @@ struct TextOnPlayerView: View {
                     fontColor: textBox.fontColor,
                     highlightColor: highlightColor,
                     wordBGColor: wordBGColor,
+                    strokeColor: textBox.strokeColor,
+                    strokeWidth: textBox.strokeWidth,
+                    shadowColor: textBox.shadowColor,
+                    shadowRadius: textBox.shadowRadius,
+                    shadowX: textBox.shadowX,
+                    shadowY: textBox.shadowY,
+                    shadowOpacity: textBox.shadowOpacity,
                     currentTime: currentTime
                 )
                 .padding(.horizontal, textBox.backgroundPadding)
@@ -442,6 +456,13 @@ struct KaraokeTextByWordHighlightOverlay: View {
     let fontSize: CGFloat
     let fontColor: Color
     let highlightColor: Color
+    let strokeColor: Color
+    let strokeWidth: CGFloat
+    let shadowColor: Color
+    let shadowRadius: CGFloat
+    let shadowX: CGFloat
+    let shadowY: CGFloat
+    let shadowOpacity: Double
     let currentTime: Double
 
     var body: some View {
@@ -451,16 +472,34 @@ struct KaraokeTextByWordHighlightOverlay: View {
                 let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
                 
                 ZStack(alignment: .leading) {
-                    // Base text (entire string)
-                    Text(word.text)
-                        .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(fontColor)
-                    // Animated text
-                    Text(word.text)
-                        .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(highlightColor)
-                        .opacity(progress)
-                        .animation(.linear(duration: 0.05), value: progress)
+                    // Base text with stroke and shadow support
+                    StrokeText(
+                        text: word.text,
+                        fontSize: fontSize,
+                        fontColor: fontColor,
+                        strokeColor: strokeColor,
+                        strokeWidth: strokeWidth,
+                        shadowColor: shadowColor,
+                        shadowRadius: shadowRadius,
+                        shadowX: shadowX,
+                        shadowY: shadowY,
+                        shadowOpacity: shadowOpacity
+                    )
+                    // Animated text with stroke and shadow support
+                    StrokeText(
+                        text: word.text,
+                        fontSize: fontSize,
+                        fontColor: highlightColor,
+                        strokeColor: strokeColor,
+                        strokeWidth: strokeWidth,
+                        shadowColor: shadowColor,
+                        shadowRadius: shadowRadius,
+                        shadowX: shadowX,
+                        shadowY: shadowY,
+                        shadowOpacity: shadowOpacity
+                    )
+                    .opacity(progress)
+                    .animation(.linear(duration: 0.05), value: progress)
                 }
             }
         }
@@ -475,6 +514,13 @@ struct KaraokeTextByWordBackgroundOverlay: View {
     let fontColor: Color
     let highlightColor: Color
     let wordBGColor: Color
+    let strokeColor: Color
+    let strokeWidth: CGFloat
+    let shadowColor: Color
+    let shadowRadius: CGFloat
+    let shadowX: CGFloat
+    let shadowY: CGFloat
+    let shadowOpacity: Double
     let currentTime: Double
 
     var body: some View {
@@ -484,29 +530,122 @@ struct KaraokeTextByWordBackgroundOverlay: View {
                 let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
                 
                 ZStack(alignment: .leading) {
-                    // Base text (entire string)
-                    Text(word.text)
-                        .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(fontColor)
-                        .padding(.horizontal, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.clear)
-                        )
-                    // Animated text
-                    Text(word.text)
-                        .font(.system(size: fontSize, weight: .bold))
-                        .foregroundColor(highlightColor)
-                        .padding(.horizontal, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(wordBGColor.opacity(0.5))
-                                .opacity(progress)
-                        )
-                        .opacity(progress)
-                        .animation(.linear(duration: 0.05), value: progress)
+                    // Base text with stroke and shadow support
+                    StrokeText(
+                        text: word.text,
+                        fontSize: fontSize,
+                        fontColor: fontColor,
+                        strokeColor: strokeColor,
+                        strokeWidth: strokeWidth,
+                        shadowColor: shadowColor,
+                        shadowRadius: shadowRadius,
+                        shadowX: shadowX,
+                        shadowY: shadowY,
+                        shadowOpacity: shadowOpacity
+                    )
+                    .padding(.horizontal, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.clear)
+                    )
+                    // Animated text with stroke and shadow support
+                    StrokeText(
+                        text: word.text,
+                        fontSize: fontSize,
+                        fontColor: highlightColor,
+                        strokeColor: strokeColor,
+                        strokeWidth: strokeWidth,
+                        shadowColor: shadowColor,
+                        shadowRadius: shadowRadius,
+                        shadowX: shadowX,
+                        shadowY: shadowY,
+                        shadowOpacity: shadowOpacity
+                    )
+                    .padding(.horizontal, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(wordBGColor.opacity(0.5))
+                            .opacity(progress)
+                    )
+                    .opacity(progress)
+                    .animation(.linear(duration: 0.05), value: progress)
                 }
             }
         }
+    }
+}
+
+// Custom view for text with stroke support using the same approach as regular text
+struct StrokeText: View {
+    let text: String
+    let fontSize: CGFloat
+    let fontColor: Color
+    let strokeColor: Color
+    let strokeWidth: CGFloat
+    let shadowColor: Color
+    let shadowRadius: CGFloat
+    let shadowX: CGFloat
+    let shadowY: CGFloat
+    let shadowOpacity: Double
+    
+    var body: some View {
+        ZStack {
+            // Stroke layer (background)
+            if let strokeAttr = createKaraokeStrokeAttr() {
+                AttributedTextOverlay(
+                    attributedString: strokeAttr,
+                    offset: .zero,
+                    isSelected: false,
+                    bgColor: .clear,
+                    cornerRadius: 0,
+                    shadowColor: UIColor.clear,
+                    shadowRadius: 0,
+                    shadowX: 0,
+                    shadowY: 0
+                )
+            }
+            
+            // Main text layer (foreground)
+            AttributedTextOverlay(
+                attributedString: createKaraokeFillAttr(),
+                offset: .zero,
+                isSelected: false,
+                bgColor: .clear,
+                cornerRadius: 0,
+                shadowColor: UIColor(shadowColor).withAlphaComponent(shadowOpacity),
+                shadowRadius: shadowRadius,
+                shadowX: shadowX,
+                shadowY: shadowY
+            )
+        }
+    }
+    
+    // Create stroke-only attributed string
+    private func createKaraokeStrokeAttr() -> NSAttributedString? {
+        guard strokeColor != .clear && strokeWidth > 0 else { return nil }
+        
+        let attrStr = NSMutableAttributedString(string: text)
+        let range = NSRange(location: 0, length: attrStr.length)
+        
+        // Scale stroke width relative to font size for better proportions
+        let scaledStrokeWidth = min(strokeWidth, fontSize * 0.15) // Max 15% of font size
+        
+        attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: fontSize, weight: .bold), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.clear, range: range) // Transparent fill
+        attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(strokeColor), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: scaledStrokeWidth, range: range) // Positive for stroke-only
+        
+        return attrStr
+    }
+    
+    // Create fill-only attributed string
+    private func createKaraokeFillAttr() -> NSAttributedString {
+        let attrStr = NSMutableAttributedString(string: text)
+        let range = NSRange(location: 0, length: attrStr.length)
+        
+        attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: fontSize, weight: .bold), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(fontColor), range: range)
+        
+        return attrStr
     }
 } 

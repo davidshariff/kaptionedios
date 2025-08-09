@@ -420,6 +420,7 @@ extension VideoEditor{
 
         // If wordTimings is present, render karaoke-style text highlighting
         if let wordTimings = model.wordTimings {
+            print("🎤 Detected karaoke text with \(wordTimings.count) words, creating karaoke layer")
             return createKaraokeTextLayer(
                 wordTimings: wordTimings,
                 model: model,
@@ -430,6 +431,9 @@ extension VideoEditor{
                 duration: duration
             )
         }
+        
+        print("📝 Creating regular text layer (no karaoke)")
+        print("   Shadow: color=\(model.shadowColor), radius=\(model.shadowRadius), opacity=\(model.shadowOpacity)")
 
         // Create attributed string for reliable text rendering (fill only)
         let fillAttributes: [NSAttributedString.Key: Any] = [
@@ -491,10 +495,11 @@ extension VideoEditor{
             }
             
             // Draw shadow if needed
-            if model.shadowRadius > 0 && model.shadowOpacity > 0 {
+            let effectiveRegularShadowRadius = (model.shadowRadius == 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) ? 4.0 : model.shadowRadius
+            if effectiveRegularShadowRadius > 0 && model.shadowOpacity > 0 {
                 let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                 cgContext.saveGState()
-                cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: model.shadowRadius, color: shadowColor.cgColor)
+                cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: effectiveRegularShadowRadius, color: shadowColor.cgColor)
                 fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
                 cgContext.restoreGState()
             }
@@ -527,6 +532,22 @@ extension VideoEditor{
             // Return a simple text layer without karaoke effects
             return createSimpleTextLayer(model: model, position: position, calculatedFontSize: calculatedFontSize, calculatedPadding: calculatedPadding, calculatedCornerRadius: calculatedCornerRadius, duration: duration)
         }
+        
+        // Calculate ratio from the already calculated font size
+        let ratio = calculatedFontSize / model.fontSize
+        
+        // Scale shadow properties like other properties
+        // Apply default shadow radius if shadow is intended but radius is 0
+        let effectiveShadowRadius = (model.shadowRadius == 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) ? 4.0 : model.shadowRadius
+        let calculatedShadowRadius = effectiveShadowRadius * ratio
+        let calculatedShadowX = model.shadowX * ratio
+        let calculatedShadowY = model.shadowY * ratio
+        
+        print("🎤 Creating karaoke text layer:")
+        print("   Text: '\(model.text)'")
+        print("   Shadow: color=\(model.shadowColor), radius=\(model.shadowRadius) -> \(calculatedShadowRadius), opacity=\(model.shadowOpacity)")
+        print("   Shadow offset: x=\(model.shadowX) -> \(calculatedShadowX), y=\(model.shadowY) -> \(calculatedShadowY)")
+        print("   Stroke: color=\(model.strokeColor), width=\(model.strokeWidth)")
 
         // 1. Set up font and calculate the width of each word (with padding for word-by-word)
         //    This is needed to lay out each word precisely and to size the overall text layer.
@@ -553,8 +574,20 @@ extension VideoEditor{
         textLayer.cornerRadius = calculatedCornerRadius
 
         // Render the karaoke text as an image for crisp display, and add animated highlight layers for each word
-        let renderer = UIGraphicsImageRenderer(size: paddedSize)
+        let rendererFormat = UIGraphicsImageRendererFormat()
+        rendererFormat.scale = UIScreen.main.scale * 2.0 // Higher scale for crisp text
+        rendererFormat.opaque = false
+        
+        let renderer = UIGraphicsImageRenderer(size: paddedSize, format: rendererFormat)
         let textImage = renderer.image { context in
+            // Enable high-quality text rendering
+            let cgContext = context.cgContext
+            cgContext.setShouldAntialias(true)
+            cgContext.setShouldSmoothFonts(true)
+            cgContext.setAllowsAntialiasing(true)
+            cgContext.setAllowsFontSmoothing(true)
+            cgContext.setAllowsFontSubpixelPositioning(true)
+            cgContext.setAllowsFontSubpixelQuantization(true)
             var x: CGFloat = calculatedPadding
             // Loop through each word to lay out and animate them individually
             for (i, word) in wordTimings.enumerated() {
@@ -589,14 +622,9 @@ extension VideoEditor{
 
                 // --- Base layer: always visible, original color ---
                 // Draw the word in its normal color as the base layer
-                let baseLayer = CATextLayer()
-                baseLayer.string = word.text
-                baseLayer.font = font
-                baseLayer.fontSize = calculatedFontSize
+                let baseLayer = CALayer()
                 baseLayer.frame = wordRect
                 baseLayer.contentsScale = UIScreen.main.scale * 2.0
-                baseLayer.alignmentMode = .left
-                baseLayer.foregroundColor = UIColor(model.fontColor).cgColor
 
                 // Render the word as an image for best quality
                 let baseRendererFormat = UIGraphicsImageRendererFormat()
@@ -614,32 +642,64 @@ extension VideoEditor{
                     cgContext.setAllowsFontSubpixelPositioning(true)
                     cgContext.setAllowsFontSubpixelQuantization(true)
                     
-                    word.text.draw(
-                        in: CGRect(
-                            x: wordHorizontalPadding,
-                            y: 0,
-                            width: wordRect.width - 2 * wordHorizontalPadding,
-                            height: wordRect.height
-                        ),
-                        withAttributes: [
+                    // Create stroke and fill attributes
+                    var strokeAttributes: [NSAttributedString.Key: Any]?
+                    if model.strokeColor != .clear && model.strokeWidth > 0 {
+                        let scaledStrokeWidth = min(model.strokeWidth, calculatedFontSize * 0.15)
+                        strokeAttributes = [
                             .font: font,
-                            .foregroundColor: UIColor(model.fontColor)
+                            .foregroundColor: UIColor.clear,
+                            .strokeColor: UIColor(model.strokeColor),
+                            .strokeWidth: scaledStrokeWidth
                         ]
+                    }
+                    
+                    let fillAttributes: [NSAttributedString.Key: Any] = [
+                        .font: font,
+                        .foregroundColor: UIColor(model.fontColor)
+                    ]
+                    
+                    let drawRect = CGRect(
+                        x: wordHorizontalPadding,
+                        y: 0,
+                        width: wordRect.width - 2 * wordHorizontalPadding,
+                        height: wordRect.height
                     )
+                    
+                    // Draw shadow if needed
+                    if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
+                        print("   🎤📦 Drawing BASE shadow for word '\(word.text)': radius=\(calculatedShadowRadius), opacity=\(model.shadowOpacity)")
+                        let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
+                        cgContext.saveGState()
+                        cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
+                        
+                        // Draw stroke with shadow if needed
+                        if let strokeAttrs = strokeAttributes {
+                            word.text.draw(in: drawRect, withAttributes: strokeAttrs)
+                        }
+                        // Draw fill with shadow
+                        word.text.draw(in: drawRect, withAttributes: fillAttributes)
+                        cgContext.restoreGState()
+                    } else {
+                        print("   🎤❌ NO shadow for word '\(word.text)': radius=\(model.shadowRadius) -> \(calculatedShadowRadius), opacity=\(model.shadowOpacity)")
+                    }
+                    
+                    // Draw stroke without shadow if needed
+                    if let strokeAttrs = strokeAttributes {
+                        word.text.draw(in: drawRect, withAttributes: strokeAttrs)
+                    }
+                    
+                    // Draw fill on top without shadow
+                    word.text.draw(in: drawRect, withAttributes: fillAttributes)
                 }
                 baseLayer.contents = baseImage.cgImage
                 textLayer.addSublayer(baseLayer)
 
                 // --- Highlight layer: green, animated opacity ---
                 // Draw the word in green as a highlight layer, initially invisible
-                let highlightLayer = CATextLayer()
-                highlightLayer.string = word.text
-                highlightLayer.font = font
-                highlightLayer.fontSize = calculatedFontSize
+                let highlightLayer = CALayer()
                 highlightLayer.frame = wordRect
                 highlightLayer.contentsScale = UIScreen.main.scale * 2.0
-                highlightLayer.alignmentMode = .left
-                highlightLayer.foregroundColor = UIColor(highlightColor).cgColor
                 highlightLayer.opacity = 0
 
                 // Render the highlighted word as an image
@@ -658,18 +718,52 @@ extension VideoEditor{
                     cgContext.setAllowsFontSubpixelPositioning(true)
                     cgContext.setAllowsFontSubpixelQuantization(true)
                     
-                    word.text.draw(
-                        in: CGRect(
-                            x: wordHorizontalPadding,
-                            y: 0,
-                            width: wordRect.width - 2 * wordHorizontalPadding,
-                            height: wordRect.height
-                        ),
-                        withAttributes: [
+                    // Create stroke and fill attributes for highlight
+                    var highlightStrokeAttributes: [NSAttributedString.Key: Any]?
+                    if model.strokeColor != .clear && model.strokeWidth > 0 {
+                        let scaledStrokeWidth = min(model.strokeWidth, calculatedFontSize * 0.15)
+                        highlightStrokeAttributes = [
                             .font: font,
-                            .foregroundColor: UIColor(highlightColor)
+                            .foregroundColor: UIColor.clear,
+                            .strokeColor: UIColor(model.strokeColor),
+                            .strokeWidth: scaledStrokeWidth
                         ]
+                    }
+                    
+                    let highlightFillAttributes: [NSAttributedString.Key: Any] = [
+                        .font: font,
+                        .foregroundColor: UIColor(highlightColor)
+                    ]
+                    
+                    let highlightDrawRect = CGRect(
+                        x: wordHorizontalPadding,
+                        y: 0,
+                        width: wordRect.width - 2 * wordHorizontalPadding,
+                        height: wordRect.height
                     )
+                    
+                    // Draw shadow if needed
+                    if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
+                        let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
+                        cgContext.saveGState()
+                        cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
+                        
+                        // Draw stroke with shadow if needed
+                        if let strokeAttrs = highlightStrokeAttributes {
+                            word.text.draw(in: highlightDrawRect, withAttributes: strokeAttrs)
+                        }
+                        // Draw fill with shadow
+                        word.text.draw(in: highlightDrawRect, withAttributes: highlightFillAttributes)
+                        cgContext.restoreGState()
+                    }
+                    
+                    // Draw stroke without shadow if needed
+                    if let strokeAttrs = highlightStrokeAttributes {
+                        word.text.draw(in: highlightDrawRect, withAttributes: strokeAttrs)
+                    }
+                    
+                    // Draw fill on top without shadow
+                    word.text.draw(in: highlightDrawRect, withAttributes: highlightFillAttributes)
                 }
                 highlightLayer.contents = highlightImage.cgImage
                 textLayer.addSublayer(highlightLayer)
@@ -694,7 +788,7 @@ extension VideoEditor{
                 
             }
         }
-        textLayer.contentsScale = UIScreen.main.scale
+        textLayer.contentsScale = UIScreen.main.scale * 2.0
         // Add appearance/disappearance animations for the whole text layer if needed
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
         return textLayer

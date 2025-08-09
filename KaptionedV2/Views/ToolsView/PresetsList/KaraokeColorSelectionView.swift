@@ -10,8 +10,6 @@ struct KaraokeColorSelectionView: View {
     @State private var selectedHighlightColor: Color
     @State private var selectedWordBGColor: Color
     @State private var selectedFontColor: Color
-    @State private var animationIndex: Int = 0
-    @State private var animationTimer: Timer?
 
     private let colorOptions: [Color] = [
         .blue, .red, .green, .orange, .yellow, .purple, .pink, .cyan,
@@ -106,27 +104,16 @@ struct KaraokeColorSelectionView: View {
 
                         HStack {
                             Spacer()
-
-                            RoundedRectangle(cornerRadius: selectedPreset.cornerRadius)
-                                .fill(selectedPreset.bgColor)
-                                .frame(width: 120, height: 40)
-                                .overlay(
-                                    HStack(spacing: 2) {
-                                        ForEach(Array(previewWords.enumerated()), id: \.offset) { index, word in
-                                            Text(word)
-                                                .font(.system(size: selectedPreset.fontSize * 0.4))
-                                                .foregroundColor(getWordColor(for: index))
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 2)
-                                                        .fill(getWordBackground(for: index))
-                                                        .padding(.horizontal, -2)
-                                                        .padding(.vertical, -2)
-                                                        .opacity(getWordBackground(for: index) == .clear ? 0 : 1)
-                                                )
-                                                .animation(.easeInOut(duration: 0.3), value: animationIndex)
-                                        }
-                                    }
-                                )
+                            
+                            PresetPreviewView(
+                                preset: selectedPreset,
+                                previewText: previewText,
+                                highlightColor: selectedHighlightColor,
+                                wordBGColor: selectedWordBGColor,
+                                fontColor: selectedFontColor,
+                                animateKaraoke: true
+                            )
+                            .frame(width: 120, height: 40)
 
                             Spacer()
                         }
@@ -286,69 +273,12 @@ struct KaraokeColorSelectionView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .onAppear {
-            startAnimation()
-        }
-        .onDisappear {
-            stopAnimation()
-        }
+
     }
 
-        private var previewText: String {
+    private var previewText: String {
         print("DEBUG: KaraokeColorSelectionView - currentSubtitleText: '\(currentSubtitleText ?? "nil")'")
         return currentSubtitleText?.isEmpty == false ? currentSubtitleText! : "Your Subtitle"
-    }
-    
-    private var previewWords: [String] {
-        return previewText.split(separator: " ").map(String.init)
-    }
-    
-    private func getPreviewHighlightColor() -> Color {
-        return selectedHighlightColor
-    }
-
-    private func getPreviewWordBGColor() -> Color {
-        switch selectedPreset.name {
-        case "Background by word":
-            return selectedWordBGColor
-        default:
-            return .clear
-        }
-    }
-    
-    // Animation helper functions
-    private func getWordColor(for index: Int) -> Color {
-        if selectedPreset.name == "Background by word" {
-            // For background by word, always use font color for text
-            return selectedFontColor
-        } else {
-            // For highlight by word/letter, use highlight color for active word
-            return index == animationIndex ? selectedHighlightColor : selectedFontColor
-        }
-    }
-    
-    private func getWordBackground(for index: Int) -> Color {
-        if selectedPreset.name == "Background by word" && index == animationIndex {
-            return selectedWordBGColor
-        }
-        return .clear
-    }
-    
-
-    
-    private func startAnimation() {
-        guard previewWords.count > 1 else { return }
-        
-        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.6, repeats: true) { _ in
-            withAnimation(.easeInOut(duration: 0.3)) {
-                animationIndex = (animationIndex + 1) % previewWords.count
-            }
-        }
-    }
-    
-    private func stopAnimation() {
-        animationTimer?.invalidate()
-        animationTimer = nil
     }
 }
 

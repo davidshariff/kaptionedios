@@ -1,0 +1,149 @@
+import SwiftUI
+import Foundation
+
+struct PresetPreviewView: View {
+    let preset: SubtitleStyle
+    let previewText: String
+    let highlightColor: Color?
+    let wordBGColor: Color?
+    let fontColor: Color?
+    let animateKaraoke: Bool
+    
+    @State private var animationIndex: Int = 0
+    @State private var animationTimer: Timer?
+    
+    private var previewWords: [String] {
+        return previewText.split(separator: " ").map(String.init)
+    }
+    
+    init(preset: SubtitleStyle, previewText: String = "Sample Text", highlightColor: Color? = nil, wordBGColor: Color? = nil, fontColor: Color? = nil, animateKaraoke: Bool = false) {
+        self.preset = preset
+        self.previewText = previewText
+        self.highlightColor = highlightColor
+        self.wordBGColor = wordBGColor
+        self.fontColor = fontColor
+        self.animateKaraoke = animateKaraoke
+    }
+    
+    var body: some View {
+        RoundedRectangle(cornerRadius: preset.cornerRadius)
+            .fill(preset.bgColor)
+            .frame(height: 32)
+            .overlay(
+                HStack(spacing: 1) {
+                    if preset.isKaraokePreset && previewWords.count > 1 {
+                        // Karaoke preview with word-by-word animation
+                        ForEach(Array(previewWords.enumerated()), id: \.offset) { index, word in
+                            Text(word)
+                                .font(.system(size: preset.fontSize * 0.3))
+                                .foregroundColor(getWordColor(for: index))
+                                .background(
+                                    RoundedRectangle(cornerRadius: 1)
+                                        .fill(getWordBackground(for: index))
+                                        .padding(.horizontal, -2)
+                                        .padding(.vertical, -1)
+                                        .opacity(getWordBackground(for: index) == .clear ? 0 : 1)
+                                )
+                                .animation(.easeInOut(duration: 0.3), value: animationIndex)
+                        }
+                    } else {
+                        // Regular preview
+                        Text(previewText)
+                            .font(.system(size: preset.fontSize * 0.3))
+                            .foregroundColor(fontColor ?? preset.fontColor)
+                            .shadow(color: preset.shadowColor.opacity(preset.shadowOpacity), radius: preset.shadowRadius, x: preset.shadowX, y: preset.shadowY)
+                    }
+                }
+            )
+            .onAppear {
+                if animateKaraoke && preset.isKaraokePreset {
+                    startAnimation()
+                }
+            }
+            .onDisappear {
+                stopAnimation()
+            }
+    }
+    
+    // Animation helper functions
+    private func getWordColor(for index: Int) -> Color {
+        if preset.name == "Background by word" {
+            // For background by word, always use font color for text
+            return fontColor ?? preset.fontColor
+        } else {
+            // For highlight by word/letter, use highlight color for active word
+            let activeHighlightColor = highlightColor ?? getDefaultHighlightColor()
+            let activeFontColor = fontColor ?? preset.fontColor
+            return index == animationIndex ? activeHighlightColor : activeFontColor
+        }
+    }
+    
+    private func getWordBackground(for index: Int) -> Color {
+        if preset.name == "Background by word" && index == animationIndex {
+            return wordBGColor ?? getDefaultWordBGColor()
+        }
+        return .clear
+    }
+    
+    private func getDefaultHighlightColor() -> Color {
+        switch preset.name {
+        case "Highlight by letter":
+            return .blue
+        case "Highlight by word":
+            return .orange
+        case "Background by word":
+            return .yellow
+        default:
+            return .blue
+        }
+    }
+    
+    private func getDefaultWordBGColor() -> Color {
+        switch preset.name {
+        case "Background by word":
+            return .blue
+        default:
+            return .clear
+        }
+    }
+    
+    private func startAnimation() {
+        guard previewWords.count > 1 else { return }
+        
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { _ in
+            withAnimation(.easeInOut(duration: 0.3)) {
+                animationIndex = (animationIndex + 1) % previewWords.count
+            }
+        }
+    }
+    
+    private func stopAnimation() {
+        animationTimer?.invalidate()
+        animationTimer = nil
+    }
+}
+
+#Preview {
+    VStack(spacing: 20) {
+        PresetPreviewView(
+            preset: SubtitleStyle.allPresets.first(where: { $0.name == "Basic" })!,
+            previewText: "Sample Text"
+        )
+        
+        PresetPreviewView(
+            preset: SubtitleStyle.allPresets.first(where: { $0.name == "Highlight by word" })!,
+            previewText: "Animated Karaoke Text",
+            highlightColor: .orange,
+            animateKaraoke: true
+        )
+        
+        PresetPreviewView(
+            preset: SubtitleStyle.allPresets.first(where: { $0.name == "Background by word" })!,
+            previewText: "Background Karaoke",
+            wordBGColor: .blue,
+            fontColor: .white,
+            animateKaraoke: true
+        )
+    }
+    .padding()
+}

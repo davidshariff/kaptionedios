@@ -85,6 +85,7 @@
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
+		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
 		F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */; };
 		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
 		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
@@ -172,6 +173,7 @@
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeColorSelectionView.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
+		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
 		F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOnPlayerView.swift; sourceTree = "<group>"; };
 		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
 		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
@@ -531,6 +533,7 @@
 			isa = PBXGroup;
 			children = (
 				F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */,
+				F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */,
 				F423FFC12E3E581D0024399E /* PresetsListView.swift */,
 			);
 			path = PresetsList;
@@ -662,6 +665,7 @@
 				F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */,
 				5AE2A2A029F465BD003D217F /* VideoEditor.swift in Sources */,
 				5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */,
+				F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */,
 				F418B72B2E40919D0021E298 /* VideoPlayerSize.swift in Sources */,
 				5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */,
 				5ACFF99829ED53FB00827A37 /* View+Ext.swift in Sources */,

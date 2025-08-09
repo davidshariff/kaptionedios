@@ -12,26 +12,41 @@ struct PresetsListView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Spacer()
+
+            ZStack {
                 Text("Select a Subtitle Style")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                    .padding(.horizontal, 8)
-                Spacer()
-                Button {
-                    isPresented = false
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(8)
+                    .font(.system(size: UIFont.preferredFont(forTextStyle: .title2).pointSize, weight: .bold, design: .rounded))
+                    .foregroundColor(Color.blue)
+                    .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 2)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.white.opacity(0.85))
+                            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+                    )
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(Color.gray.opacity(0.7))
+                            .background(
+                                Circle()
+                                    .fill(Color.black.opacity(0.1))
+                                    .frame(width: 36, height: 36)
+                                    .shadow(color: Color.black.opacity(0.10), radius: 2, x: 0, y: 1)
+                            )
+                    }
+                    .padding(.trailing, 20)
                 }
             }
+            .padding(.top, 12)
             
             ScrollView {
-                LazyVStack(spacing: 12) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 12) {
                     ForEach(SubtitleStyle.allPresets) { style in
                         Button(action: {
                             if style.isKaraokePreset {
@@ -42,35 +57,32 @@ struct PresetsListView: View {
                                 onSelect(style)
                             }
                         }) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(style.name)
-                                        .font(.headline)
-                                        .foregroundColor(.primary)
-                                    Text("Font: \(Int(style.fontSize))pt")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                }
+                            VStack(spacing: 6) {
+                                // Prominent preview - takes most of the space
+                                PresetPreviewView(
+                                    preset: style,
+                                    previewText: getCurrentSubtitleText() ?? "Sample Text",
+                                    animateKaraoke: style.isKaraokePreset
+                                )
+                                .frame(height: 40)
                                 
-                                Spacer()
-                                
-                                RoundedRectangle(cornerRadius: style.cornerRadius)
-                                    .fill(style.bgColor)
-                                    .frame(width: 60, height: 24)
-                                    .overlay(
-                                        Text("Aa")
-                                            .font(.system(size: style.fontSize * 0.5))
-                                            .foregroundColor(style.fontColor)
-                                            .shadow(color: style.shadowColor.opacity(style.shadowOpacity), radius: style.shadowRadius, x: style.shadowX, y: style.shadowY)
-                                    )
+                                // Compact title only
+                                Text(style.name)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .frame(height: 24) // Fixed height for consistency
                             }
-                            .padding()
+                            .padding(8)
+                            .frame(height: 80) // Fixed total height for all presets
                             .background(isCurrentPreset(style) ? Color.blue.opacity(0.3) : Color(.systemGray5))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(isCurrentPreset(style) ? Color.blue : Color.clear, lineWidth: 3)
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(isCurrentPreset(style) ? Color.blue : Color.clear, lineWidth: 2)
                             )
-                            .cornerRadius(12)
+                            .cornerRadius(8)
                         }
                         .buttonStyle(PlainButtonStyle())
                     }

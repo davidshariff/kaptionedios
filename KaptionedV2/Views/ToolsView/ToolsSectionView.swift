@@ -141,7 +141,7 @@ struct ToolsSectionView: View {
                         // Use the shared subtitle generation method with confirmation
                         editorVM.generateSubtitles(showConfirmation: true)
                     }
-                    Text("Generate Subs")
+                    Text("Generate Captions")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.top, 4)

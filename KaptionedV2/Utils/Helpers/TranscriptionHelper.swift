@@ -113,7 +113,7 @@ class TranscriptionHelper {
                             wordTimings: wordTimings,
                             isKaraokePreset: true,
                             karaokeType: .word,
-                            presetName: "Highlight by word"
+                            presetName: "Modern White"
                         )
                     }
 

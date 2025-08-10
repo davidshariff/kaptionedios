@@ -69,27 +69,22 @@ struct PresetPreviewView: View {
     
     // Animation helper functions
     private func getWordColor(for index: Int) -> Color {
-        print("DEBUG PresetPreviewView.getWordColor: preset.name='\(preset.name)', index=\(index), animationIndex=\(animationIndex)")
-        print("DEBUG PresetPreviewView.getWordColor: highlightColor=\(String(describing: highlightColor)), fontColor=\(String(describing: fontColor))")
         
         if preset.name == "Background by word" {
             // For background by word, use highlight color for active word text, font color for inactive
             let activeHighlightColor = highlightColor ?? getDefaultHighlightColor()
             let inactiveFontColor = fontColor ?? preset.fontColor
             let result = index == animationIndex ? activeHighlightColor : inactiveFontColor
-            print("DEBUG PresetPreviewView.getWordColor: Background by word -> active=\(index == animationIndex), result=\(result)")
             return result
         } else if preset.name == "Highlight by word" {
             // For highlight by word, use highlight color for active word, font color for inactive
             let activeHighlightColor = highlightColor ?? getDefaultHighlightColor()
             let inactiveFontColor = fontColor ?? preset.fontColor
             let result = index == animationIndex ? activeHighlightColor : inactiveFontColor
-            print("DEBUG PresetPreviewView.getWordColor: Highlight by word -> active=\(index == animationIndex), result=\(result)")
             return result
         } else {
             // For other presets, just use font color
             let result = fontColor ?? preset.fontColor
-            print("DEBUG PresetPreviewView.getWordColor: Other preset -> \(result)")
             return result
         }
     }

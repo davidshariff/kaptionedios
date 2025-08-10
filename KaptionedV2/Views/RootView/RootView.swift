@@ -122,12 +122,6 @@ struct RootView: View {
     }
 }
 
-struct RootView_Previews2: PreviewProvider {
-    static var previews: some View {
-        RootView(rootVM: RootViewModel(mainContext: dev.viewContext))
-    }
-}
-
 extension RootView{
     
     private func optimalFontSize() -> CGFloat {
@@ -180,6 +174,10 @@ extension RootView{
                             Animation.easeInOut(duration: 2.0)
                                 .repeatForever(autoreverses: true),
                             value: UUID()
+                        )
+                        .overlay(
+                            // Flashlight beam effect
+                            FlashlightBeamView()
                         )
                     
                     // Floating sparkles around the icon
@@ -563,6 +561,37 @@ private struct SparkleView: View {
                             colorIndex = (colorIndex + 1) % colors.count
                         }
                     }
+                }
+            }
+    }
+}
+
+// Flashlight beam view that rotates around the circle
+private struct FlashlightBeamView: View {
+    @State private var rotationAngle: Double = 0
+    
+    var body: some View {
+        Circle()
+            .fill(
+                RadialGradient(
+                    colors: [
+                        .white.opacity(0.4),
+                        .blue.opacity(0.2),
+                        .clear
+                    ],
+                    center: .topLeading,
+                    startRadius: 0,
+                    endRadius: 50
+                )
+            )
+            .frame(width: 120, height: 120)
+            .rotationEffect(.degrees(rotationAngle))
+            .onAppear {
+                withAnimation(
+                    Animation.linear(duration: 3.0)
+                        .repeatForever(autoreverses: false)
+                ) {
+                    rotationAngle = 360
                 }
             }
     }

@@ -182,7 +182,6 @@ struct PresetsListView: View {
         
         // Fallback to currentTextBox if no time-based match
         if let currentText = currentTextBox?.text, !currentText.isEmpty {
-            print("DEBUG: PresetsListView - Using currentTextBox: '\(currentText)'")
             return currentText
         }
         

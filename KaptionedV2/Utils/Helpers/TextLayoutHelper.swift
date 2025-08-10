@@ -44,10 +44,6 @@ struct TextLayoutHelper {
         return totalWidth / CGFloat(words.count)
     }
     
-
-    
-
-    
     /// Splits subtitle segments into smaller chunks based on optimal word count
     /// - Parameters:
     ///   - textBoxes: Array of subtitle objects from transcribeVideo

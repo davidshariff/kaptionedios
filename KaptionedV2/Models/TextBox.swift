@@ -29,6 +29,7 @@ struct TextBox: Identifiable{
     var lastOffset: CGSize = .zero
     var backgroundPadding: CGFloat = 8
     var cornerRadius: CGFloat = 0
+    
     // Shadow properties
     var shadowColor: Color = .black
     var shadowRadius: CGFloat = 0
@@ -78,7 +79,7 @@ struct TextBox: Identifiable{
             self.fontSize = preset.fontSize
             self.lastFontSize = lastFontSize
             self.bgColor = preset.bgColor
-            self.fontColor = fontColor // Use provided fontColor instead of preset.fontColor
+            self.fontColor = preset.fontColor // Use preset's fontColor
             self.strokeColor = preset.strokeColor
             self.strokeWidth = preset.strokeWidth
             self.timeRange = timeRange
@@ -98,6 +99,29 @@ struct TextBox: Identifiable{
                 self.highlightColor = highlightColor
                 self.wordBGColor = wordBGColor
             }
+            
+            // If this is a karaoke preset, set the karaoke colors from the preset
+            if preset.isKaraokePreset {
+                let karaokePreset: KaraokePreset
+                switch preset.name {
+                case "Highlight by word":
+                    karaokePreset = .word
+                case "Background by word":
+                    karaokePreset = .wordbg
+                default:
+                    karaokePreset = .word
+                }
+                self.isKaraokePreset = true
+                self.karaokeType = karaokePreset.karaokeType
+                // Only set karaoke colors if they weren't explicitly provided
+                if self.highlightColor == nil {
+                    self.highlightColor = karaokePreset.highlightColor
+                }
+                if self.wordBGColor == nil {
+                    self.wordBGColor = karaokePreset.wordBGColor
+                }
+            }
+            
             self.presetName = presetName
         } else {
             print("DEBUG: No presetName provided during TextBox initialization 🟡")
@@ -203,11 +227,12 @@ struct SubtitleStyle: Identifiable, Equatable {
     }
 
     static let allPresets: [SubtitleStyle] = [
+        // Karaoke presets - see below struct KaraokePreset for more info
         SubtitleStyle(
             name: "Highlight by word",
             fontSize: 32,
             bgColor: .clear,
-            fontColor: .yellow,
+            fontColor: .white,
             strokeColor: .black,
             strokeWidth: 2,
             backgroundPadding: 8,
@@ -235,6 +260,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowOpacity: 0,
             isKaraokePreset: true
         ),
+        // Non-karaoke presets
         SubtitleStyle(
             name: "Classic Yellow",
             fontSize: 32,
@@ -374,7 +400,7 @@ struct KaraokePreset {
 
     static let word = KaraokePreset(
         karaokeType: .word,
-        highlightColor: .orange,
+        highlightColor: .blue,
         wordBGColor: .clear,
         presetName: "Highlight by word"
     )

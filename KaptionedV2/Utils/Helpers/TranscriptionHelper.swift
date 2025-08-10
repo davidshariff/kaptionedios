@@ -111,9 +111,9 @@ class TranscriptionHelper {
                             text: segment.sentence,
                             timeRange: start...end,
                             wordTimings: wordTimings,
-                            // karaokeWords: wordTimings,
-                            // karaokeType: .word,
-                            presetName: "Classic Yellow"
+                            isKaraokePreset: true,
+                            karaokeType: .word,
+                            presetName: "Highlight by word"
                         )
                     }
 

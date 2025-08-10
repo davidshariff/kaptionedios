@@ -449,19 +449,34 @@ extension MainEditorView{
 
                 // Show word timeline only when in edit subtitles mode
                 VStack(spacing: 0) {
+                    
                     // Top row with time/duration on the left and close button on the right
                     if !textEditor.showEditTextContent && editorVM.showWordTimeline {
                         ZStack {
                             
                             HStack {
-                                // Time / Duration on the left
+                                // Time / Duration on the left with fixed width
                                 if let video = editorVM.currentVideo {
-                                    Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .padding(.top, 8)
-                                        .padding(.leading, 8)
+                                    HStack(spacing: 2) {
+                                        Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString())")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .frame(width: 35, alignment: .trailing)
+                                        
+                                        Text("/")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                        
+                                        Text("\(video.totalDuration.formatterTimeString())")
+                                            .font(.caption)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.white)
+                                            .frame(width: 35, alignment: .leading)
+                                    }
+                                    .padding(.top, 8)
+
                                 }
                                 
                                 Spacer()
@@ -484,17 +499,37 @@ extension MainEditorView{
                                 .padding(.trailing, 8)
                             }
                             
-                            // Play/Pause button absolutely centered
+                            // Play/Pause button positioned after time (fixed position)
                             if let video = editorVM.currentVideo {
-                                Button {
-                                    videoPlayer.action(video)
-                                } label: {
-                                    Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
-                                        .font(.title2)
-                                        .foregroundColor(.white)
+                                HStack {
+                                    Spacer()
+                                        .frame(width: 80) // Fixed space for time
+                                    
+                                    Button {
+                                        videoPlayer.action(video)
+                                    } label: {
+                                        Image(systemName: videoPlayer.isPlaying ? "pause.fill" : "play.fill")
+                                            .font(.title2)
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding(.top, 8)
+                                    
+                                    Spacer()
                                 }
-                                .padding(.top, 8)
                             }
+                            
+                            // "Edit Mode" text absolutely centered with better styling
+                            Text("(Edit Mode)")
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(Color.white.opacity(0.85))
+                                .padding(.top, 8)
+                                .padding(.horizontal, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.black.opacity(0.7))
+                                )
+
+
                         }
                         .frame(height: 40)
                         .padding(.bottom, 8)

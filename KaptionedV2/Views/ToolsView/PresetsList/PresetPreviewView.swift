@@ -99,21 +99,21 @@ struct PresetPreviewView: View {
     
     private func getDefaultHighlightColor() -> Color {
         switch preset.name {
-        case "Highlight by word":
-            return .orange
-        case "Background by word":
-            return .yellow
-        default:
-            return .orange
+            case "Highlight by word":
+                return KaraokePreset.word.highlightColor
+            case "Background by word":
+                return KaraokePreset.wordbg.highlightColor
+            default:
+                return .white
         }
     }
     
     private func getDefaultWordBGColor() -> Color {
         switch preset.name {
-        case "Background by word":
-            return .blue
-        default:
-            return .clear
+            case "Background by word":
+                return KaraokePreset.wordbg.wordBGColor
+            default:
+                return .clear
         }
     }
     

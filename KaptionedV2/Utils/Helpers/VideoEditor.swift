@@ -828,7 +828,7 @@ extension VideoEditor{
                     let bgRect = wordRect // background matches the padded word rect
                     let bgPath = UIBezierPath(roundedRect: bgRect, cornerRadius: bgCornerRadius)
                     bgLayer.path = bgPath.cgPath
-                    bgLayer.fillColor = UIColor(wordBGColor).withAlphaComponent(0.5).cgColor
+                    bgLayer.fillColor = UIColor(wordBGColor).cgColor
                     bgLayer.opacity = 0 // Start invisible
                     // Animate opacity in sync with highlight (appears instantly at word start)
                     let bgAnim = CABasicAnimation(keyPath: "opacity")

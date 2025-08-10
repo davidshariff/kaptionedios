@@ -406,7 +406,7 @@ struct KaraokePreset {
     )
     static let wordbg = KaraokePreset(
         karaokeType: .wordbg,
-        highlightColor: .white,
+        highlightColor: Color.white,
         wordBGColor: .pink,
         presetName: "Background by word",
         previewWordSpacing: 4,

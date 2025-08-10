@@ -15,7 +15,7 @@ struct PresetsListView: View {
 
             ZStack {
                 Text("Select a Subtitle Style")
-                    .font(.system(size: UIFont.preferredFont(forTextStyle: .title2).pointSize, weight: .bold, design: .rounded))
+                    .font(.title2.bold())
                     .foregroundColor(Color.blue)
                     .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 2)
                     .padding(.horizontal, 12)
@@ -217,9 +217,11 @@ struct PresetsListView: View {
         // Otherwise, return the preset's default highlight color
         switch preset.name {
         case "Highlight by word":
-            return .blue // KaraokePreset.word default
+            return KaraokePreset.word.highlightColor
         case "Background by word":
-            return .yellow // KaraokePreset.wordbg default
+            return KaraokePreset.wordbg.highlightColor
+        case "Word & Scale":
+            return KaraokePreset.wordAndScale.highlightColor
         default:
             return .blue
         }
@@ -236,9 +238,11 @@ struct PresetsListView: View {
         // Otherwise, return the preset's default word background color
         switch preset.name {
         case "Highlight by word":
-            return .clear // KaraokePreset.word default
+            return KaraokePreset.word.wordBGColor
         case "Background by word":
-            return .blue // KaraokePreset.wordbg default
+            return KaraokePreset.wordbg.wordBGColor
+        case "Word & Scale":
+            return KaraokePreset.wordAndScale.wordBGColor
         default:
             return .clear
         }

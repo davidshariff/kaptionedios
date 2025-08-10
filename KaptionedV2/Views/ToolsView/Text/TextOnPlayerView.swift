@@ -532,7 +532,7 @@ struct KaraokeTextByWordBackgroundOverlay: View {
                 .padding(.horizontal, 4)
                 .background(
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(wordBGColor.opacity(0.5))
+                        .fill(wordBGColor)
                         .opacity(progress)
                 )
                 .opacity(progress)

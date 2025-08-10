@@ -91,6 +91,7 @@ extension RootView{
                             value: UUID()
                         )
                 }
+                .padding(.bottom, 20)
                 
                 VStack(spacing: 8) {
                     Text("Welcome to Kaptioned")

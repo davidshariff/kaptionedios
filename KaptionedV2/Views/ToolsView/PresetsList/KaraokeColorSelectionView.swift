@@ -25,22 +25,28 @@ struct KaraokeColorSelectionView: View {
         // Use current colors if provided, otherwise fall back to defaults based on preset type
         let defaultHighlightColor: Color
         let defaultWordBGColor: Color
+
+        print("DEBUG: KaraokeColorSelectionView - selectedPreset: \(selectedPreset.name)")
         
         switch selectedPreset.name {
-        case "Highlight by word":
-            defaultHighlightColor = .blue // Use the updated default from KaraokePreset.word
-            defaultWordBGColor = .clear
-        case "Background by word":
-            defaultHighlightColor = .yellow
-            defaultWordBGColor = .blue
-        default:
-            defaultHighlightColor = .blue
-            defaultWordBGColor = .clear
+            case "Highlight by word":
+                defaultHighlightColor = KaraokePreset.word.highlightColor // Use the updated default from KaraokePreset.word
+                defaultWordBGColor = KaraokePreset.word.wordBGColor
+            case "Background by word":
+                defaultHighlightColor = KaraokePreset.wordbg.highlightColor
+                defaultWordBGColor = KaraokePreset.wordbg.wordBGColor
+            default:
+                defaultHighlightColor = .blue
+                defaultWordBGColor = .clear
         }
         
         self._selectedHighlightColor = State(initialValue: currentHighlightColor ?? defaultHighlightColor)
         self._selectedWordBGColor = State(initialValue: currentWordBGColor ?? defaultWordBGColor)
         self._selectedFontColor = State(initialValue: currentFontColor ?? selectedPreset.fontColor)
+
+        print("DEBUG: KaraokeColorSelectionView - defaultHighlightColor: \(defaultHighlightColor)")
+        print("DEBUG: KaraokeColorSelectionView - defaultWordBGColor: \(defaultWordBGColor)")
+        
     }
 
     var body: some View {

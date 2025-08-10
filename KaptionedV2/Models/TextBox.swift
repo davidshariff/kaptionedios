@@ -414,6 +414,22 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowY: 2,
             shadowOpacity: 0.7,
             isKaraokePreset: false
+        ),
+        SubtitleStyle(
+            name: "Bold Shadow Pop",
+            fontSize: 42,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .black,
+            strokeWidth: 6,
+            backgroundPadding: 0,
+            cornerRadius: 0,
+            shadowColor: .black,
+            shadowRadius: 2,
+            shadowX: -3,
+            shadowY: 3,
+            shadowOpacity: 0.8,
+            isKaraokePreset: false
         )
     ]
 }

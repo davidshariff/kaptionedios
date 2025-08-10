@@ -660,34 +660,42 @@ extension VideoEditor{
                 height: paddedSize.height - 2 * calculatedPadding
             )
             
-            // Draw stroke layer first (background)
-            if let strokeAttr = strokeAttributedString {
+            // Draw shadow if needed - apply to stroke first if it exists, otherwise to fill
+            let effectiveRegularShadowRadius = (model.shadowRadius == 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) ? 4.0 : model.shadowRadius
+            if effectiveRegularShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear {
+                let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
+                cgContext.saveGState()
+                cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: effectiveRegularShadowRadius, color: shadowColor.cgColor)
+                
+                // Apply shadow to stroke if it exists, otherwise to fill
+                if let strokeAttr = strokeAttributedString {
+                    if hasExplicitLineBreaks {
+                        strokeAttr.draw(in: drawingRect)
+                    } else {
+                        strokeAttr.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+                    }
+                } else {
+                    if hasExplicitLineBreaks {
+                        fillAttributedString.draw(in: drawingRect)
+                    } else {
+                        fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+                    }
+                }
+                cgContext.restoreGState()
+            }
+            
+            // Draw stroke layer without shadow (only if shadow wasn't applied to stroke)
+            if let strokeAttr = strokeAttributedString, !(effectiveRegularShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) {
                 if hasExplicitLineBreaks {
                     strokeAttr.draw(in: drawingRect)
-
                 } else {
                     strokeAttr.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
                 }
             }
             
-            // Draw shadow if needed
-            let effectiveRegularShadowRadius = (model.shadowRadius == 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) ? 4.0 : model.shadowRadius
-            if effectiveRegularShadowRadius > 0 && model.shadowOpacity > 0 {
-                let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
-                cgContext.saveGState()
-                cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: effectiveRegularShadowRadius, color: shadowColor.cgColor)
-                if hasExplicitLineBreaks {
-                    fillAttributedString.draw(in: drawingRect)
-
-                } else {
-                    fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
-                }
-                cgContext.restoreGState()
-            }
-            // Draw main text (without shadow)
+            // Draw main fill text (without shadow)
             if hasExplicitLineBreaks {
                 fillAttributedString.draw(in: drawingRect)
-
             } else {
                 fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
             }
@@ -904,7 +912,7 @@ extension VideoEditor{
                     )
                     
                     // Draw shadow if needed - apply to stroke layer when stroke exists, otherwise to fill layer
-                    if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
+                    if calculatedShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear {
                         let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                         cgContext.saveGState()
                         cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
@@ -1001,7 +1009,7 @@ extension VideoEditor{
                     )
                     
                     // Draw shadow if needed - apply to stroke layer when stroke exists, otherwise to fill layer
-                    if calculatedShadowRadius > 0 && model.shadowOpacity > 0 {
+                    if calculatedShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear {
                         let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                         cgContext.saveGState()
                         cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)

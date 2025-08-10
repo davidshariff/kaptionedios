@@ -425,6 +425,20 @@ struct KaraokePreset {
     let presetName: String
     let previewWordSpacing: CGFloat
     let exportWordSpacing: CGFloat
+    
+    /// Calibrated export spacing that compensates for Core Animation vs SwiftUI rendering differences
+    var calibratedExportSpacing: CGFloat {
+        // Core Animation text rendering is typically more compact than SwiftUI
+        // Apply a calibration multiplier based on empirical testing
+        switch karaokeType {
+        case .wordbg:
+            // Background style: 1.5x multiplier (4pt preview → 6pt export)
+            return previewWordSpacing * 1.5
+        case .word, .wordAndScale:
+            // Highlight styles: 3.0x multiplier (8pt preview → 24pt export) 
+            return previewWordSpacing * 3.0
+        }
+    }
 
     static let word = KaraokePreset(
         karaokeType: .word,

@@ -758,8 +758,8 @@ extension VideoEditor{
             karaokePreset = KaraokePreset.wordAndScale
         }
         
-        // Use export word spacing from the preset
-        let wordSpacing: CGFloat = karaokePreset.exportWordSpacing
+        // Use calibrated export word spacing that compensates for Core Animation rendering differences
+        let wordSpacing: CGFloat = karaokePreset.calibratedExportSpacing
         
         // Calculate word positions for multi-line layout
         let wordPositions = calculateKaraokeWordPositions(

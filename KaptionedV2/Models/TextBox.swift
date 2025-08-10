@@ -423,23 +423,31 @@ struct KaraokePreset {
     let highlightColor: Color
     let wordBGColor: Color
     let presetName: String
+    let previewWordSpacing: CGFloat
+    let exportWordSpacing: CGFloat
 
     static let word = KaraokePreset(
         karaokeType: .word,
         highlightColor: .blue,
         wordBGColor: .clear,
-        presetName: "Highlight by word"
+        presetName: "Highlight by word",
+        previewWordSpacing: 8,
+        exportWordSpacing: 16
     )
     static let wordbg = KaraokePreset(
         karaokeType: .wordbg,
         highlightColor: .yellow,
         wordBGColor: .blue,
-        presetName: "Background by word"
+        presetName: "Background by word",
+        previewWordSpacing: 4,
+        exportWordSpacing: 6
     )
     static let wordAndScale = KaraokePreset(
         karaokeType: .wordAndScale,
         highlightColor: .yellow,
         wordBGColor: .clear,
-        presetName: "Word & Scale"
+        presetName: "Word & Scale",
+        previewWordSpacing: 8,
+        exportWordSpacing: 16
     )
 }

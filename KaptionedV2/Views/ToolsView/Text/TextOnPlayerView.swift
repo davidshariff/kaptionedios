@@ -430,7 +430,7 @@ struct KaraokeTextByWordHighlightOverlay: View {
         KaraokeTextLayout(
             originalText: text,
             words: words,
-            spacing: 4,
+            spacing: KaraokePreset.word.previewWordSpacing,
             lineSpacing: 2
         ) { word in
             let isActive = currentTime >= word.start && currentTime < word.end
@@ -491,7 +491,7 @@ struct KaraokeTextByWordBackgroundOverlay: View {
         KaraokeTextLayout(
             originalText: text,
             words: words,
-            spacing: 4,
+            spacing: KaraokePreset.wordbg.previewWordSpacing,
             lineSpacing: 2
         ) { word in
             let isActive = currentTime >= word.start && currentTime < word.end
@@ -563,7 +563,7 @@ struct KaraokeTextWordAndScaleOverlay: View {
         KaraokeTextLayout(
             originalText: text,
             words: words,
-            spacing: 4,
+            spacing: KaraokePreset.wordAndScale.previewWordSpacing,
             lineSpacing: 2
         ) { word in
             let isActive = currentTime >= word.start && currentTime < word.end
@@ -697,7 +697,7 @@ struct KaraokeTextLayout<Content: View>: View {
     init(
         originalText: String,
         words: [WordWithTiming],
-        spacing: CGFloat = 4,
+        spacing: CGFloat = 8,
         lineSpacing: CGFloat = 2,
         @ViewBuilder content: @escaping (WordWithTiming) -> Content
     ) {
@@ -786,7 +786,7 @@ struct KaraokeWrappingLayout: Layout {
     let spacing: CGFloat
     let lineSpacing: CGFloat
     
-    init(spacing: CGFloat = 4, lineSpacing: CGFloat = 2) {
+    init(spacing: CGFloat = 8, lineSpacing: CGFloat = 2) {
         self.spacing = spacing
         self.lineSpacing = lineSpacing
     }

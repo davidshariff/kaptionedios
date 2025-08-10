@@ -747,6 +747,20 @@ extension VideoEditor{
         // Calculate word layout considering line breaks
         let wordWidths = wordTimings.map { ($0.text as NSString).size(withAttributes: attributes).width + 2 * wordHorizontalPadding }
         
+        // Get the appropriate karaoke preset for spacing
+        let karaokePreset: KaraokePreset
+        switch karaokeType {
+        case .word:
+            karaokePreset = KaraokePreset.word
+        case .wordbg:
+            karaokePreset = KaraokePreset.wordbg
+        case .wordAndScale:
+            karaokePreset = KaraokePreset.wordAndScale
+        }
+        
+        // Use export word spacing from the preset
+        let wordSpacing: CGFloat = karaokePreset.exportWordSpacing
+        
         // Calculate word positions for multi-line layout
         let wordPositions = calculateKaraokeWordPositions(
             originalText: model.text,
@@ -754,7 +768,8 @@ extension VideoEditor{
             wordWidths: wordWidths,
             hasExplicitLineBreaks: hasExplicitLineBreaks,
             calculatedPadding: calculatedPadding,
-            lineHeight: font.lineHeight
+            lineHeight: font.lineHeight,
+            wordSpacing: wordSpacing
         )
         
         // Calculate total dimensions from word positions
@@ -1149,7 +1164,8 @@ extension VideoEditor{
         wordWidths: [CGFloat],
         hasExplicitLineBreaks: Bool,
         calculatedPadding: CGFloat,
-        lineHeight: CGFloat
+        lineHeight: CGFloat,
+        wordSpacing: CGFloat
     ) -> [WordPosition] {
         
         if !hasExplicitLineBreaks {
@@ -1164,7 +1180,7 @@ extension VideoEditor{
                     width: wordWidths[i],
                     height: lineHeight
                 ))
-                x += wordWidths[i] + 8 // 8pt spacing between words
+                x += wordWidths[i] + wordSpacing // Dynamic spacing between words
             }
             return positions
         }
@@ -1199,7 +1215,7 @@ extension VideoEditor{
             var lineWidth: CGFloat = 0
             for i in 0..<wordCount {
                 if wordIndex + i < finalWordWidths.count {
-                    lineWidth += finalWordWidths[wordIndex + i] + (i > 0 ? 8 : 0) // 8pt spacing
+                    lineWidth += finalWordWidths[wordIndex + i] + (i > 0 ? wordSpacing : 0) // Dynamic spacing
                 }
             }
             lineWidths.append(lineWidth)
@@ -1262,7 +1278,7 @@ extension VideoEditor{
                 for i in 0..<targetWordInLineIndex {
                     let prevWordTimingIndex = lineTextWordIndex + i
                     if prevWordTimingIndex < finalWordWidths.count {
-                        x += finalWordWidths[prevWordTimingIndex] + 8 // 8pt spacing
+                        x += finalWordWidths[prevWordTimingIndex] + wordSpacing // Dynamic spacing
                     }
                 }
                 

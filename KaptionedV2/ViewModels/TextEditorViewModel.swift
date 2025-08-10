@@ -82,7 +82,8 @@ class TextEditorViewModel: ObservableObject{
         if let textBox, isEdit{
             isEditMode = true
             currentTextBox = textBox
-            showEditTextContent = false  // Show full editor for openTextEditor
+            // Show full editor for openTextEditor, not the small one
+            showEditTextContent = false
         }else{
             currentTextBox = TextBox(timeRange: timeRange ?? (1...5))
             isEditMode = false

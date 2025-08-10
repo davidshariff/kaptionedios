@@ -135,13 +135,9 @@ struct TextOnPlayerView: View {
         }
         .contentShape(Rectangle())
         .onTapGesture {
-            if showEditSubtitlesMode {
-                editOrSelectTextBox(textBox, isSelected)
-            }
-            else {
-                showEditSubtitlesMode = true
-                viewModel.selectedTextBox = textBox
-            }
+            // set the current textbox to the selected textbox
+            showEditSubtitlesMode = true
+            viewModel.selectedTextBox = textBox
         }
     }
     
@@ -297,25 +293,7 @@ private func createStrokeAttr(_ textBox: TextBox) -> NSAttributedString? {
 
 extension TextOnPlayerView {
     
-    private func textBoxButtons(_ textBox: TextBox) -> some View{
-        HStack(spacing: 10){
-            Button {
-                viewModel.copy(textBox)
-            } label: {
-                Image(systemName: "doc.on.doc")
-                    .imageScale(.small)
-                    .padding(5)
-                    .background(Color(.systemGray2), in: Circle())
-            }
-        }
-        .foregroundColor(.white)
-    }
-    
-    private func editOrSelectTextBox(_ textBox: TextBox, _ isSelected: Bool){
-        // Always open text editor directly when tapping text
-        viewModel.openTextEditor(isEdit: true, textBox)
-    }
-    
+    // get the index of the textbox in the textbox array
     private func getIndex(_ id: UUID) -> Int{
         let index = viewModel.textBoxes.firstIndex(where: {$0.id == id})
         return index ?? 0
@@ -379,10 +357,26 @@ struct AttributedTextOverlay: UIViewRepresentable {
         
         // Selection border
         if isSelected {
-            uiView.layer.borderColor = UIColor.cyan.cgColor
-            uiView.layer.borderWidth = 1
+            uiView.layer.borderWidth = 0
+            uiView.layer.cornerRadius = 8
+            uiView.layer.masksToBounds = false
+            
+            // Create dashed border effect
+            let borderLayer = CAShapeLayer()
+            borderLayer.strokeColor = UIColor.purple.cgColor
+            borderLayer.lineDashPattern = [6, 4]
+            borderLayer.lineWidth = 2
+            borderLayer.fillColor = nil
+            borderLayer.path = UIBezierPath(roundedRect: uiView.bounds.insetBy(dx: -8, dy: -8), cornerRadius: 12).cgPath
+            
+            // Remove existing border layers
+            uiView.layer.sublayers?.removeAll { $0 is CAShapeLayer }
+            uiView.layer.addSublayer(borderLayer)
         } else {
             uiView.layer.borderWidth = 0
+            uiView.layer.cornerRadius = 0
+            // Remove border layers
+            uiView.layer.sublayers?.removeAll { $0 is CAShapeLayer }
         }
         // Update shadow
         uiView.layer.shadowColor = shadowColor.cgColor
@@ -392,7 +386,6 @@ struct AttributedTextOverlay: UIViewRepresentable {
     }
 } 
 
-// KaraokeTextOverlay SwiftUI view
 
 struct KaraokeTextByWordHighlightOverlay: View {
 

@@ -115,41 +115,7 @@ extension RootView{
             
             // Enhanced new project button for empty state
             VStack(spacing: 12) {
-                PhotosPicker(selection: $item, matching: .videos) {
-                    VStack(spacing: 16) {
-                        // Icon with background
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.blue.opacity(0.1))
-                                .frame(width: 60, height: 60)
-                            
-                            Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 30))
-                                .foregroundColor(.blue)
-                        }
-                        
-                        VStack(spacing: 4) {
-                            Text("Create New Project")
-                                .font(.headline)
-                                .foregroundColor(.primary)
-                            
-                            Text("Import a video to get started")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
-                    .padding(.horizontal, 20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemGray6))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                            )
-                    )
-                }
+                AnimatedBorderPhotosPickerFast(selection: $item)
                 
                 // Helpful tips
                 VStack(spacing: 12) {
@@ -186,7 +152,7 @@ extension RootView{
                         Spacer()
                     }
                 }
-                .padding(.horizontal, 20)
+                .padding(.horizontal, 30)
                 .padding(.vertical, 16)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
@@ -260,6 +226,89 @@ extension RootView{
                 self.showLoader = false
             }
         }
+    }
+}
+
+// MARK: - Animated Border for Create New Project (Faster)
+private struct AnimatedBorderPhotosPickerFast: View {
+    @Binding var selection: PhotosPickerItem?
+    @State private var gradientAngle: Double = 0
+    
+    // Fast speed: 360 degrees in 1 second (60fps)
+    private let timer = Timer.publish(every: 1.0 / 60.0, on: .main, in: .common).autoconnect()
+    
+    var body: some View {
+        PhotosPicker(selection: $selection, matching: .videos) {
+            VStack(spacing: 16) {
+                // Icon with background (blinking/fading gently)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.blue.opacity(0.1))
+                        .frame(width: 60, height: 60)
+                        .opacity(iconOpacity)
+                    
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 30))
+                        .foregroundColor(.blue)
+                        .opacity(iconOpacity)
+                }
+                
+                VStack(spacing: 4) {
+                    Text("Create New Project")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Text("Import a video to get started")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.systemGray6))
+                    .overlay(
+                        AnimatedBorderViewFast(angle: gradientAngle)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                    )
+            )
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 1.2)
+                    .repeatForever(autoreverses: true)
+            ) {
+                iconOpacity = 0.6
+            }
+        }
+        .onReceive(timer) { _ in
+            gradientAngle += 2
+            if gradientAngle > 360 { gradientAngle -= 360 }
+        }
+    }
+
+    @State private var iconOpacity: Double = 1.0
+}
+
+private struct AnimatedBorderViewFast: View {
+    var angle: Double
+    
+    var body: some View {
+        let gradient = AngularGradient(
+            gradient: Gradient(colors: [
+                Color.blue.opacity(0.7),
+                Color.purple.opacity(0.7),
+                Color.pink.opacity(0.7),
+                Color.blue.opacity(0.7)
+            ]),
+            center: .center,
+            angle: .degrees(angle)
+        )
+        RoundedRectangle(cornerRadius: 16)
+            .stroke(gradient, lineWidth: 2)
+            .animation(nil, value: angle) // Animation handled by parent
     }
 }
 

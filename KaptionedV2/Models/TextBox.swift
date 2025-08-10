@@ -258,7 +258,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: true
         ),
         SubtitleStyle(
-            name: "Background by word",
+            name: "Background by word", // confirmed style.
             fontSize: 32,
             bgColor: .clear,
             fontColor: .white,

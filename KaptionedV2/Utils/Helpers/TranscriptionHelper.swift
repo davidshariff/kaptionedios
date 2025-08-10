@@ -15,6 +15,7 @@ class TranscriptionHelper {
     
     func transcribeVideo(
         fileURL: URL,
+        language: String = "en",
         completion: @escaping (Result<[TextBox], Error>) -> Void
     ) {
         // Start audio extraction from the provided video file
@@ -62,7 +63,7 @@ class TranscriptionHelper {
             // --- Add primary language field to multipart form data ---
             data.append("--\(boundary)\r\n".data(using: .utf8)!)
             data.append("Content-Disposition: form-data; name=\"primary_lang\"\r\n\r\n".data(using: .utf8)!)
-            data.append("en\r\n".data(using: .utf8)!)
+            data.append("\(language)\r\n".data(using: .utf8)!)
             data.append("--\(boundary)--\r\n".data(using: .utf8)!)
 
             print("[TranscriptionHelper] Starting upload to API: \(url)")

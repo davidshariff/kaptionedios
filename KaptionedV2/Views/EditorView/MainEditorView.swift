@@ -232,6 +232,19 @@ struct MainEditorView: View {
                 }
             }
             
+            // Language picker sheet
+            if editorVM.showLanguagePicker {
+                LanguagePickerSheet(
+                    isPresented: $editorVM.showLanguagePicker,
+                    onLanguageSelected: { language in
+                        editorVM.onLanguageSelected(language)
+                    },
+                    hasExistingSubtitles: editorVM.hasExistingSubtitles,
+                    isFromNewProject: editorVM.isLanguagePickerFromNewProject
+                )
+                .zIndex(2500)
+            }
+            
             // Centered cross overlay
             if showCrossOverlay {
                 CrossOverlayView()

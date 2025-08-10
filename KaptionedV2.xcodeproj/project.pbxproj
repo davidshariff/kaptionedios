@@ -87,6 +87,7 @@
 		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
 		F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */; };
 		F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90902E4876840031E9DF /* BottomSheetView.swift */; };
+		F48A90932E487EB40031E9DF /* LanguagePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */; };
 		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
 		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
@@ -176,6 +177,7 @@
 		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
 		F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOnPlayerView.swift; sourceTree = "<group>"; };
 		F48A90902E4876840031E9DF /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
+		F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerSheet.swift; sourceTree = "<group>"; };
 		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
 		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
@@ -396,6 +398,7 @@
 		5ACFF99B29ED5C3500827A37 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
+				F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */,
 				F48A90902E4876840031E9DF /* BottomSheetView.swift */,
 				5ACFF9AA29EE8B8500827A37 /* Player */,
 				5ACFF9A729EE876D00827A37 /* Sliders */,
@@ -647,6 +650,7 @@
 				5AFA25C429FA727C00B820D0 /* FramesToolView.swift in Sources */,
 				F42364982E3698A100057C86 /* GridTestView.swift in Sources */,
 				F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */,
+				F48A90932E487EB40031E9DF /* LanguagePickerSheet.swift in Sources */,
 				5ACFF98729E949A900827A37 /* VideoItem.swift in Sources */,
 				5A17E08129F1495000DB4A47 /* CropperRatio.swift in Sources */,
 				5ACFF98D29E99C7F00827A37 /* RecordVideoView.swift in Sources */,

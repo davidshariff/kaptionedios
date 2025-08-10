@@ -15,6 +15,14 @@ class EditorViewModel: ObservableObject{
     @Published var showErrorAlert: Bool = false
     @Published var errorMessage: String = ""
     
+    @Published var showLanguagePicker: Bool = false
+    @Published var isLanguagePickerFromNewProject: Bool = false
+    
+    /// Check if the current video has existing subtitles
+    var hasExistingSubtitles: Bool {
+        return currentVideo?.textBoxes.isEmpty == false
+    }
+    
     @Published var videoPlayerSize: VideoPlayerSize = .half
     @Published var showWordTimeline: Bool = true
     
@@ -194,75 +202,77 @@ extension EditorViewModel{
             return 
         }
         
-        let performGeneration = {
-            print("🎬 [EditorViewModel] Starting subtitle generation")
-            
-            self.isLoading = true
-            TranscriptionHelper.shared.transcribeVideo(fileURL: video.url) { [weak self] result in
-                DispatchQueue.main.async {
-                    guard let self = self else { return }
-                    
-                    self.isLoading = false
-                    switch result {
-                    case .success(let subs):
-                        print("🎬 [EditorViewModel] Transcription completed with \(subs.count) subtitle segments")
-                        
-                        // Optimize all subtitles at once
-                        let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
-                            textBoxes: subs,
-                            videoWidth: video.frameSize.width,
-                            padding: 0
-                        )
-                        
-                        print("🎬 [EditorViewModel] Optimized textBoxes count: \(optimizedTextBoxes.count)")
-                        
-                        // Update the text boxes - this will automatically save to the project
-                        self.setText(optimizedTextBoxes)
-                        
-                        // Notify the TextEditorViewModel about the new text boxes
-                        self.onTextBoxesUpdated?(optimizedTextBoxes)
-                        
-                        // Notify that subtitles have been generated
-                        self.onSubtitlesGenerated?()
-                        
-                        completion?()
-                        
-                    case .failure(let error):
-                        print("❌ [EditorViewModel] Transcription failed: \(error.localizedDescription)")
-                        self.errorMessage = "Failed to generate subtitles: \(error.localizedDescription)"
-                        self.showErrorAlert = true
-                        completion?()
-                    }
-                }
-            }
-        }
-        
+        // Show language picker for manual generation
         if showConfirmation {
-            // Show confirmation dialog for manual generation
-            let alert = UIAlertController(
-                title: "Generate Subtitles?", 
-                message: "This will replace any existing subtitles. Continue?",
-                preferredStyle: .alert
-            )
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel) { _ in
-                completion?()
-            })
-            
-            alert.addAction(UIAlertAction(title: "Ok", style: .default) { _ in
-                performGeneration()
-            })
-            
-            UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true)
+            isLanguagePickerFromNewProject = false
+            showLanguagePicker = true
         } else {
-            // Direct generation for automatic subtitle generation
-            performGeneration()
+            // Direct generation for automatic subtitle generation (default to English)
+            performSubtitleGeneration(language: "en", completion: completion)
         }
     }
     
-    /// Automatically generates subtitles for new videos without confirmation
+    /// Performs the actual subtitle generation with the selected language
+    /// - Parameter language: The language code for transcription
+    /// - Parameter completion: Optional completion handler called after generation completes
+    private func performSubtitleGeneration(language: String, completion: (() -> Void)? = nil) {
+        guard let video = currentVideo else { 
+            completion?()
+            return 
+        }
+        
+        print("🎬 [EditorViewModel] Starting subtitle generation with language: \(language)")
+        
+        self.isLoading = true
+        TranscriptionHelper.shared.transcribeVideo(fileURL: video.url, language: language) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                self.isLoading = false
+                switch result {
+                case .success(let subs):
+                    print("🎬 [EditorViewModel] Transcription completed with \(subs.count) subtitle segments")
+                    
+                    // Optimize all subtitles at once
+                    let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
+                        textBoxes: subs,
+                        videoWidth: video.frameSize.width,
+                        padding: 0
+                    )
+                    
+                    print("🎬 [EditorViewModel] Optimized textBoxes count: \(optimizedTextBoxes.count)")
+                    
+                    // Update the text boxes - this will automatically save to the project
+                    self.setText(optimizedTextBoxes)
+                    
+                    // Notify the TextEditorViewModel about the new text boxes
+                    self.onTextBoxesUpdated?(optimizedTextBoxes)
+                    
+                    // Notify that subtitles have been generated
+                    self.onSubtitlesGenerated?()
+                    
+                    completion?()
+                    
+                case .failure(let error):
+                    print("❌ [EditorViewModel] Transcription failed: \(error.localizedDescription)")
+                    self.errorMessage = "Failed to generate subtitles: \(error.localizedDescription)"
+                    self.showErrorAlert = true
+                    completion?()
+                }
+            }
+        }
+    }
+    
+    /// Called when a language is selected from the language picker
+    /// - Parameter language: The selected language code
+    func onLanguageSelected(_ language: String) {
+        performSubtitleGeneration(language: language)
+    }
+    
+    /// Automatically generates subtitles for new videos - shows language picker
     func generateSubtitlesAutomatically() {
-        generateSubtitles(showConfirmation: false)
+        isLanguagePickerFromNewProject = true
+        showLanguagePicker = true
     }
 }
 

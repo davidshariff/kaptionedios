@@ -62,15 +62,43 @@ struct RootView: View {
                 rootVM.fetch()
             }
             .overlay {
-                if showLoader{
-                    Color.secondary.opacity(0.2).ignoresSafeArea()
-                    VStack(spacing: 10){
-                        Text("Loading video")
-                        ProgressView()
+                if showLoader {
+                    ZStack {
+                        // Backdrop blur
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .background(.ultraThinMaterial)
+                        
+                        // Loading card
+                        VStack(spacing: 20) {
+                            // Loading animation
+                            if showLoader {
+                                PremiumLoaderView()
+                            }
+                            
+                            VStack(spacing: 8) {
+                                Text("Loading Video")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                
+                                Text("Please wait while we prepare your video")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                        }
+                        .padding(32)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(.regularMaterial)
+                                .shadow(color: .black.opacity(0.1), radius: 20, x: 0, y: 10)
+                        )
+                        .padding(.horizontal, 40)
                     }
-                    .padding()
-                    .frame(height: 100)
-                    .background(Color(.systemGray6), in: RoundedRectangle(cornerRadius: 12))
+                    .scaleEffect(showLoader ? 1.0 : 0.9)
+                    .opacity(showLoader ? 1.0 : 0.0)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1), value: showLoader)
                 }
             }
             .confirmationDialog(
@@ -309,7 +337,8 @@ extension RootView{
             self.showLoader = true
             if let video = try await newItem?.loadTransferable(type: VideoItem.self) {
                 selectedVideoURL = video.url
-                try await Task.sleep(for: .milliseconds(50))
+                // Show loader for at least 1 second so animation is visible
+                try await Task.sleep(for: .milliseconds(1000))
                 self.showLoader = false
                 self.showEditor.toggle()
                 
@@ -317,6 +346,142 @@ extension RootView{
                 print("Failed load video")
                 self.showLoader = false
             }
+        }
+    }
+}
+
+// MARK: - Premium Loader Component
+struct PremiumLoaderView: View {
+    @State private var isAnimating = false
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var rotationAngle: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Outer pulsing ring
+            Circle()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color.blue.opacity(0.3),
+                            Color.purple.opacity(0.2),
+                            Color.blue.opacity(0.1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 3
+                )
+                .frame(width: 90, height: 90)
+                .scaleEffect(pulseScale)
+                .opacity(0.6)
+                .animation(
+                    .easeInOut(duration: 2.0)
+                    .repeatForever(autoreverses: true),
+                    value: pulseScale
+                )
+            
+            // Main gradient ring
+            Circle()
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color.blue.opacity(0.4),
+                            Color.purple.opacity(0.3),
+                            Color.pink.opacity(0.2),
+                            Color.clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 4
+                )
+                .frame(width: 75, height: 75)
+            
+            // Animated progress ring
+            Circle()
+                .trim(from: 0, to: 0.7)
+                .stroke(
+                    LinearGradient(
+                        colors: [
+                            Color.blue,
+                            Color.purple,
+                            Color.pink,
+                            Color.blue.opacity(0.3)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: 5, lineCap: .round)
+                )
+                .frame(width: 75, height: 75)
+                .rotationEffect(.degrees(-90))
+                .rotationEffect(.degrees(rotationAngle))
+                .animation(
+                    .linear(duration: 2.5)
+                    .repeatForever(autoreverses: false),
+                    value: rotationAngle
+                )
+            
+            // Inner core with glow
+            ZStack {
+                // Glow effect
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [
+                                Color.blue.opacity(0.4),
+                                Color.purple.opacity(0.2),
+                                Color.clear
+                            ],
+                            center: .center,
+                            startRadius: 2,
+                            endRadius: 25
+                        )
+                    )
+                    .frame(width: 50, height: 50)
+                    .scaleEffect(isAnimating ? 1.2 : 0.8)
+                    .opacity(isAnimating ? 0.8 : 0.4)
+                    .animation(
+                        .easeInOut(duration: 1.5)
+                        .repeatForever(autoreverses: true),
+                        value: isAnimating
+                    )
+                
+                // Center dot
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue, Color.purple],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 8, height: 8)
+                    .shadow(color: .blue.opacity(0.5), radius: 4, x: 0, y: 0)
+            }
+            
+            // Sparkle effects
+            ForEach(0..<6, id: \.self) { index in
+                Circle()
+                    .fill(Color.white.opacity(0.8))
+                    .frame(width: 2, height: 2)
+                    .offset(x: 35)
+                    .rotationEffect(.degrees(Double(index) * 60))
+                    .rotationEffect(.degrees(rotationAngle * 0.5))
+                    .opacity(isAnimating ? 1.0 : 0.3)
+                    .animation(
+                        .easeInOut(duration: 1.0)
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(index) * 0.1),
+                        value: isAnimating
+                    )
+            }
+        }
+        .onAppear {
+            isAnimating = true
+            pulseScale = 1.3
+            rotationAngle = 360
         }
     }
 }

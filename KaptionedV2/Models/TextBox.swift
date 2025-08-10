@@ -247,7 +247,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         SubtitleStyle(
             name: "Background by word",
             fontSize: 32,
-            bgColor: .black.opacity(0.5),
+            bgColor: .clear,
             fontColor: .white,
             strokeColor: .clear,
             strokeWidth: 0,

@@ -59,7 +59,6 @@
 		5ACFF9B229EEA93400827A37 /* ToolsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF9B129EEA93400827A37 /* ToolsSectionView.swift */; };
 		5AE2A2A029F465BD003D217F /* VideoEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE2A29F29F465BD003D217F /* VideoEditor.swift */; };
 		5AE2A2A229F66EE9003D217F /* VideoExporterBottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE2A2A129F66EE9003D217F /* VideoExporterBottomSheetView.swift */; };
-		5AE2A2A429F67B96003D217F /* SheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE2A2A329F67B96003D217F /* SheetView.swift */; };
 		5AE2A2A629F6A949003D217F /* VideoQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE2A2A529F6A949003D217F /* VideoQuality.swift */; };
 		5AE2A2A829F6BA29003D217F /* ExporterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE2A2A729F6BA29003D217F /* ExporterViewModel.swift */; };
 		5AE2A2AE29F880D0003D217F /* FiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AE2A2AD29F880D0003D217F /* FiltersView.swift */; };
@@ -87,6 +86,7 @@
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
 		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
 		F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */; };
+		F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90902E4876840031E9DF /* BottomSheetView.swift */; };
 		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
 		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
@@ -148,7 +148,6 @@
 		5ACFF9B129EEA93400827A37 /* ToolsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolsSectionView.swift; sourceTree = "<group>"; };
 		5AE2A29F29F465BD003D217F /* VideoEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEditor.swift; sourceTree = "<group>"; };
 		5AE2A2A129F66EE9003D217F /* VideoExporterBottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoExporterBottomSheetView.swift; sourceTree = "<group>"; };
-		5AE2A2A329F67B96003D217F /* SheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetView.swift; sourceTree = "<group>"; };
 		5AE2A2A529F6A949003D217F /* VideoQuality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoQuality.swift; sourceTree = "<group>"; };
 		5AE2A2A729F6BA29003D217F /* ExporterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExporterViewModel.swift; sourceTree = "<group>"; };
 		5AE2A2AD29F880D0003D217F /* FiltersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersView.swift; sourceTree = "<group>"; };
@@ -176,6 +175,7 @@
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
 		F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOnPlayerView.swift; sourceTree = "<group>"; };
+		F48A90902E4876840031E9DF /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
 		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
@@ -396,10 +396,10 @@
 		5ACFF99B29ED5C3500827A37 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
+				F48A90902E4876840031E9DF /* BottomSheetView.swift */,
 				5ACFF9AA29EE8B8500827A37 /* Player */,
 				5ACFF9A729EE876D00827A37 /* Sliders */,
 				5ACFF9A629EE876900827A37 /* Buttons */,
-				5AE2A2A329F67B96003D217F /* SheetView.swift */,
 			);
 			path = ViewComponents;
 			sourceTree = "<group>";
@@ -700,7 +700,6 @@
 				F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */,
 				5A5E6F9B2A03A24B00F5EBF8 /* AudioButtonView.swift in Sources */,
 				5ACFF99F29ED709B00827A37 /* RangeSliderView.swift in Sources */,
-				5AE2A2A429F67B96003D217F /* SheetView.swift in Sources */,
 				5A5E6F972A039EFD00F5EBF8 /* AVAudioSession+Ext.swift in Sources */,
 				F4D67B712E47C46700164273 /* SubtitleGenerationLoader.swift in Sources */,
 				5A08FC7429EFD5E400AB877C /* NewTimelineSlider.swift in Sources */,
@@ -717,6 +716,7 @@
 				F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */,
 				5AE2A2B029F88113003D217F /* FilteredImage.swift in Sources */,
 				5A5F95732A0166D90041C3F6 /* Swipe.swift in Sources */,
+				F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */,
 				5A3D13B029F186160027E25E /* CoreDataManager.swift in Sources */,
 				5A3D13A829F184000027E25E /* PersistenceController.swift in Sources */,
 			);

@@ -9,9 +9,9 @@ struct VideoExporterBottomSheetView: View {
         self._viewModel = StateObject(wrappedValue: ExporterViewModel(video: video))
     }
     var body: some View {
-        SheetView(
+        BottomSheetView(
             isPresented: $isPresented, 
-            bgOpacity: 0.4, 
+            bgOpacity: 0.4,
             allowDismiss: viewModel.renderState != .loading
         ) {
             VStack(alignment: .leading){

@@ -20,7 +20,7 @@ struct SubslistView: View {
     }
     
     var body: some View {
-        SheetView(isPresented: $isPresented, bgOpacity: 0.3) {
+        BottomSheetView(isPresented: $isPresented, bgOpacity: 0.3, sheetOpacity: 0.3) {
             VStack(spacing: 16) {
                 Text("Subtitles")
                     .font(.title2)

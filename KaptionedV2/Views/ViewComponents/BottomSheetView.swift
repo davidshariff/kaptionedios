@@ -1,22 +1,17 @@
-//
-//  SheetView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 24.04.2023.
-//
-
 import SwiftUI
 
-struct SheetView<Content: View>: View {
+struct BottomSheetView<Content: View>: View {
     @Binding var isPresented: Bool
     @State private var showSheet: Bool = false
     @State private var slideGesture: CGSize
     var bgOpacity: CGFloat
+    var sheetOpacity: CGFloat
     var allowDismiss: Bool
     let content: Content
-    init(isPresented: Binding<Bool>, bgOpacity: CGFloat = 0.01, allowDismiss: Bool = true, @ViewBuilder content: () -> Content){
+    init(isPresented: Binding<Bool>, bgOpacity: CGFloat = 0.01, sheetOpacity: CGFloat = 1.0, allowDismiss: Bool = true, @ViewBuilder content: () -> Content){
         self._isPresented = isPresented
         self.bgOpacity = bgOpacity
+        self.sheetOpacity = sheetOpacity
         self.allowDismiss = allowDismiss
         self._slideGesture = State(initialValue: CGSize.zero)
         self.content = content()
@@ -49,13 +44,13 @@ struct SheetView<Content: View>: View {
 }
 
 
-extension SheetView{
+extension BottomSheetView{
     private var sheetLayer: some View{
         VStack(spacing: 0){
             HStack(alignment: .top, spacing: -20){
                 Spacer()
                 Capsule()
-                    .fill(Color(.systemGray4))
+                    .fill(Color.gray.opacity(0.3))
                     .frame(width: 80, height: 6)
                 Spacer()
                 if allowDismiss {
@@ -82,8 +77,9 @@ extension SheetView{
         }
         .frame(maxWidth: .infinity)
         .background(Color(.systemGray6))
-        .clipShape(CustomCorners(corners: [.topLeft, .topRight], radius: 12))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: -5)
+        .opacity(sheetOpacity)
         .gesture(
             allowDismiss ? 
             DragGesture().onChanged{ value in
@@ -106,15 +102,6 @@ extension SheetView{
 }
 
 
-struct CustomCorners: Shape {
-    
-    var corners: UIRectCorner
-    var radius: CGFloat
-    
-    func path(in rect: CGRect) -> Path {
-        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-        return Path(path.cgPath)
-    }
-}
+
 
 

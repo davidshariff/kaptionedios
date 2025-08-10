@@ -164,10 +164,12 @@ struct PlayerControl: View{
                 currentTime: videoPlayer.currentTime,
                 showMinorTicks: false,
                 showPlayhead: true,
-                customPixelsPerSecond: 30,
+                customPixelsPerSecond: 40,
                 onChange: {
                     videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
-                }
+                },
+                timeLabelYOffset: 15,
+                tickYOffset: -10
             )
             .frame(width: 300)
         }

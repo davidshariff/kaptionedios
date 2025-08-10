@@ -25,6 +25,8 @@ struct RulerView: View {
     var exposedOffset: Binding<CGFloat>?
     var externalDragOffset: Binding<CGFloat>?
     var externalZoomOffset: Binding<CGFloat>?
+    var timeLabelYOffset: CGFloat = 0
+    var tickYOffset: CGFloat = 0
     
     // Constants
     let duration: Double
@@ -61,7 +63,9 @@ struct RulerView: View {
         exposedOffset: Binding<CGFloat>? = nil,
         externalDragOffset: Binding<CGFloat>? = nil,
         externalZoomOffset: Binding<CGFloat>? = nil,
-        onChange: @escaping () -> Void = {}
+        onChange: @escaping () -> Void = {},
+        timeLabelYOffset: CGFloat = 0,
+        tickYOffset: CGFloat = 0
     ) {
         self._value = value
         self.bounds = bounds
@@ -80,6 +84,14 @@ struct RulerView: View {
         self.externalDragOffset = externalDragOffset
         self.externalZoomOffset = externalZoomOffset
         self.onChange = onChange
+        self.timeLabelYOffset = timeLabelYOffset
+        self.tickYOffset = tickYOffset
+    }
+    
+    private func formatTime(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainingSeconds = seconds % 60
+        return String(format: "%02d:%02d", minutes, remainingSeconds)
     }
     
     private func createRulerTicks(pixelsPerSecond: CGFloat) -> some View {
@@ -92,14 +104,6 @@ struct RulerView: View {
                             .frame(width: 1, height: showMinorTicks ? 12 : tickHeight)
                     }
                     
-                    if showTimelabel {
-                        Text("\(second)")
-                            .font(.system(size: 8))
-                            .foregroundColor(.gray)
-                            .frame(height: 12)
-                            .padding(.top, 4)
-                    }
-                    
                     if showMinorTicks {
                         Rectangle()
                             .fill(Color.gray.opacity(0.3))
@@ -107,6 +111,26 @@ struct RulerView: View {
                     }
                 }
                 .frame(width: pixelsPerSecond, alignment: .leading)
+                .offset(y: tickYOffset)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .offset(x: offset)
+    }
+    
+    private func createTimeLabels(pixelsPerSecond: CGFloat) -> some View {
+        let tickHeight = showMinorTicks ? 12 : self.tickHeight
+        let labelYPosition = tickHeight + 8 // Position below the ticks with some spacing
+        
+        return ZStack {
+            ForEach(0..<Int(duration) + 1, id: \.self) { second in
+                if showTimelabel {
+                    Text(formatTime(second))
+                        .font(.system(size: 8))
+                        .foregroundColor(.gray)
+                        .frame(width: 30, height: 12)
+                        .position(x: CGFloat(second) * pixelsPerSecond, y: labelYPosition + timeLabelYOffset)
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -131,6 +155,7 @@ struct RulerView: View {
             
             ZStack {
                 createRulerTicks(pixelsPerSecond: zoomedPixelsPerSecond)
+                createTimeLabels(pixelsPerSecond: zoomedPixelsPerSecond)
                 createPlayhead(geometry: geometry)
             }
             // center the timeline in the parent view

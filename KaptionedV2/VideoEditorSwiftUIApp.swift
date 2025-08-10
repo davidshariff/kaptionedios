@@ -1,9 +1,6 @@
-//
-//  VideoEditorSwiftUIApp.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 14.04.2023.
-//
+//////////////////////////////////
+// Main entry point for the app //
+//////////////////////////////////
 
 import SwiftUI
 

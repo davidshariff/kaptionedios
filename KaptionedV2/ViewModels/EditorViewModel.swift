@@ -29,6 +29,7 @@ class EditorViewModel: ObservableObject{
     var onSaving: (() -> Void)?
     var onTextBoxesUpdated: (([TextBox]) -> Void)?
     var onSubtitlesGenerated: (() -> Void)?
+    var maxWordsPerLine: Int = 3
     
     private var projectEntity: ProjectEntity?
     
@@ -224,7 +225,7 @@ extension EditorViewModel{
         print("🎬 [EditorViewModel] Starting subtitle generation with language: \(language)")
         
         self.isLoading = true
-        TranscriptionHelper.shared.transcribeVideo(fileURL: video.url, language: language) { [weak self] result in
+        TranscriptionHelper.shared.transcribeVideo(fileURL: video.url, language: language, max_words_per_line: maxWordsPerLine) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 

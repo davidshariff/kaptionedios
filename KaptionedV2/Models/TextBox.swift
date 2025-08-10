@@ -239,19 +239,19 @@ struct SubtitleStyle: Identifiable, Equatable {
     static let allPresets: [SubtitleStyle] = [
         // Karaoke presets - see below struct KaraokePreset for more info
         SubtitleStyle(
-            name: "Highlight by word",
+            name: "Highlight by word", // confirmed style
             fontSize: 32,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,
-            strokeWidth: 2,
-            backgroundPadding: 8,
-            cornerRadius: 8,
+            strokeWidth: 5,
+            backgroundPadding: 0,
+            cornerRadius: 0,
             shadowColor: .black,
-            shadowRadius: 6,
-            shadowX: 0,
+            shadowRadius: 2,
+            shadowX: 2,
             shadowY: 2,
-            shadowOpacity: 0.7,
+            shadowOpacity: 1,
             isKaraokePreset: true
         ),
         SubtitleStyle(
@@ -416,7 +416,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: false
         ),
         SubtitleStyle(
-            name: "Bold Shadow Pop",
+            name: "Bold Shadow Pop", // confirmed style
             fontSize: 42,
             bgColor: .clear,
             fontColor: .white,
@@ -458,7 +458,7 @@ struct KaraokePreset {
 
     static let word = KaraokePreset(
         karaokeType: .word,
-        highlightColor: .blue,
+        highlightColor: .yellow,
         wordBGColor: .clear,
         presetName: "Highlight by word",
         previewWordSpacing: 8,

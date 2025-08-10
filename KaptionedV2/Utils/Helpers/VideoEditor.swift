@@ -564,6 +564,12 @@ extension VideoEditor{
         let calculatedFontSize = model.fontSize * ratio
         let calculatedPadding = model.backgroundPadding * ratio
         let calculatedCornerRadius = model.cornerRadius * ratio
+        
+        // Scale shadow properties like other properties
+        let effectiveRegularShadowRadius = (model.shadowRadius == 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) ? 4.0 : model.shadowRadius
+        let calculatedShadowRadius = effectiveRegularShadowRadius * ratio
+        let calculatedShadowX = model.shadowX * ratio
+        let calculatedShadowY = model.shadowY * ratio
 
         // If wordTimings is present, render karaoke-style text highlighting
         if let wordTimings = model.wordTimings {
@@ -660,32 +666,33 @@ extension VideoEditor{
                 height: paddedSize.height - 2 * calculatedPadding
             )
             
-            // Draw shadow if needed - apply to stroke first if it exists, otherwise to fill
-            let effectiveRegularShadowRadius = (model.shadowRadius == 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) ? 4.0 : model.shadowRadius
-            if effectiveRegularShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear {
+            // Draw shadow if needed - apply to the complete text (stroke + fill)
+            if calculatedShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear {
                 let shadowColor = UIColor(model.shadowColor).withAlphaComponent(model.shadowOpacity)
                 cgContext.saveGState()
-                cgContext.setShadow(offset: CGSize(width: model.shadowX, height: model.shadowY), blur: effectiveRegularShadowRadius, color: shadowColor.cgColor)
+                cgContext.setShadow(offset: CGSize(width: calculatedShadowX, height: calculatedShadowY), blur: calculatedShadowRadius, color: shadowColor.cgColor)
                 
-                // Apply shadow to stroke if it exists, otherwise to fill
+                // Draw stroke with shadow if it exists
                 if let strokeAttr = strokeAttributedString {
                     if hasExplicitLineBreaks {
                         strokeAttr.draw(in: drawingRect)
                     } else {
                         strokeAttr.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
                     }
-                } else {
-                    if hasExplicitLineBreaks {
-                        fillAttributedString.draw(in: drawingRect)
-                    } else {
-                        fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
-                    }
                 }
+                
+                // Draw fill with shadow
+                if hasExplicitLineBreaks {
+                    fillAttributedString.draw(in: drawingRect)
+                } else {
+                    fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+                }
+                
                 cgContext.restoreGState()
             }
             
-            // Draw stroke layer without shadow (only if shadow wasn't applied to stroke)
-            if let strokeAttr = strokeAttributedString, !(effectiveRegularShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) {
+            // Draw stroke layer without shadow (only if no shadow was applied)
+            if let strokeAttr = strokeAttributedString, !(calculatedShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) {
                 if hasExplicitLineBreaks {
                     strokeAttr.draw(in: drawingRect)
                 } else {
@@ -693,11 +700,13 @@ extension VideoEditor{
                 }
             }
             
-            // Draw main fill text (without shadow)
-            if hasExplicitLineBreaks {
-                fillAttributedString.draw(in: drawingRect)
-            } else {
-                fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+            // Draw main fill text without shadow (only if no shadow was applied)
+            if !(calculatedShadowRadius > 0 && model.shadowOpacity > 0 && model.shadowColor != .clear) {
+                if hasExplicitLineBreaks {
+                    fillAttributedString.draw(in: drawingRect)
+                } else {
+                    fillAttributedString.draw(at: CGPoint(x: calculatedPadding, y: calculatedPadding))
+                }
             }
         }
         textLayer.contents = textImage.cgImage

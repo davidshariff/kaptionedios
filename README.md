@@ -228,6 +228,34 @@ videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
     asTrackID: overlayTrackID)
 ```
 
+### 🔧 iOS 18.5 Compatibility Fixes
+
+#### **Animation Timing Issue**
+iOS 18.5 introduced changes to how `beginTime` values are interpreted in `CABasicAnimation` when used with `AVVideoCompositionCoreAnimationTool` on physical devices. This caused subtitles to work on simulators but not on real devices.
+
+**Solution**: Use `AVCoreAnimationBeginTimeAtZero` for device builds:
+```swift
+#if targetEnvironment(simulator)
+animation.beginTime = timeValue
+#else
+// iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+animation.beginTime = AVCoreAnimationBeginTimeAtZero + timeValue
+#endif
+```
+
+#### **Shadow Property Scaling**
+Regular text export wasn't scaling shadow properties (radius, offset) like karaoke text, causing exported shadows to not match the preview.
+
+**Solution**: Apply consistent shadow scaling across all text types:
+```swift
+// Scale shadow properties like other properties
+let calculatedShadowRadius = effectiveShadowRadius * ratio
+let calculatedShadowX = model.shadowX * ratio
+let calculatedShadowY = model.shadowY * ratio
+```
+
+These fixes ensure perfect WYSIWYG consistency between preview and export across all iOS versions and device types.
+
 ### 🔄 WYSIWYG Preview
 
 The preview matches the final output because:

@@ -185,6 +185,8 @@ struct SubtitleStyle: Identifiable, Equatable {
     var wordTimings: [WordWithTiming]? = nil
     var isKaraokePreset: Bool = false
     
+
+    
     // Custom karaoke colors (used when user customizes karaoke presets)
     var customHighlightColor: Color? = nil
     var customWordBGColor: Color? = nil
@@ -237,9 +239,10 @@ struct SubtitleStyle: Identifiable, Equatable {
     }
 
     static let allPresets: [SubtitleStyle] = [
+
         // Karaoke presets - see below struct KaraokePreset for more info
         SubtitleStyle(
-            name: "Highlight by word", // confirmed style
+            name: "Highlight by word", // confirmed style: https://www.tiktok.com/@healthy.tips15/video/7520399199410588950?is_from_webapp=1&sender_device=pc
             fontSize: 32,
             bgColor: .clear,
             fontColor: .white,
@@ -286,6 +289,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowOpacity: 0.7,
             isKaraokePreset: true
         ),
+
         // Non-karaoke presets
         SubtitleStyle(
             name: "Classic Yellow",
@@ -416,7 +420,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: false
         ),
         SubtitleStyle(
-            name: "Bold Shadow Pop", // confirmed style
+            name: "Bold Shadow Pop", // confirmed style: https://www.tiktok.com/@debatedigest5/video/7515131366774803754?is_from_webapp=1&sender_device=pc
             fontSize: 42,
             bgColor: .clear,
             fontColor: .white,
@@ -428,6 +432,22 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowRadius: 2,
             shadowX: -3,
             shadowY: 3,
+            shadowOpacity: 0.8,
+            isKaraokePreset: false
+        ),
+        SubtitleStyle(
+            name: "Pop Art Bold", // confirmed style: https://www.tiktok.com/@mattpaige68/video/7530643035198065934?is_from_webapp=1&sender_device=pc
+            fontSize: 44,
+            bgColor: .clear,
+            fontColor: .yellow,
+            strokeColor: .black,
+            strokeWidth: 10,
+            backgroundPadding: 0,
+            cornerRadius: 0,
+            shadowColor: Color(red: 1.0, green: 0.3, blue: 0.0),
+            shadowRadius: 1,
+            shadowX: 1,
+            shadowY: 2,
             shadowOpacity: 0.8,
             isKaraokePreset: false
         )

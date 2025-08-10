@@ -260,6 +260,7 @@ struct TextLayoutHelper {
             shadowY: properties["shadowY"] as? CGFloat ?? 0,
             shadowOpacity: properties["shadowOpacity"] as? Double ?? 0.5,
             wordTimings: wordTimings,
+            activeWordScale: properties["activeWordScale"] as? CGFloat ?? 1.2,
             presetName: properties["presetName"] as? String
         )
     }

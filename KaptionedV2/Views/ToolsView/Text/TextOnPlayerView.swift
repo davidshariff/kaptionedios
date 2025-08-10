@@ -191,6 +191,29 @@ struct TextOnPlayerView: View {
                 .padding(.horizontal, textBox.backgroundPadding)
                 .padding(.vertical, textBox.backgroundPadding / 2)
             } 
+            else if let wordTimings = textBox.wordTimings, 
+                    let karaokeType = textBox.karaokeType,
+                    let highlightColor = textBox.highlightColor,
+                    karaokeType == .wordAndScale {
+                KaraokeTextWordAndScaleOverlay(
+                    text: textBox.text,
+                    words: wordTimings,
+                    fontSize: textBox.fontSize,
+                    fontColor: textBox.fontColor,
+                    highlightColor: highlightColor,
+                    strokeColor: textBox.strokeColor,
+                    strokeWidth: textBox.strokeWidth,
+                    shadowColor: textBox.shadowColor,
+                    shadowRadius: textBox.shadowRadius,
+                    shadowX: textBox.shadowX,
+                    shadowY: textBox.shadowY,
+                    shadowOpacity: textBox.shadowOpacity,
+                    activeWordScale: textBox.activeWordScale,
+                    currentTime: currentTime
+                )
+                .padding(.horizontal, textBox.backgroundPadding)
+                .padding(.vertical, textBox.backgroundPadding / 2)
+            } 
         }
         else {
             ZStack {
@@ -513,6 +536,75 @@ struct KaraokeTextByWordBackgroundOverlay: View {
                         .opacity(progress)
                 )
                 .opacity(progress)
+                .animation(.linear(duration: 0.05), value: progress)
+            }
+        }
+    }
+}
+
+struct KaraokeTextWordAndScaleOverlay: View {
+
+    let text: String
+    let words: [WordWithTiming]
+    let fontSize: CGFloat
+    let fontColor: Color
+    let highlightColor: Color
+    let strokeColor: Color
+    let strokeWidth: CGFloat
+    let shadowColor: Color
+    let shadowRadius: CGFloat
+    let shadowX: CGFloat
+    let shadowY: CGFloat
+    let shadowOpacity: Double
+    let activeWordScale: CGFloat
+    let currentTime: Double
+
+    var body: some View {
+        KaraokeTextLayout(
+            originalText: text,
+            words: words,
+            spacing: 4,
+            lineSpacing: 2
+        ) { word in
+            let isActive = currentTime >= word.start && currentTime < word.end
+            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            
+            // Calculate scale based on active state with smooth transitions
+            let targetScale: CGFloat = isActive ? activeWordScale : 1.0
+            
+            ZStack(alignment: .leading) {
+                // Base text with stroke and shadow support
+                StrokeText(
+                    text: word.text,
+                    fontSize: fontSize,
+                    fontColor: fontColor,
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    shadowColor: shadowColor,
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY,
+                    shadowOpacity: shadowOpacity
+                )
+                .scaleEffect(targetScale)
+                .animation(.easeInOut(duration: 0.15), value: targetScale)
+                
+                // Animated highlight text with stroke and shadow support
+                StrokeText(
+                    text: word.text,
+                    fontSize: fontSize,
+                    fontColor: highlightColor,
+                    strokeColor: strokeColor,
+                    strokeWidth: strokeWidth,
+                    shadowColor: shadowColor,
+                    shadowRadius: shadowRadius,
+                    shadowX: shadowX,
+                    shadowY: shadowY,
+                    shadowOpacity: shadowOpacity
+                )
+                .scaleEffect(targetScale)
+                .opacity(progress)
+                .animation(.easeInOut(duration: 0.15), value: targetScale)
                 .animation(.linear(duration: 0.05), value: progress)
             }
         }

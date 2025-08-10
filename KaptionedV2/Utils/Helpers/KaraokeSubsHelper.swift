@@ -18,6 +18,8 @@ struct KaraokeSubsHelper {
             preset = KaraokePreset.word
         case .wordbg:
             preset = KaraokePreset.wordbg
+        case .wordAndScale:
+            preset = KaraokePreset.wordAndScale
         }
         var boxes: [TextBox] = []
         for textBox in textBoxes {

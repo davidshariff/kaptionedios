@@ -198,6 +198,8 @@ struct PresetsListView: View {
             return .word
         case "Background by word":
             return .wordbg
+        case "Word & Scale":
+            return .wordAndScale
         default:
             return .word
         }

@@ -738,6 +738,9 @@ extension VideoEditor{
         // Add horizontal padding to each word for word-by-word background (for visual separation)
         let wordHorizontalPadding: CGFloat = (karaokeType == .wordbg) ? 8 : 0
         
+        // Word & Scale karaoke scaling factor for active words
+        let activeWordScale = model.activeWordScale
+        
         // Check if original text has explicit line breaks
         let hasExplicitLineBreaks = model.text.contains("\n")
         
@@ -821,6 +824,29 @@ extension VideoEditor{
                 let baseLayer = CALayer()
                 baseLayer.frame = wordRect
                 baseLayer.contentsScale = UIScreen.main.scale * 2.0
+                
+                // Word & Scale karaoke: Add scaling animation for active word
+                if karaokeType == .wordAndScale {
+                    // Scale up animation when word becomes active
+                    let scaleUpAnimation = CABasicAnimation(keyPath: "transform.scale")
+                    scaleUpAnimation.fromValue = 1.0
+                    scaleUpAnimation.toValue = activeWordScale
+                    scaleUpAnimation.beginTime = word.start
+                    scaleUpAnimation.duration = 0.15 // Quick scale up
+                    scaleUpAnimation.fillMode = .forwards
+                    scaleUpAnimation.isRemovedOnCompletion = false
+                    baseLayer.add(scaleUpAnimation, forKey: "wordAndScaleUp")
+                    
+                    // Scale down animation when word becomes inactive
+                    let scaleDownAnimation = CABasicAnimation(keyPath: "transform.scale")
+                    scaleDownAnimation.fromValue = activeWordScale
+                    scaleDownAnimation.toValue = 1.0
+                    scaleDownAnimation.beginTime = word.end
+                    scaleDownAnimation.duration = 0.15 // Quick scale down
+                    scaleDownAnimation.fillMode = .forwards
+                    scaleDownAnimation.isRemovedOnCompletion = false
+                    baseLayer.add(scaleDownAnimation, forKey: "wordAndScaleDown")
+                }
 
                 // Render the word as an image for best quality
                 let baseRendererFormat = UIGraphicsImageRendererFormat()
@@ -895,6 +921,29 @@ extension VideoEditor{
                 highlightLayer.frame = wordRect
                 highlightLayer.contentsScale = UIScreen.main.scale * 2.0
                 highlightLayer.opacity = 0
+                
+                // Word & Scale karaoke: Add scaling animation for active word highlight
+                if karaokeType == .wordAndScale {
+                    // Scale up animation when word becomes active
+                    let highlightScaleUpAnimation = CABasicAnimation(keyPath: "transform.scale")
+                    highlightScaleUpAnimation.fromValue = 1.0
+                    highlightScaleUpAnimation.toValue = activeWordScale
+                    highlightScaleUpAnimation.beginTime = word.start
+                    highlightScaleUpAnimation.duration = 0.15 // Quick scale up
+                    highlightScaleUpAnimation.fillMode = .forwards
+                    highlightScaleUpAnimation.isRemovedOnCompletion = false
+                    highlightLayer.add(highlightScaleUpAnimation, forKey: "wordAndScaleHighlightUp")
+                    
+                    // Scale down animation when word becomes inactive
+                    let highlightScaleDownAnimation = CABasicAnimation(keyPath: "transform.scale")
+                    highlightScaleDownAnimation.fromValue = activeWordScale
+                    highlightScaleDownAnimation.toValue = 1.0
+                    highlightScaleDownAnimation.beginTime = word.end
+                    highlightScaleDownAnimation.duration = 0.15 // Quick scale down
+                    highlightScaleDownAnimation.fillMode = .forwards
+                    highlightScaleDownAnimation.isRemovedOnCompletion = false
+                    highlightLayer.add(highlightScaleDownAnimation, forKey: "wordAndScaleHighlightDown")
+                }
 
                 // Render the highlighted word as an image
                 let highlightRendererFormat = UIGraphicsImageRendererFormat()

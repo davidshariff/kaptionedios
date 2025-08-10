@@ -12,6 +12,7 @@ struct WordWithTiming: Identifiable, Equatable, Codable {
 enum KaraokeType: String, CaseIterable, Codable {
     case word = "Word"
     case wordbg = "WordBG"
+    case wordAndScale = "WordAndScale"
 }
 
 struct TextBox: Identifiable{
@@ -45,6 +46,9 @@ struct TextBox: Identifiable{
     var highlightColor: Color? = nil
     var wordBGColor: Color? = nil
     
+    // TikTok karaoke scaling properties
+    var activeWordScale: CGFloat = 1.2 // Scale factor for the active word (default 20% bigger)
+    
     // Preset tracking
     var presetName: String? = nil
     
@@ -71,6 +75,7 @@ struct TextBox: Identifiable{
         karaokeType: KaraokeType? = nil,
         highlightColor: Color? = nil,
         wordBGColor: Color? = nil,
+        activeWordScale: CGFloat = 1.2,
         presetName: String? = nil
     ) {
         // If presetName is provided, find and apply the preset values
@@ -108,6 +113,8 @@ struct TextBox: Identifiable{
                     karaokePreset = .word
                 case "Background by word":
                     karaokePreset = .wordbg
+                case "Word & Scale":
+                    karaokePreset = .wordAndScale
                 default:
                     karaokePreset = .word
                 }
@@ -121,7 +128,7 @@ struct TextBox: Identifiable{
                     self.wordBGColor = karaokePreset.wordBGColor
                 }
             }
-            
+            self.activeWordScale = activeWordScale
             self.presetName = presetName
         } else {
             print("DEBUG: No presetName provided during TextBox initialization 🟡")
@@ -150,6 +157,7 @@ struct TextBox: Identifiable{
                 self.highlightColor = highlightColor
                 self.wordBGColor = wordBGColor
             }
+            self.activeWordScale = activeWordScale
             self.presetName = presetName
         }
     }
@@ -209,6 +217,8 @@ struct SubtitleStyle: Identifiable, Equatable {
                 karaokePreset = .word
             case "Background by word":
                 karaokePreset = .wordbg
+            case "Word & Scale":
+                karaokePreset = .wordAndScale
             default:
                 karaokePreset = .word
             }
@@ -258,6 +268,22 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowX: 0,
             shadowY: 0,
             shadowOpacity: 0,
+            isKaraokePreset: true
+        ),
+        SubtitleStyle(
+            name: "Word & Scale",
+            fontSize: 32,
+            bgColor: .clear,
+            fontColor: .white,
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 8,
+            cornerRadius: 8,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 2,
+            shadowOpacity: 0.7,
             isKaraokePreset: true
         ),
         // Non-karaoke presets
@@ -409,5 +435,11 @@ struct KaraokePreset {
         highlightColor: .yellow,
         wordBGColor: .blue,
         presetName: "Background by word"
+    )
+    static let wordAndScale = KaraokePreset(
+        karaokeType: .wordAndScale,
+        highlightColor: .yellow,
+        wordBGColor: .clear,
+        presetName: "Word & Scale"
     )
 }

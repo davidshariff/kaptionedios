@@ -270,5 +270,290 @@ This approach is fully compliant with iOS App Store guidelines because:
 
 This implementation demonstrates exactly how professional video editing apps achieve high-quality subtitle burning with frame-accurate timing and rich styling, all while maintaining iOS compliance and performance standards.
 
+## 🎨 Adding New Karaoke Styles
+
+This section documents how to add new karaoke subtitle styles to the app, using the "Word & Scale" implementation as a complete example.
+
+### 📋 Overview
+
+Adding a new karaoke style requires updates across 6 main areas:
+1. **Model Layer** - Define the karaoke type and properties
+2. **Preset Configuration** - Add the style to available presets
+3. **Helper Functions** - Update karaoke generation logic
+4. **Preview System** - Create SwiftUI preview component
+5. **Export Pipeline** - Implement Core Animation rendering
+6. **UI Integration** - Wire up preset selection logic
+
+### 🔧 Step-by-Step Implementation
+
+#### 1. Model Layer Updates (`TextBox.swift`)
+
+**Add new karaoke type:**
+```swift
+enum KaraokeType: String, CaseIterable, Codable {
+    case word = "Word"
+    case wordbg = "WordBG"
+    case wordAndScale = "WordAndScale"  // ✅ New type
+}
+```
+
+**Add any new properties needed:**
+```swift
+struct TextBox: Identifiable {
+    // ... existing properties
+    
+    // Custom karaoke properties
+    var activeWordScale: CGFloat = 1.2 // ✅ New scaling property
+}
+```
+
+**Update TextBox initializer:**
+```swift
+init(
+    // ... existing parameters
+    activeWordScale: CGFloat = 1.2,  // ✅ Add new parameter
+    presetName: String? = nil
+) {
+    // ... existing logic
+    self.activeWordScale = activeWordScale  // ✅ Set property
+}
+```
+
+**Add preset case handling:**
+```swift
+switch preset.name {
+case "Highlight by word":
+    karaokePreset = .word
+case "Background by word":
+    karaokePreset = .wordbg
+case "Word & Scale":                    // ✅ New preset case
+    karaokePreset = .wordAndScale
+default:
+    karaokePreset = .word
+}
+```
+
+**Create new KaraokePreset:**
+```swift
+static let wordAndScale = KaraokePreset(     // ✅ New preset
+    karaokeType: .wordAndScale,
+    highlightColor: .yellow,
+    wordBGColor: .clear,
+    presetName: "Word & Scale"
+)
+```
+
+**Add to SubtitleStyle.allPresets:**
+```swift
+SubtitleStyle(
+    name: "Word & Scale",               // ✅ New style preset
+    fontSize: 32,
+    bgColor: .clear,
+    fontColor: .white,
+    strokeColor: .black,
+    strokeWidth: 2,
+    backgroundPadding: 8,
+    cornerRadius: 8,
+    shadowColor: .black,
+    shadowRadius: 6,
+    shadowX: 0,
+    shadowY: 2,
+    shadowOpacity: 0.7,
+    isKaraokePreset: true
+),
+```
+
+#### 2. Helper Functions (`KaraokeSubsHelper.swift`)
+
+**Update karaoke generation switch:**
+```swift
+switch karaokeType {
+case .word:
+    preset = KaraokePreset.word
+case .wordbg:
+    preset = KaraokePreset.wordbg
+case .wordAndScale:                     // ✅ Handle new type
+    preset = KaraokePreset.wordAndScale
+}
+```
+
+#### 3. UI Integration (Preset Selection)
+
+**Update `ToolsSectionView.swift`:**
+```swift
+private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
+    switch style.name {
+    case "Highlight by word": return .word
+    case "Background by word": return .wordbg
+    case "Word & Scale": return .wordAndScale  // ✅ Map preset name
+    default: return .word
+    }
+}
+```
+
+**Update `PresetsListView.swift`:**
+```swift
+private func getKaraokeType(for presetName: String) -> KaraokeType {
+    switch presetName {
+    case "Highlight by word": return .word
+    case "Background by word": return .wordbg
+    case "Word & Scale": return .wordAndScale  // ✅ Map preset name
+    default: return .word
+    }
+}
+```
+
+#### 4. Preview System (`TextOnPlayerView.swift`)
+
+**Add new karaoke overlay condition:**
+```swift
+else if let wordTimings = textBox.wordTimings, 
+        let karaokeType = textBox.karaokeType,
+        let highlightColor = textBox.highlightColor,
+        karaokeType == .wordAndScale {          // ✅ New condition
+    KaraokeTextWordAndScaleOverlay(
+        text: textBox.text,
+        words: wordTimings,
+        fontSize: textBox.fontSize,
+        fontColor: textBox.fontColor,
+        highlightColor: highlightColor,
+        strokeColor: textBox.strokeColor,
+        strokeWidth: textBox.strokeWidth,
+        shadowColor: textBox.shadowColor,
+        shadowRadius: textBox.shadowRadius,
+        shadowX: textBox.shadowX,
+        shadowY: textBox.shadowY,
+        shadowOpacity: textBox.shadowOpacity,
+        activeWordScale: textBox.activeWordScale,  // ✅ Pass new property
+        currentTime: currentTime
+    )
+}
+```
+
+**Create new SwiftUI preview component:**
+```swift
+struct KaraokeTextWordAndScaleOverlay: View {
+    // Properties for styling and animation
+    let text: String
+    let words: [WordWithTiming]
+    let fontSize: CGFloat
+    let fontColor: Color
+    let highlightColor: Color
+    // ... other styling properties
+    let activeWordScale: CGFloat        // ✅ New scaling property
+    let currentTime: Double
+
+    var body: some View {
+        KaraokeTextLayout(
+            originalText: text,
+            words: words,
+            spacing: 4,
+            lineSpacing: 2
+        ) { word in
+            let isActive = currentTime >= word.start && currentTime < word.end
+            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            
+            // ✅ Calculate dynamic scale
+            let targetScale: CGFloat = isActive ? activeWordScale : 1.0
+            
+            ZStack(alignment: .leading) {
+                // Base text layer
+                StrokeText(/* ... */)
+                    .scaleEffect(targetScale)                           // ✅ Apply scaling
+                    .animation(.easeInOut(duration: 0.15), value: targetScale)
+                
+                // Highlight text layer
+                StrokeText(/* ... with highlight color */)
+                    .scaleEffect(targetScale)                           // ✅ Apply scaling
+                    .opacity(progress)
+                    .animation(.easeInOut(duration: 0.15), value: targetScale)
+                    .animation(.linear(duration: 0.05), value: progress)
+            }
+        }
+    }
+}
+```
+
+#### 5. Export Pipeline (`VideoEditor.swift`)
+
+**Add scaling logic in `createKaraokeTextLayer`:**
+
+```swift
+// Get scaling factor from model
+let activeWordScale = model.activeWordScale        // ✅ Extract scale factor
+
+// For each word, add scaling animations to base layer
+if karaokeType == .wordAndScale {                  // ✅ New karaoke type check
+    // Scale up animation when word becomes active
+    let scaleUpAnimation = CABasicAnimation(keyPath: "transform.scale")
+    scaleUpAnimation.fromValue = 1.0
+    scaleUpAnimation.toValue = activeWordScale
+    scaleUpAnimation.beginTime = word.start
+    scaleUpAnimation.duration = 0.15
+    scaleUpAnimation.fillMode = .forwards
+    scaleUpAnimation.isRemovedOnCompletion = false
+    baseLayer.add(scaleUpAnimation, forKey: "wordAndScaleUp")
+    
+    // Scale down animation when word becomes inactive
+    let scaleDownAnimation = CABasicAnimation(keyPath: "transform.scale")
+    scaleDownAnimation.fromValue = activeWordScale
+    scaleDownAnimation.toValue = 1.0
+    scaleDownAnimation.beginTime = word.end
+    scaleDownAnimation.duration = 0.15
+    scaleDownAnimation.fillMode = .forwards
+    scaleDownAnimation.isRemovedOnCompletion = false
+    baseLayer.add(scaleDownAnimation, forKey: "wordAndScaleDown")
+}
+
+// Apply same scaling to highlight layer
+if karaokeType == .wordAndScale {                  // ✅ Scale highlight layer too
+    // ... same scaling animations for highlightLayer
+}
+```
+
+**Update `TextLayoutHelper.swift` for new properties:**
+```swift
+private static func createTextBoxFromProperties(/* ... */) -> TextBox {
+    return TextBox(
+        // ... existing properties
+        activeWordScale: properties["activeWordScale"] as? CGFloat ?? 1.2,  // ✅ Preserve new property
+        presetName: properties["presetName"] as? String
+    )
+}
+```
+
+### 🎯 Key Implementation Principles
+
+1. **WYSIWYG Consistency**: The SwiftUI preview must match the exported video exactly
+2. **Frame-Accurate Timing**: Use `CMTime` and `CABasicAnimation.beginTime` for precise synchronization
+3. **Property Preservation**: All custom properties must be handled in `TextLayoutHelper.createTextBoxFromProperties`
+4. **Complete Integration**: Update all switch statements that handle karaoke types
+5. **Animation Coordination**: Both base and highlight layers need the same animations for visual consistency
+
+### 🔍 Testing Checklist
+
+When adding a new karaoke style, verify:
+
+- [ ] Preset appears in presets list
+- [ ] Preset selection triggers karaoke generation
+- [ ] Preview shows the effect in real-time
+- [ ] Preview animations match intended behavior
+- [ ] Export produces the same visual effect as preview
+- [ ] Multi-line text works correctly
+- [ ] All text styling options (stroke, shadow, etc.) work
+- [ ] Animation timing is frame-accurate
+- [ ] Memory usage is reasonable during export
+
+### 💡 Example: Word & Scale Implementation
+
+The "Word & Scale" karaoke style demonstrates a complete implementation that:
+- Combines word highlighting (like existing karaoke) with dynamic scaling
+- Scales active words to 120% size by default (configurable via `activeWordScale`)
+- Uses smooth 0.15-second scale transitions
+- Maintains perfect preview-export consistency
+- Supports all existing text styling features
+
+This implementation serves as a template for creating other advanced karaoke effects like rotation, color transitions, or particle effects.
+
   
   

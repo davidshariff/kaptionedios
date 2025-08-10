@@ -834,7 +834,12 @@ extension VideoEditor{
                     let bgAnim = CABasicAnimation(keyPath: "opacity")
                     bgAnim.fromValue = 0
                     bgAnim.toValue = 1
+                    #if targetEnvironment(simulator)
                     bgAnim.beginTime = word.start
+                    #else
+                    // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                    bgAnim.beginTime = AVCoreAnimationBeginTimeAtZero + word.start
+                    #endif
                     bgAnim.duration = 0.01 // Instant for word-by-word
                     bgAnim.fillMode = .forwards
                     bgAnim.isRemovedOnCompletion = false
@@ -844,7 +849,12 @@ extension VideoEditor{
                     let bgFadeOutAnim = CABasicAnimation(keyPath: "opacity")
                     bgFadeOutAnim.fromValue = 1
                     bgFadeOutAnim.toValue = 0
+                    #if targetEnvironment(simulator)
                     bgFadeOutAnim.beginTime = word.end
+                    #else
+                    // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                    bgFadeOutAnim.beginTime = AVCoreAnimationBeginTimeAtZero + word.end
+                    #endif
                     bgFadeOutAnim.duration = 0.01
                     bgFadeOutAnim.fillMode = .forwards
                     bgFadeOutAnim.isRemovedOnCompletion = false
@@ -865,7 +875,12 @@ extension VideoEditor{
                     let scaleUpAnimation = CABasicAnimation(keyPath: "transform.scale")
                     scaleUpAnimation.fromValue = 1.0
                     scaleUpAnimation.toValue = activeWordScale
+                    #if targetEnvironment(simulator)
                     scaleUpAnimation.beginTime = word.start
+                    #else
+                    // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                    scaleUpAnimation.beginTime = AVCoreAnimationBeginTimeAtZero + word.start
+                    #endif
                     scaleUpAnimation.duration = 0.15 // Quick scale up
                     scaleUpAnimation.fillMode = .forwards
                     scaleUpAnimation.isRemovedOnCompletion = false
@@ -875,7 +890,12 @@ extension VideoEditor{
                     let scaleDownAnimation = CABasicAnimation(keyPath: "transform.scale")
                     scaleDownAnimation.fromValue = activeWordScale
                     scaleDownAnimation.toValue = 1.0
+                    #if targetEnvironment(simulator)
                     scaleDownAnimation.beginTime = word.end
+                    #else
+                    // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                    scaleDownAnimation.beginTime = AVCoreAnimationBeginTimeAtZero + word.end
+                    #endif
                     scaleDownAnimation.duration = 0.15 // Quick scale down
                     scaleDownAnimation.fillMode = .forwards
                     scaleDownAnimation.isRemovedOnCompletion = false
@@ -962,7 +982,12 @@ extension VideoEditor{
                     let highlightScaleUpAnimation = CABasicAnimation(keyPath: "transform.scale")
                     highlightScaleUpAnimation.fromValue = 1.0
                     highlightScaleUpAnimation.toValue = activeWordScale
+                    #if targetEnvironment(simulator)
                     highlightScaleUpAnimation.beginTime = word.start
+                    #else
+                    // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                    highlightScaleUpAnimation.beginTime = AVCoreAnimationBeginTimeAtZero + word.start
+                    #endif
                     highlightScaleUpAnimation.duration = 0.15 // Quick scale up
                     highlightScaleUpAnimation.fillMode = .forwards
                     highlightScaleUpAnimation.isRemovedOnCompletion = false
@@ -972,7 +997,12 @@ extension VideoEditor{
                     let highlightScaleDownAnimation = CABasicAnimation(keyPath: "transform.scale")
                     highlightScaleDownAnimation.fromValue = activeWordScale
                     highlightScaleDownAnimation.toValue = 1.0
+                    #if targetEnvironment(simulator)
                     highlightScaleDownAnimation.beginTime = word.end
+                    #else
+                    // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                    highlightScaleDownAnimation.beginTime = AVCoreAnimationBeginTimeAtZero + word.end
+                    #endif
                     highlightScaleDownAnimation.duration = 0.15 // Quick scale down
                     highlightScaleDownAnimation.fillMode = .forwards
                     highlightScaleDownAnimation.isRemovedOnCompletion = false
@@ -1050,7 +1080,12 @@ extension VideoEditor{
                 let highlightAnim = CABasicAnimation(keyPath: "opacity")
                 highlightAnim.fromValue = 0
                 highlightAnim.toValue = 1
+                #if targetEnvironment(simulator)
                 highlightAnim.beginTime = word.start
+                #else
+                // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                highlightAnim.beginTime = AVCoreAnimationBeginTimeAtZero + word.start
+                #endif
 
                 // Karaoke animation - appear instantly for word-based highlighting
                 highlightAnim.duration = 0.01
@@ -1062,7 +1097,12 @@ extension VideoEditor{
                 let highlightFadeOutAnim = CABasicAnimation(keyPath: "opacity")
                 highlightFadeOutAnim.fromValue = 1
                 highlightFadeOutAnim.toValue = 0
+                #if targetEnvironment(simulator)
                 highlightFadeOutAnim.beginTime = word.end
+                #else
+                // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+                highlightFadeOutAnim.beginTime = AVCoreAnimationBeginTimeAtZero + word.end
+                #endif
                 highlightFadeOutAnim.duration = 0.01
                 highlightFadeOutAnim.fillMode = .forwards
                 highlightFadeOutAnim.isRemovedOnCompletion = false
@@ -1103,7 +1143,12 @@ extension VideoEditor{
             appearance.fromValue = 0
             appearance.toValue = 1
             appearance.duration = 0.05
+            #if targetEnvironment(simulator)
             appearance.beginTime = timeRange.lowerBound
+            #else
+            // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+            appearance.beginTime = AVCoreAnimationBeginTimeAtZero + timeRange.lowerBound
+            #endif
             appearance.fillMode = .forwards
             appearance.isRemovedOnCompletion = false
             textLayer.add(appearance, forKey: "Appearance")
@@ -1114,7 +1159,12 @@ extension VideoEditor{
             let disappearance = CABasicAnimation(keyPath: "opacity")
             disappearance.fromValue = 1
             disappearance.toValue = 0
+            #if targetEnvironment(simulator)
             disappearance.beginTime = timeRange.upperBound
+            #else
+            // iOS 18.5 fix: Use AVCoreAnimationBeginTimeAtZero for device builds
+            disappearance.beginTime = AVCoreAnimationBeginTimeAtZero + timeRange.upperBound
+            #endif
             disappearance.duration = 0.05
             disappearance.fillMode = .forwards
             disappearance.isRemovedOnCompletion = false

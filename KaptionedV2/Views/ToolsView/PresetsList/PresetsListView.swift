@@ -115,6 +115,9 @@ struct PresetsListView: View {
                 ),
                 selectedPreset: karaokePreset,
                 currentSubtitleText: getCurrentSubtitleText(),
+                currentHighlightColor: getCurrentHighlightColor(for: karaokePreset),
+                currentWordBGColor: getCurrentWordBGColor(for: karaokePreset),
+                currentFontColor: getCurrentFontColor(for: karaokePreset),
                 onConfirm: { highlightColor, wordBGColor, fontColor in
                     handleKaraokePresetSelection(karaokePreset, highlightColor: highlightColor, wordBGColor: wordBGColor, fontColor: fontColor)
                     selectedKaraokePreset = nil // Close the sheet
@@ -198,5 +201,56 @@ struct PresetsListView: View {
         default:
             return .word
         }
+    }
+    
+    // Helper functions to get current colors from the current TextBox
+    private func getCurrentHighlightColor(for preset: SubtitleStyle) -> Color? {
+        // If we have a current TextBox with the same karaoke preset, use its colors
+        if let currentTextBox = currentTextBox,
+           currentTextBox.isKaraokePreset,
+           currentTextBox.presetName == preset.name {
+            return currentTextBox.highlightColor
+        }
+        
+        // Otherwise, return the preset's default highlight color
+        switch preset.name {
+        case "Highlight by word":
+            return .blue // KaraokePreset.word default
+        case "Background by word":
+            return .yellow // KaraokePreset.wordbg default
+        default:
+            return .blue
+        }
+    }
+    
+    private func getCurrentWordBGColor(for preset: SubtitleStyle) -> Color? {
+        // If we have a current TextBox with the same karaoke preset, use its colors
+        if let currentTextBox = currentTextBox,
+           currentTextBox.isKaraokePreset,
+           currentTextBox.presetName == preset.name {
+            return currentTextBox.wordBGColor
+        }
+        
+        // Otherwise, return the preset's default word background color
+        switch preset.name {
+        case "Highlight by word":
+            return .clear // KaraokePreset.word default
+        case "Background by word":
+            return .blue // KaraokePreset.wordbg default
+        default:
+            return .clear
+        }
+    }
+    
+    private func getCurrentFontColor(for preset: SubtitleStyle) -> Color? {
+        // If we have a current TextBox with the same karaoke preset, use its colors
+        if let currentTextBox = currentTextBox,
+           currentTextBox.isKaraokePreset,
+           currentTextBox.presetName == preset.name {
+            return currentTextBox.fontColor
+        }
+        
+        // Otherwise, return the preset's default font color
+        return preset.fontColor
     }
 }

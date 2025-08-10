@@ -16,27 +16,31 @@ struct KaraokeColorSelectionView: View {
         .mint, .teal, .indigo, .brown, .gray, .black, .white, .clear
     ]
 
-    init(isPresented: Binding<Bool>, selectedPreset: SubtitleStyle, currentSubtitleText: String?, onConfirm: @escaping (Color, Color, Color) -> Void) {
+    init(isPresented: Binding<Bool>, selectedPreset: SubtitleStyle, currentSubtitleText: String?, currentHighlightColor: Color? = nil, currentWordBGColor: Color? = nil, currentFontColor: Color? = nil, onConfirm: @escaping (Color, Color, Color) -> Void) {
         self._isPresented = isPresented
         self.selectedPreset = selectedPreset
         self.currentSubtitleText = currentSubtitleText
         self.onConfirm = onConfirm
 
-        // Initialize with default colors based on preset type
+        // Use current colors if provided, otherwise fall back to defaults based on preset type
+        let defaultHighlightColor: Color
+        let defaultWordBGColor: Color
+        
         switch selectedPreset.name {
         case "Highlight by word":
-            self._selectedHighlightColor = State(initialValue: .orange)
-            self._selectedWordBGColor = State(initialValue: .clear)
-            self._selectedFontColor = State(initialValue: selectedPreset.fontColor)
+            defaultHighlightColor = .blue // Use the updated default from KaraokePreset.word
+            defaultWordBGColor = .clear
         case "Background by word":
-            self._selectedHighlightColor = State(initialValue: .yellow)
-            self._selectedWordBGColor = State(initialValue: .blue)
-            self._selectedFontColor = State(initialValue: selectedPreset.fontColor)
+            defaultHighlightColor = .yellow
+            defaultWordBGColor = .blue
         default:
-            self._selectedHighlightColor = State(initialValue: .blue)
-            self._selectedWordBGColor = State(initialValue: .clear)
-            self._selectedFontColor = State(initialValue: selectedPreset.fontColor)
+            defaultHighlightColor = .blue
+            defaultWordBGColor = .clear
         }
+        
+        self._selectedHighlightColor = State(initialValue: currentHighlightColor ?? defaultHighlightColor)
+        self._selectedWordBGColor = State(initialValue: currentWordBGColor ?? defaultWordBGColor)
+        self._selectedFontColor = State(initialValue: currentFontColor ?? selectedPreset.fontColor)
     }
 
     var body: some View {
@@ -140,7 +144,7 @@ struct KaraokeColorSelectionView: View {
                                 }) {
                                     Circle()
                                         .fill(color == .clear ? Color.white : color)
-                                        .frame(width: 32, height: 32)
+                                        .frame(width: selectedHighlightColor == color ? 36 : 32, height: selectedHighlightColor == color ? 36 : 32)
                                         .overlay(
                                             Circle()
                                                 .stroke(selectedHighlightColor == color ? Color.blue : Color.gray.opacity(0.3), lineWidth: selectedHighlightColor == color ? 3 : 1)
@@ -149,12 +153,17 @@ struct KaraokeColorSelectionView: View {
                                             // Show diagonal line for clear color
                                             color == .clear ?
                                             Path { path in
-                                                path.move(to: CGPoint(x: 4, y: 28))
-                                                path.addLine(to: CGPoint(x: 28, y: 4))
+                                                let size: CGFloat = selectedHighlightColor == color ? 36 : 32
+                                                let offset: CGFloat = selectedHighlightColor == color ? 6 : 4
+                                                let endOffset: CGFloat = selectedHighlightColor == color ? 30 : 28
+                                                path.move(to: CGPoint(x: offset, y: size - offset))
+                                                path.addLine(to: CGPoint(x: size - offset, y: offset))
                                             }
                                             .stroke(Color.red, lineWidth: 2)
                                             : nil
                                         )
+                                        .scaleEffect(selectedHighlightColor == color ? 1.0 : 1.0)
+                                        .animation(.easeInOut(duration: 0.2), value: selectedHighlightColor)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -178,7 +187,7 @@ struct KaraokeColorSelectionView: View {
                                     }) {
                                         Circle()
                                             .fill(color == .clear ? Color.white : color)
-                                            .frame(width: 32, height: 32)
+                                            .frame(width: selectedWordBGColor == color ? 36 : 32, height: selectedWordBGColor == color ? 36 : 32)
                                             .overlay(
                                                 Circle()
                                                     .stroke(selectedWordBGColor == color ? Color.blue : Color.gray.opacity(0.3), lineWidth: selectedWordBGColor == color ? 3 : 1)
@@ -187,12 +196,17 @@ struct KaraokeColorSelectionView: View {
                                                 // Show diagonal line for clear color
                                                 color == .clear ?
                                                 Path { path in
-                                                    path.move(to: CGPoint(x: 4, y: 28))
-                                                    path.addLine(to: CGPoint(x: 28, y: 4))
+                                                    let size: CGFloat = selectedWordBGColor == color ? 36 : 32
+                                                    let offset: CGFloat = selectedWordBGColor == color ? 6 : 4
+                                                    let endOffset: CGFloat = selectedWordBGColor == color ? 30 : 28
+                                                    path.move(to: CGPoint(x: offset, y: size - offset))
+                                                    path.addLine(to: CGPoint(x: size - offset, y: offset))
                                                 }
                                                 .stroke(Color.red, lineWidth: 2)
                                                 : nil
                                             )
+                                            .scaleEffect(selectedWordBGColor == color ? 1.0 : 1.0)
+                                            .animation(.easeInOut(duration: 0.2), value: selectedWordBGColor)
                                     }
                                     .buttonStyle(PlainButtonStyle())
                                 }
@@ -216,7 +230,7 @@ struct KaraokeColorSelectionView: View {
                                 }) {
                                     Circle()
                                         .fill(color == .clear ? Color.white : color)
-                                        .frame(width: 32, height: 32)
+                                        .frame(width: selectedFontColor == color ? 36 : 32, height: selectedFontColor == color ? 36 : 32)
                                         .overlay(
                                             Circle()
                                                 .stroke(selectedFontColor == color ? Color.blue : Color.gray.opacity(0.3), lineWidth: selectedFontColor == color ? 3 : 1)
@@ -225,12 +239,17 @@ struct KaraokeColorSelectionView: View {
                                             // Show diagonal line for clear color
                                             color == .clear ?
                                             Path { path in
-                                                path.move(to: CGPoint(x: 4, y: 28))
-                                                path.addLine(to: CGPoint(x: 28, y: 4))
+                                                let size: CGFloat = selectedFontColor == color ? 36 : 32
+                                                let offset: CGFloat = selectedFontColor == color ? 6 : 4
+                                                let endOffset: CGFloat = selectedFontColor == color ? 30 : 28
+                                                path.move(to: CGPoint(x: offset, y: size - offset))
+                                                path.addLine(to: CGPoint(x: size - offset, y: offset))
                                             }
                                             .stroke(Color.red, lineWidth: 2)
                                             : nil
                                         )
+                                        .scaleEffect(selectedFontColor == color ? 1.0 : 1.0)
+                                        .animation(.easeInOut(duration: 0.2), value: selectedFontColor)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                             }
@@ -290,6 +309,9 @@ struct KaraokeColorSelectionView: View {
         isPresented: .constant(true),
         selectedPreset: SubtitleStyle.allPresets.first(where: { $0.name == "Highlight by word" })!,
         currentSubtitleText: "Sample text for preview",
+        currentHighlightColor: .blue,
+        currentWordBGColor: .clear,
+        currentFontColor: .yellow,
         onConfirm: { _, _, _ in }
     )
 }

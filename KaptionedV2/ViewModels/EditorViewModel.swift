@@ -266,7 +266,7 @@ extension EditorViewModel{
     /// Called when a language is selected from the language picker
     /// - Parameter language: The selected language code
     func onLanguageSelected(_ language: String) {
-        performSubtitleGeneration(language: language)
+        performSubtitleGeneration(language: language == "zh-TW" ? "zh" : language)
     }
     
     /// Automatically generates subtitles for new videos - shows language picker

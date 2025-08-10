@@ -20,8 +20,7 @@ struct LanguagePickerSheet: View {
         ("Russian", "ru"),
         ("Japanese", "ja"),
         ("Korean", "ko"),
-        ("Chinese (Simplified)", "zh"),
-        ("Chinese (Traditional)", "zh-TW"),
+        ("Chinese", "zh"),
         ("Arabic", "ar"),
         ("Hindi", "hi"),
         ("Dutch", "nl"),
@@ -142,12 +141,14 @@ struct LanguageRow: View {
                         .font(.title3)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 8)
                     .fill(isSelected ? Color.blue.opacity(0.1) : Color.clear)
             )
+            .contentShape(Rectangle())
         }
         .buttonStyle(PlainButtonStyle())
         

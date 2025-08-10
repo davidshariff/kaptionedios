@@ -163,8 +163,9 @@ extension RootView{
         VStack(spacing: 30) {
             // Hero section with welcome message
             VStack(spacing: 16) {
-                // Large icon with gradient background
+                // Large icon with gradient background and animations
                 ZStack {
+                    // Animated background circle with pulsing effect
                     Circle()
                         .fill(
                             LinearGradient(
@@ -174,7 +175,29 @@ extension RootView{
                             )
                         )
                         .frame(width: 120, height: 120)
+                        .scaleEffect(1.0)
+                        .animation(
+                            Animation.easeInOut(duration: 2.0)
+                                .repeatForever(autoreverses: true),
+                            value: UUID()
+                        )
                     
+                    // Floating sparkles around the icon
+                    ForEach(0..<8, id: \.self) { index in
+                        SparkleView()
+                            .offset(
+                                x: 80 * cos(Double(index) * .pi / 4),
+                                y: 80 * sin(Double(index) * .pi / 4)
+                            )
+                            .animation(
+                                Animation.easeInOut(duration: 3.0 + Double(index) * 0.2)
+                                    .repeatForever(autoreverses: true)
+                                    .delay(Double(index) * 0.1),
+                                value: UUID()
+                            )
+                    }
+                    
+                    // Main icon
                     Image(systemName: "video.badge.plus")
                         .font(.system(size: 40, weight: .light))
                         .foregroundStyle(
@@ -184,6 +207,12 @@ extension RootView{
                                 endPoint: .bottomTrailing
                             )
                         )
+                        .scaleEffect(1.0)
+                        .animation(
+                            Animation.easeInOut(duration: 1.5)
+                                .repeatForever(autoreverses: true),
+                            value: UUID()
+                        )
                 }
                 
                 VStack(spacing: 8) {
@@ -191,6 +220,12 @@ extension RootView{
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)
+                        .opacity(0.8)
+                        .animation(
+                            Animation.easeInOut(duration: 2.0)
+                                .repeatForever(autoreverses: true),
+                            value: UUID()
+                        )
                     
                     Text("Automatically generate stunning captions for your videos")
                         .font(.body)
@@ -204,7 +239,7 @@ extension RootView{
             VStack(spacing: 12) {
                 PhotosPicker(selection: $item, matching: .videos) {
                     VStack(spacing: 16) {
-                        // Icon with animated background
+                        // Icon with background
                         ZStack {
                             RoundedRectangle(cornerRadius: 16)
                                 .fill(Color.blue.opacity(0.1))
@@ -483,5 +518,52 @@ struct PremiumLoaderView: View {
             pulseScale = 1.3
             rotationAngle = 360
         }
+    }
+}
+
+// Sparkle view for floating animations with individual color changes
+private struct SparkleView: View {
+    @State private var isAnimating = false
+    @State private var colorIndex = 0
+    
+    private let colors: [Color] = [
+        .blue.opacity(0.6),
+        .purple.opacity(0.6),
+        .pink.opacity(0.6),
+        .orange.opacity(0.6),
+        .green.opacity(0.6)
+    ]
+    
+    // Random delay for each sparkle to start color cycling
+    private let randomDelay: Double
+    
+    init() {
+        self.randomDelay = Double.random(in: 0...2.0)
+    }
+    
+    var body: some View {
+        Image(systemName: "sparkle")
+            .font(.system(size: 12))
+            .foregroundColor(colors[colorIndex])
+            .scaleEffect(isAnimating ? 1.5 : 0.5)
+            .opacity(isAnimating ? 1.0 : 0.3)
+            .rotationEffect(.degrees(isAnimating ? 360 : 0))
+            .onAppear {
+                withAnimation(
+                    Animation.easeInOut(duration: 2.0)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    isAnimating = true
+                }
+                
+                // Individual color cycling animation with random delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + randomDelay) {
+                    Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            colorIndex = (colorIndex + 1) % colors.count
+                        }
+                    }
+                }
+            }
     }
 }

@@ -20,6 +20,8 @@ struct RootView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         
                         if rootVM.projects.isEmpty {
+                            Spacer()
+                            Spacer()
                             // Empty state with welcome design
                             emptyStateView
                         } else {

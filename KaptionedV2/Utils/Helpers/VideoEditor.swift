@@ -839,6 +839,17 @@ extension VideoEditor{
                     bgAnim.fillMode = .forwards
                     bgAnim.isRemovedOnCompletion = false
                     bgLayer.add(bgAnim, forKey: "bgOpacity")
+                    
+                    // Add fade out animation for background when word ends
+                    let bgFadeOutAnim = CABasicAnimation(keyPath: "opacity")
+                    bgFadeOutAnim.fromValue = 1
+                    bgFadeOutAnim.toValue = 0
+                    bgFadeOutAnim.beginTime = word.end
+                    bgFadeOutAnim.duration = 0.01
+                    bgFadeOutAnim.fillMode = .forwards
+                    bgFadeOutAnim.isRemovedOnCompletion = false
+                    bgLayer.add(bgFadeOutAnim, forKey: "bgOpacityFadeOut")
+                    
                     textLayer.addSublayer(bgLayer)
                 }
 
@@ -1046,6 +1057,16 @@ extension VideoEditor{
                 highlightAnim.fillMode = .forwards
                 highlightAnim.isRemovedOnCompletion = false
                 highlightLayer.add(highlightAnim, forKey: "karaokeOpacity")
+                
+                // Add fade out animation when word ends
+                let highlightFadeOutAnim = CABasicAnimation(keyPath: "opacity")
+                highlightFadeOutAnim.fromValue = 1
+                highlightFadeOutAnim.toValue = 0
+                highlightFadeOutAnim.beginTime = word.end
+                highlightFadeOutAnim.duration = 0.01
+                highlightFadeOutAnim.fillMode = .forwards
+                highlightFadeOutAnim.isRemovedOnCompletion = false
+                highlightLayer.add(highlightFadeOutAnim, forKey: "karaokeOpacityFadeOut")
             }
         }
         textLayer.contentsScale = UIScreen.main.scale * 2.0

@@ -434,7 +434,7 @@ struct KaraokeTextByWordHighlightOverlay: View {
             lineSpacing: 2
         ) { word in
             let isActive = currentTime >= word.start && currentTime < word.end
-            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            let progress: CGFloat = isActive ? 1 : 0
             
             ZStack(alignment: .leading) {
                 // Base text with stroke and shadow support
@@ -495,7 +495,7 @@ struct KaraokeTextByWordBackgroundOverlay: View {
             lineSpacing: 2
         ) { word in
             let isActive = currentTime >= word.start && currentTime < word.end
-            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            let progress: CGFloat = isActive ? 1 : 0
             
             ZStack(alignment: .leading) {
                 // Base text with stroke and shadow support
@@ -570,7 +570,7 @@ struct KaraokeTextWordAndScaleOverlay: View {
             baseSpacing: KaraokePreset.wordAndScale.previewWordSpacing,
             lineSpacing: 2
         ) { word, isActive, targetScale in
-            let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
+            let progress: CGFloat = isActive ? 1 : 0
             
             ZStack(alignment: .leading) {
                 // Base text with stroke and shadow support

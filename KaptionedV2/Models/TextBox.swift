@@ -418,6 +418,6 @@ struct KaraokePreset {
         wordBGColor: .clear,
         presetName: "Word & Scale",
         previewWordSpacing: 8,
-        exportWordSpacing: 8
+        exportWordSpacing: 10
     )
 }

@@ -1,10 +1,3 @@
-//
-//  VideoExporterBottomSheetView.swift
-//  VideoEditorSwiftUI
-//
-//  Created by Bogdan Zykov on 24.04.2023.
-//
-
 import SwiftUI
 
 struct VideoExporterBottomSheetView: View {

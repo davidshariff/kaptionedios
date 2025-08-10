@@ -560,17 +560,17 @@ struct KaraokeTextWordAndScaleOverlay: View {
     let currentTime: Double
 
     var body: some View {
-        KaraokeTextLayout(
+        // Use a custom layout that accounts for scaling
+        KaraokeScaledTextLayout(
             originalText: text,
             words: words,
-            spacing: KaraokePreset.wordAndScale.previewWordSpacing,
+            fontSize: fontSize,
+            activeWordScale: activeWordScale,
+            currentTime: currentTime,
+            baseSpacing: KaraokePreset.wordAndScale.previewWordSpacing,
             lineSpacing: 2
-        ) { word in
-            let isActive = currentTime >= word.start && currentTime < word.end
+        ) { word, isActive, targetScale in
             let progress: CGFloat = isActive ? 1 : (currentTime >= word.end ? 1 : 0)
-            
-            // Calculate scale based on active state with smooth transitions
-            let targetScale: CGFloat = isActive ? activeWordScale : 1.0
             
             ZStack(alignment: .leading) {
                 // Base text with stroke and shadow support
@@ -686,6 +686,101 @@ struct StrokeText: View {
     }
 }
 
+// Custom layout for karaoke text that accounts for word scaling
+struct KaraokeScaledTextLayout<Content: View>: View {
+    let originalText: String
+    let words: [WordWithTiming]
+    let fontSize: CGFloat
+    let activeWordScale: CGFloat
+    let currentTime: Double
+    let baseSpacing: CGFloat
+    let lineSpacing: CGFloat
+    let content: (WordWithTiming, Bool, CGFloat) -> Content
+    
+    init(
+        originalText: String,
+        words: [WordWithTiming],
+        fontSize: CGFloat,
+        activeWordScale: CGFloat,
+        currentTime: Double,
+        baseSpacing: CGFloat = 8,
+        lineSpacing: CGFloat = 2,
+        @ViewBuilder content: @escaping (WordWithTiming, Bool, CGFloat) -> Content
+    ) {
+        self.originalText = originalText
+        self.words = words
+        self.fontSize = fontSize
+        self.activeWordScale = activeWordScale
+        self.currentTime = currentTime
+        self.baseSpacing = baseSpacing
+        self.lineSpacing = lineSpacing
+        self.content = content
+    }
+    
+    var body: some View {
+        let lines = organizeWordsIntoLines()
+        let hasMultipleLines = lines.count > 1
+        
+        // Calculate dynamic spacing that scales with font size
+        let dynamicBaseSpacing = baseSpacing * (fontSize / 20.0) // Scale relative to base font size of 20
+        
+        VStack(alignment: hasMultipleLines ? .center : .leading, spacing: lineSpacing) {
+            ForEach(0..<lines.count, id: \.self) { lineIndex in
+                KaraokeScaledLineLayout(
+                    words: lines[lineIndex],
+                    fontSize: fontSize,
+                    activeWordScale: activeWordScale,
+                    currentTime: currentTime,
+                    baseSpacing: dynamicBaseSpacing,
+                    content: content
+                )
+            }
+        }
+    }
+    
+    private func organizeWordsIntoLines() -> [[WordWithTiming]] {
+        // Split original text into lines to detect explicit line breaks
+        let textLines = originalText.components(separatedBy: .newlines)
+        
+        if textLines.count <= 1 {
+            // No explicit line breaks, return all words as one line
+            return [words]
+        }
+        
+        // Map words to their corresponding text lines
+        var result: [[WordWithTiming]] = []
+        var wordIndex = 0
+        
+        for textLine in textLines {
+            let lineWords = textLine.split { $0.isWhitespace }.map(String.init)
+            var currentLineWords: [WordWithTiming] = []
+            
+            for _ in lineWords {
+                if wordIndex < words.count {
+                    currentLineWords.append(words[wordIndex])
+                    wordIndex += 1
+                }
+            }
+            
+            if !currentLineWords.isEmpty {
+                result.append(currentLineWords)
+            }
+        }
+        
+        // Add any remaining words to the last line (safety fallback)
+        while wordIndex < words.count {
+            if !result.isEmpty {
+                result[result.count - 1].append(words[wordIndex])
+            } else {
+                result.append([words[wordIndex]])
+            }
+            wordIndex += 1
+        }
+        
+        return result.isEmpty ? [words] : result
+    }
+}
+
 // Karaoke text layout that handles explicit line breaks and word wrapping
 struct KaraokeTextLayout<Content: View>: View {
     let originalText: String
@@ -776,6 +871,49 @@ struct KaraokeLineLayout<Content: View>: View {
         KaraokeWrappingLayout(spacing: spacing, lineSpacing: 2) {
             ForEach(0..<words.count, id: \.self) { index in
                 content(words[index])
+            }
+        }
+    }
+}
+
+// View for a single line of karaoke words with scaling-aware layout
+struct KaraokeScaledLineLayout<Content: View>: View {
+    let words: [WordWithTiming]
+    let fontSize: CGFloat
+    let activeWordScale: CGFloat
+    let currentTime: Double
+    let baseSpacing: CGFloat
+    let content: (WordWithTiming, Bool, CGFloat) -> Content
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(0..<words.count, id: \.self) { index in
+                let word = words[index]
+                let isActive = currentTime >= word.start && currentTime < word.end
+                let targetScale: CGFloat = isActive ? activeWordScale : 1.0
+                
+                // Calculate spacing that expands equally on both sides
+                let extraSpacing = isActive ? fontSize * 0.3 : 0
+                let leftSpacing = extraSpacing * 0.5
+                let rightSpacing = extraSpacing * 0.5
+                
+                HStack(spacing: 0) {
+                    if index > 0 {
+                        Spacer()
+                            .frame(width: baseSpacing)
+                    }
+                    
+                    // Add spacing that expands equally on both sides
+                    HStack(spacing: 0) {
+                        Spacer()
+                            .frame(width: leftSpacing)
+                        
+                        content(word, isActive, targetScale)
+                        
+                        Spacer()
+                            .frame(width: rightSpacing)
+                    }
+                }
             }
         }
     }

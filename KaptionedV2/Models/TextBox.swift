@@ -274,7 +274,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: true
         ),
         SubtitleStyle(
-            name: "Word & Scale",
+            name: "Word & Scale", // confirmed style.
             fontSize: 32,
             bgColor: .clear,
             fontColor: .white,
@@ -418,6 +418,6 @@ struct KaraokePreset {
         wordBGColor: .clear,
         presetName: "Word & Scale",
         previewWordSpacing: 8,
-        exportWordSpacing: 16
+        exportWordSpacing: 8
     )
 }

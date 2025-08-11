@@ -49,55 +49,57 @@ struct KaraokeColorSelectionView: View {
         
     }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            // Header
-            HStack {
-                HStack(alignment: .center, spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(LinearGradient(
-                                gradient: Gradient(colors: [selectedPreset.bgColor.opacity(0.7), selectedPreset.fontColor.opacity(0.7)]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ))
-                            .frame(width: 38, height: 38)
-                        Image(systemName: "music.note.list")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.18), radius: 2, x: 0, y: 1)
-                    }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Customize Animation Colors")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                        HStack(spacing: 4) {
-                            Text("Preset:")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text("\"\(selectedPreset.name)\"")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundColor(selectedPreset.fontColor)
-                                .lineLimit(1)
-                                .truncationMode(.tail)
+        var body: some View {
+        Group {
+            if ConfigurationManager.shared.isKaraokeEnabled() {
+                VStack(alignment: .leading, spacing: 20) {
+                    // Header
+                    HStack {
+                        HStack(alignment: .center, spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(LinearGradient(
+                                        gradient: Gradient(colors: [selectedPreset.bgColor.opacity(0.7), selectedPreset.fontColor.opacity(0.7)]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ))
+                                    .frame(width: 38, height: 38)
+                                Image(systemName: "music.note.list")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.18), radius: 2, x: 0, y: 1)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Customize Animation Colors")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+                                HStack(spacing: 4) {
+                                    Text("Preset:")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                    Text("\"\(selectedPreset.name)\"")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(selectedPreset.fontColor)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                }
+                            }
+                        }
+
+                        Spacer()
+
+                        Button {
+                            isPresented = false
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                                .padding(8)
                         }
                     }
-                }
-
-                Spacer()
-
-                Button {
-                    isPresented = false
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.title2)
-                        .foregroundColor(.white)
-                        .padding(8)
-                }
-            }
-            .padding(.horizontal)
+                    .padding(.horizontal)
             .padding(.top)
 
             ScrollView {
@@ -297,6 +299,36 @@ struct KaraokeColorSelectionView: View {
                 .padding(.bottom, 20)
             }
             .scrollIndicators(.hidden)
+                }
+            } else {
+                // Show message when karaoke is disabled
+                VStack(spacing: 16) {
+                    Image(systemName: "music.note.list")
+                        .font(.system(size: 48))
+                        .foregroundColor(.secondary)
+                    
+                    Text("Karaoke Features Disabled")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                    
+                    Text("Karaoke subtitle features are currently disabled in the app configuration.")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    
+                    Button("Close") {
+                        isPresented = false
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(Color.blue)
+                    .cornerRadius(8)
+                }
+                .padding()
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemBackground))

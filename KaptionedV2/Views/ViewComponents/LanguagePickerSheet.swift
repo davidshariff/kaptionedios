@@ -6,31 +6,39 @@ struct LanguagePickerSheet: View {
     let hasExistingSubtitles: Bool
     let isFromNewProject: Bool
     
-    @State private var selectedLanguage: String = "en"
+    @State private var selectedLanguage: String = ConfigurationManager.shared.getDefaultLanguage()
     @State private var showReplaceWarning: Bool = false
     
-    // Common languages for transcription
-    private let languages = [
-        ("English", "en"),
-        ("Spanish", "es"),
-        ("French", "fr"),
-        ("German", "de"),
-        ("Italian", "it"),
-        ("Portuguese", "pt"),
-        ("Russian", "ru"),
-        ("Japanese", "ja"),
-        ("Korean", "ko"),
-        ("Chinese", "zh"),
-        ("Arabic", "ar"),
-        ("Hindi", "hi"),
-        ("Dutch", "nl"),
-        ("Swedish", "sv"),
-        ("Norwegian", "no"),
-        ("Danish", "da"),
-        ("Finnish", "fi"),
-        ("Polish", "pl"),
-        ("Turkish", "tr")
-    ]
+    // Languages for transcription - use supported languages from config
+    private var languages: [(String, String)] {
+        let supportedLanguages = ConfigurationManager.shared.getSupportedLanguages()
+        let languageNames: [String: String] = [
+            "en": "English",
+            "es": "Spanish", 
+            "fr": "French",
+            "de": "German",
+            "it": "Italian",
+            "pt": "Portuguese",
+            "ru": "Russian",
+            "ja": "Japanese",
+            "ko": "Korean",
+            "zh": "Chinese",
+            "ar": "Arabic",
+            "hi": "Hindi",
+            "nl": "Dutch",
+            "sv": "Swedish",
+            "no": "Norwegian",
+            "da": "Danish",
+            "fi": "Finnish",
+            "pl": "Polish",
+            "tr": "Turkish"
+        ]
+        
+        return supportedLanguages.compactMap { code in
+            guard let name = languageNames[code] else { return nil }
+            return (name, code)
+        }.sorted { $0.0 < $1.0 } // Sort by language name
+    }
     
     var body: some View {
         BottomSheetView(

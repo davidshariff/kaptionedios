@@ -29,7 +29,9 @@ class EditorViewModel: ObservableObject{
     var onSaving: (() -> Void)?
     var onTextBoxesUpdated: (([TextBox]) -> Void)?
     var onSubtitlesGenerated: (() -> Void)?
-    var maxWordsPerLine: Int = 3
+    var maxWordsPerLine: Int {
+        return ConfigurationManager.shared.getDefaultMaxWordsPerLine()
+    }
     
     private var projectEntity: ProjectEntity?
     
@@ -208,8 +210,8 @@ extension EditorViewModel{
             isLanguagePickerFromNewProject = false
             showLanguagePicker = true
         } else {
-            // Direct generation for automatic subtitle generation (default to English)
-            performSubtitleGeneration(language: "en", completion: completion)
+            // Direct generation for automatic subtitle generation (use default language from config)
+            performSubtitleGeneration(language: ConfigurationManager.shared.getDefaultLanguage(), completion: completion)
         }
     }
     

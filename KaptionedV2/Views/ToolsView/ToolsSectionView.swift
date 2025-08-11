@@ -151,13 +151,13 @@ struct ToolsSectionView: View {
                 
                 // Edit Subtitles button
                 VStack(spacing: 4) {
-                    ToolButtonView(label: "Edit", image: "list.bullet", isChange: false) {
+                    ToolButtonView(label: "Edit", image: "pencil", isChange: false) {
                         // Handle edit subtitles action
                         withAnimation(.easeInOut(duration: 0.3)) {
                             showEditSubtitlesMode = true
                         }
                     }
-                    Text("Edit Subtitles")
+                    Text("Edit Subtitles & Styles")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.top, 4)
@@ -259,7 +259,7 @@ extension ToolsSectionView {
     private func toolLabel(for tool: ToolEnum) -> String {
         switch tool {
         case .presets:
-            return selectedPreset?.name ?? "Select Template"
+            return selectedPreset?.name ?? "Pre-made Templates"
         case .subslist:
             return "Subtitle list"
         }
@@ -267,10 +267,10 @@ extension ToolsSectionView {
     
     private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
         switch style.name {
-        case "Highlight by word": return .word
-        case "Background by word": return .wordbg
-        case "Word & Scale": return .wordAndScale
-        default: return .word
+            case "Highlight by word": return .word
+            case "Background by word": return .wordbg
+            case "Word & Scale": return .wordAndScale
+            default: return .word
         }
     }
 

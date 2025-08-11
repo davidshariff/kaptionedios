@@ -279,7 +279,7 @@ struct TextToolbar: View {
                             .font(.title2)
                             .foregroundColor(.white.opacity(0.8))
                         
-                        Text("tap text to edit")
+                        Text("tap text above to edit")
                             .font(.headline)
                             .foregroundColor(.white)
                             .multilineTextAlignment(.center)
@@ -302,7 +302,7 @@ struct TextToolbar: View {
                         Image(systemName: "plus")
                             .font(.headline)
                             .foregroundColor(.white)
-                        Text("add new")
+                        Text("add new text")
                             .font(.headline)
                             .foregroundColor(.white)
                     }

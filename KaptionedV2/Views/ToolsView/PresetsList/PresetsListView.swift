@@ -14,31 +14,22 @@ struct PresetsListView: View {
         VStack(alignment: .leading, spacing: 12) {
 
             ZStack {
-                Text("Select a Subtitle Style")
+                Text("Choose a style")
                     .font(.title2.bold())
-                    .foregroundColor(Color.blue)
+                    .foregroundColor(Color.white)
                     .shadow(color: Color.black.opacity(0.18), radius: 2, x: 0, y: 2)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.white.opacity(0.85))
-                            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
-                    )
                 HStack {
                     Spacer()
                     Button {
                         isPresented = false
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
+                        Image(systemName: "xmark")
                             .font(.title2)
-                            .foregroundColor(Color.gray.opacity(0.7))
-                            .background(
-                                Circle()
-                                    .fill(Color.black.opacity(0.1))
-                                    .frame(width: 36, height: 36)
-                                    .shadow(color: Color.black.opacity(0.10), radius: 2, x: 0, y: 1)
-                            )
+                            .foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.gray.opacity(0.3), in: Circle())
                     }
                     .padding(.trailing, 20)
                 }

@@ -3,7 +3,6 @@ import CryptoKit
 import Combine
 import UIKit
 import RevenueCat
-import StoreKit
 
 /// Manages subscription status and enforces video creation limits with encrypted storage
 /// Now integrated with RevenueCat for real payment processing
@@ -106,9 +105,6 @@ class SubscriptionManager: ObservableObject {
         
         // Always reset manager state (whether logout succeeded or not)
         await RevenueCatManager.shared.resetState()
-        
-        // Clear StoreKit 2 transactions (for testing)
-        await clearStoreKitTransactions()
         
         // Create a fresh anonymous user with new UUID
         do {

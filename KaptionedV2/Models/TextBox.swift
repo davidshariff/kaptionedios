@@ -258,7 +258,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: true
         ),
         SubtitleStyle(
-            name: "Background by word", // confirmed style.
+            name: "Background by word", // confirmed style: https://www.tiktok.com/t/ZT6aERhMF/
             fontSize: 32,
             bgColor: .clear,
             fontColor: .white,
@@ -266,11 +266,11 @@ struct SubtitleStyle: Identifiable, Equatable {
             strokeWidth: 5,
             backgroundPadding: 8,
             cornerRadius: 8,
-            shadowColor: .clear,
-            shadowRadius: 0,
-            shadowX: 0,
-            shadowY: 0,
-            shadowOpacity: 0,
+            shadowColor: .black,
+            shadowRadius: 2,
+            shadowX: 2,
+            shadowY: 2,
+            shadowOpacity: 1,
             isKaraokePreset: true
         ),
         SubtitleStyle(

@@ -124,25 +124,40 @@ struct TextOnPlayerView: View {
     
     @ViewBuilder
     private func textContent(textBox: TextBox, isSelected: Bool) -> some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: textBox.cornerRadius)
-                .fill(textBox.bgColor)
-            
+        // For non-karaoke presets with stroke, handle background in text rendering
+        // For karaoke presets or no stroke, use separate background rectangle
+        if !textBox.isKaraokePreset && textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+            // Non-karaoke with stroke: render background as part of text
             textOverlay(textBox: textBox, isSelected: isSelected)
-        }
-        .if(!textBox.isKaraokePreset) { view in
-            view.fixedSize()
-        }
-        .if(textBox.isKaraokePreset) { view in
-            view.fixedSize() // Same as regular text - no auto-wrapping
-        }
-        .contentShape(Rectangle())
-        .onTapGesture {
-            // set the current textbox to the selected textbox
-            viewModel.selectedTextBox = textBox
-            // show the edit subtitles mode
-            showEditSubtitlesMode = true
-            pauseVideo()
+                .fixedSize()
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    viewModel.selectedTextBox = textBox
+                    showEditSubtitlesMode = true
+                    pauseVideo()
+                }
+        } else {
+            // Karaoke presets or no stroke: use separate background rectangle
+            ZStack {
+                RoundedRectangle(cornerRadius: textBox.cornerRadius)
+                    .fill(textBox.bgColor)
+                
+                textOverlay(textBox: textBox, isSelected: isSelected)
+            }
+            .if(!textBox.isKaraokePreset) { view in
+                view.fixedSize()
+            }
+            .if(textBox.isKaraokePreset) { view in
+                view.fixedSize() // Same as regular text - no auto-wrapping
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                // set the current textbox to the selected textbox
+                viewModel.selectedTextBox = textBox
+                // show the edit subtitles mode
+                showEditSubtitlesMode = true
+                pauseVideo()
+            }
         }
     }
     
@@ -221,37 +236,45 @@ struct TextOnPlayerView: View {
             } 
         }
         else {
+            // For non-karaoke presets, use two-layer approach for clean stroke rendering
             ZStack {
-                // Stroke layer (background)
-                if let strokeAttr = createStrokeAttr(textBox) {
+                // Background with padding and rounded corners
+                RoundedRectangle(cornerRadius: textBox.cornerRadius)
+                    .fill(textBox.bgColor)
+                
+                // Text layers with internal padding
+                ZStack {
+                    // Stroke layer (background) - only if stroke is enabled
+                    if let strokeAttr = createStrokeAttr(textBox) {
+                        AttributedTextOverlay(
+                            attributedString: strokeAttr,
+                            offset: .zero,
+                            isSelected: false,
+                            bgColor: .clear,
+                            cornerRadius: 0,
+                            shadowColor: UIColor.clear,
+                            shadowRadius: 0,
+                            shadowX: 0,
+                            shadowY: 0
+                        )
+                    }
+                    
+                    // Main text layer (foreground)
                     AttributedTextOverlay(
-                        attributedString: strokeAttr,
+                        attributedString: createNSAttr(textBox),
                         offset: .zero,
-                        isSelected: false, // No selection border on stroke layer
+                        isSelected: isSelected,
                         bgColor: .clear,
-                        cornerRadius: textBox.cornerRadius,
-                        shadowColor: UIColor.clear, // No shadow on stroke layer
-                        shadowRadius: 0,
-                        shadowX: 0,
-                        shadowY: 0
+                        cornerRadius: 0,
+                        shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
+                        shadowRadius: textBox.shadowRadius,
+                        shadowX: textBox.shadowX,
+                        shadowY: textBox.shadowY
                     )
                 }
-                
-                // Main text layer (foreground)
-                AttributedTextOverlay(
-                    attributedString: createNSAttr(textBox),
-                    offset: .zero,
-                    isSelected: isSelected,
-                    bgColor: .clear,
-                    cornerRadius: textBox.cornerRadius,
-                    shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
-                    shadowRadius: textBox.shadowRadius,
-                    shadowX: textBox.shadowX,
-                    shadowY: textBox.shadowY
-                )
+                .padding(.horizontal, textBox.backgroundPadding)
+                .padding(.vertical, textBox.backgroundPadding / 2)
             }
-            .padding(.horizontal, textBox.backgroundPadding)
-            .padding(.vertical, textBox.backgroundPadding / 2)
         }
     }
     
@@ -287,7 +310,33 @@ private func createNSAttr(_ textBox: TextBox) -> NSAttributedString {
     
     attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
     attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
-    attrStr.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor(textBox.bgColor), range: range)
+    
+    // Apply shadow if needed
+    if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {
+        let shadow = NSShadow()
+        shadow.shadowColor = UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity)
+        shadow.shadowBlurRadius = textBox.shadowRadius
+        shadow.shadowOffset = CGSize(width: textBox.shadowX, height: textBox.shadowY)
+        attrStr.addAttribute(.shadow, value: shadow, range: range)
+    }
+    
+    return attrStr
+}
+
+// Create combined attributed string with stroke and fill for non-karaoke presets
+private func createCombinedAttr(_ textBox: TextBox) -> NSAttributedString {
+    let attrStr = NSMutableAttributedString(string: textBox.text)
+    let range = NSRange(location: 0, length: attrStr.length)
+    
+    attrStr.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: textBox.fontSize, weight: .medium), range: range)
+    attrStr.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor(textBox.fontColor), range: range)
+    
+    // Apply stroke with negative width (stroke around the text)
+    if textBox.strokeColor != .clear && textBox.strokeWidth > 0 {
+        let scaledStrokeWidth = min(textBox.strokeWidth, textBox.fontSize * 0.15) // Max 15% of font size
+        attrStr.addAttribute(NSAttributedString.Key.strokeColor, value: UIColor(textBox.strokeColor), range: range)
+        attrStr.addAttribute(NSAttributedString.Key.strokeWidth, value: -scaledStrokeWidth, range: range) // Negative for stroke around text
+    }
     
     // Apply shadow if needed
     if textBox.shadowRadius > 0 && textBox.shadowOpacity > 0 {

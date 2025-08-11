@@ -12,7 +12,6 @@ The configuration system allows the app to load remote configuration settings fr
 
 1. **ConfigurationManager.swift** - Contains all configuration models and manages loading, caching, and merging of configurations
 2. **ConfigurationManager+Extensions.swift** - Provides convenient access methods
-3. **ConfigurationStatusView.swift** - UI component to display configuration status
 
 ### Configuration Structure
 
@@ -152,20 +151,6 @@ let language = configManager.getDefaultLanguage()
 let maxWordsPerLine = configManager.getDefaultMaxWordsPerLine()
 ```
 
-## Monitoring Configuration Status
-
-You can use the `ConfigurationStatusView` to display the current configuration status in your app:
-
-```swift
-ConfigurationStatusView()
-```
-
-This view shows:
-- Loading state
-- Last update time
-- Error messages
-- Current configuration summary
-
 ## Adding New Configuration Options
 
 To add new configuration options:
@@ -175,12 +160,3 @@ To add new configuration options:
 3. Add a getter method in `ConfigurationManager.swift`
 4. Add a convenience property in `ConfigurationManager+Extensions.swift`
 5. Update the merging logic in `mergeConfigs` method if needed
-
-## Testing
-
-To test the configuration system:
-
-1. Start the app - it should load configuration automatically
-2. Check the console logs for configuration loading messages
-3. Use `ConfigurationStatusView` to verify the configuration loaded correctly
-4. Test with network disabled to verify fallback behavior

@@ -394,8 +394,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             fontSize: 38,
             bgColor: Color(red: 0.8, green: 0.2, blue: 0.8), // Purple
             fontColor: Color(red: 1.0, green: 0.8, blue: 0.0), // Gold
-            strokeColor: .clear,
-            strokeWidth: 0,
+            strokeColor: .black,
+            strokeWidth: 2,
             backgroundPadding: 10,
             cornerRadius: 12,
             shadowColor: Color(red: 0.6, green: 0.0, blue: 0.8),

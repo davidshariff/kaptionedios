@@ -4,10 +4,13 @@ import UIKit
 struct TextOnPlayerView: View {
     
     var currentTime: Double
-    @ObservedObject var viewModel: TextEditorViewModel
     var originalVideoSize: CGSize
     var videoScale: CGFloat = 1.0
+
+    @ObservedObject var viewModel: TextEditorViewModel
     @Binding var showEditSubtitlesMode: Bool
+    var pauseVideo: () -> Void
+
     @Environment(\.videoSize) private var videoSize
     
     var body: some View {
@@ -136,8 +139,10 @@ struct TextOnPlayerView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             // set the current textbox to the selected textbox
-            showEditSubtitlesMode = true
             viewModel.selectedTextBox = textBox
+            // show the edit subtitles mode
+            showEditSubtitlesMode = true
+            pauseVideo()
         }
     }
     

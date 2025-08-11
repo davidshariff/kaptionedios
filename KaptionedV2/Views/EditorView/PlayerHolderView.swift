@@ -67,7 +67,7 @@ struct PlayerHolderView: View{
             .allFrame()
         }
         .onReceive(videoPlayer.$currentTime) { _ in
-            guard videoPlayer.isPlaying, let video = editorVM.currentVideo else { return }
+            guard videoPlayer.isPlaying, let _ = editorVM.currentVideo else { return }
         }
     }
     
@@ -100,9 +100,12 @@ extension PlayerHolderView{
                                 // this is the text overlay player
                                 TextOnPlayerView(
                                     currentTime: videoPlayer.currentTime,
-                                    viewModel: textEditor,
                                     originalVideoSize: video.frameSize,
-                                    showEditSubtitlesMode: $showEditSubtitlesMode
+                                    viewModel: textEditor,
+                                    showEditSubtitlesMode: $showEditSubtitlesMode,
+                                    pauseVideo: {
+                                        videoPlayer.pause()
+                                    }
                                 )
                                 .environment(\.videoSize, CGSize(
                                     width: proxy.size.width,

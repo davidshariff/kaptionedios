@@ -155,6 +155,7 @@ struct ToolsSectionView: View {
                         // Handle edit subtitles action
                         withAnimation(.easeInOut(duration: 0.3)) {
                             showEditSubtitlesMode = true
+                            videoPlayer.pause()
                         }
                     }
                     Text("Edit Text & Styles")

@@ -157,7 +157,7 @@ struct ToolsSectionView: View {
                             showEditSubtitlesMode = true
                         }
                     }
-                    Text("Edit Subtitles & Styles")
+                    Text("Edit Text & Styles")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                         .padding(.top, 4)

@@ -37,6 +37,7 @@ struct RulerView: View {
     let showTimelabel: Bool
     let tickHeight: CGFloat
     let customPixelsPerSecond: CGFloat
+    let scrollSensitivity: CGFloat
     
     // Zoom constraints
     let minZoomLevel: CGFloat = 1.0
@@ -58,6 +59,8 @@ struct RulerView: View {
         showTimelabel: Bool = true,
         tickHeight: CGFloat = 20,
         customPixelsPerSecond: CGFloat = 0,
+        // 0.5 is default, 1.0 makes it faster, 2.0 makes super fast etc
+        scrollSensitivity: CGFloat = 0.5,
         actualTimelineWidth: Binding<CGFloat>? = nil,
         rulerStartInParentX: Binding<CGFloat>? = nil,
         exposedOffset: Binding<CGFloat>? = nil,
@@ -78,6 +81,7 @@ struct RulerView: View {
         self.showTimelabel = showTimelabel
         self.tickHeight = tickHeight
         self.customPixelsPerSecond = customPixelsPerSecond
+        self.scrollSensitivity = scrollSensitivity
         self.actualTimelineWidth = actualTimelineWidth
         self.rulerStartInParentX = rulerStartInParentX
         self.exposedOffset = exposedOffset
@@ -170,10 +174,10 @@ struct RulerView: View {
                         isChange = true
                         let translation = gesture.translation.width
                         
-                        // Scale the drag sensitivity based on zoom level
+                        // Scale the drag sensitivity based on zoom level and custom scroll sensitivity
                         // Higher zoom = slower drag (more precise), Lower zoom = faster drag (less precise)
                         let zoomSensitivity = 1.0 / zoomLevel
-                        let scaledTranslation = translation * zoomSensitivity
+                        let scaledTranslation = translation * zoomSensitivity * scrollSensitivity
                         
                         let scaleFactor = calculatedTimelineWidth / geometry.size.width
                         let finalTranslation = scaledTranslation * scaleFactor
@@ -297,9 +301,9 @@ struct RulerView: View {
                     // Calculate the scale factor for the timeline
                     let scaleFactor = calculatedTimelineWidth / geometry.size.width
                     
-                    // Scale the drag sensitivity based on zoom level
+                    // Scale the drag sensitivity based on zoom level and custom scroll sensitivity
                     let zoomSensitivity = 1.0 / zoomLevel
-                    let scaledTranslation = newOffset * zoomSensitivity * scaleFactor
+                    let scaledTranslation = newOffset * zoomSensitivity * scrollSensitivity * scaleFactor
                     
                     // Apply the external drag as a relative movement from the start position
                     let newRulerOffset = externalDragStartOffset + scaledTranslation

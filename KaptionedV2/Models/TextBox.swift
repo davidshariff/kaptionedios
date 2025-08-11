@@ -390,7 +390,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: false
         ),
         SubtitleStyle(
-            name: "Retro Wave",
+            name: "Retro Wave", // confirmed style
             fontSize: 38,
             bgColor: Color(red: 0.8, green: 0.2, blue: 0.8), // Purple
             fontColor: Color(red: 1.0, green: 0.8, blue: 0.0), // Gold
@@ -406,9 +406,9 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: false
         ),
         SubtitleStyle(
-            name: "Minimal Dark",
+            name: "Minimal Dark", // confirmed style
             fontSize: 30,
-            bgColor: Color.black.opacity(0.7),
+            bgColor: Color.black.opacity(1),
             fontColor: .white,
             strokeColor: .clear,
             strokeWidth: 0,
@@ -422,7 +422,7 @@ struct SubtitleStyle: Identifiable, Equatable {
             isKaraokePreset: false
         ),
         SubtitleStyle(
-            name: "Bubble Pop",
+            name: "Bubble Pop", // confirmed style
             fontSize: 34,
             bgColor: Color(red: 1.0, green: 0.4, blue: 0.6), // Pink
             fontColor: .white,

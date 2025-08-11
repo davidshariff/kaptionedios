@@ -15,10 +15,14 @@ class TranscriptionHelper {
     
     func transcribeVideo(
         fileURL: URL,
-        language: String = "en",
-        max_words_per_line: Int = 1,
+        language: String? = nil,
+        max_words_per_line: Int? = nil,
         completion: @escaping (Result<[TextBox], Error>) -> Void
     ) {
+        // Use configuration manager for defaults
+        let configManager = ConfigurationManager.shared
+        let defaultLanguage = language ?? configManager.getDefaultLanguage()
+        let defaultMaxWordsPerLine = max_words_per_line ?? configManager.getDefaultMaxWordsPerLine()
         // Start audio extraction from the provided video file
         print("[TranscriptionHelper] Starting audio extraction from video: \(fileURL)")
 
@@ -33,8 +37,8 @@ class TranscriptionHelper {
 
             print("[TranscriptionHelper] Audio extracted: \(audioURL)")
 
-            // Prepare the API endpoint and request
-            let url = URL(string: "https://premium-tetra-together.ngrok-free.app/transcribe")!
+            // Prepare the API endpoint and request using configuration manager
+            let url = configManager.getTranscriptionURL()
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
 
@@ -64,12 +68,12 @@ class TranscriptionHelper {
             // --- Add primary language field to multipart form data ---
             data.append("--\(boundary)\r\n".data(using: .utf8)!)
             data.append("Content-Disposition: form-data; name=\"primary_lang\"\r\n\r\n".data(using: .utf8)!)
-            data.append("\(language)\r\n".data(using: .utf8)!)
+            data.append("\(defaultLanguage)\r\n".data(using: .utf8)!)
             
             // --- Add max_words_per_line field to multipart form data ---
             data.append("--\(boundary)\r\n".data(using: .utf8)!)
             data.append("Content-Disposition: form-data; name=\"max_words_per_line\"\r\n\r\n".data(using: .utf8)!)
-            data.append("\(max_words_per_line)\r\n".data(using: .utf8)!)
+            data.append("\(defaultMaxWordsPerLine)\r\n".data(using: .utf8)!)
             data.append("--\(boundary)--\r\n".data(using: .utf8)!)
 
             print("[TranscriptionHelper] Starting upload to API: \(url)")

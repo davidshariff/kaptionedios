@@ -83,6 +83,8 @@
 		F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
 		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
+		F485E5372E49EB64007A680B /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E5362E49EB64007A680B /* ConfigurationManager.swift */; };
+		F485E5392E49EB81007A680B /* ConfigurationManager+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */; };
 		F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */; };
 		F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90902E4876840031E9DF /* BottomSheetView.swift */; };
 		F48A90932E487EB40031E9DF /* LanguagePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */; };
@@ -172,6 +174,8 @@
 		F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeColorSelectionView.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
+		F485E5362E49EB64007A680B /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
+		F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationManager+Extensions.swift"; sourceTree = "<group>"; };
 		F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOnPlayerView.swift; sourceTree = "<group>"; };
 		F48A90902E4876840031E9DF /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerSheet.swift; sourceTree = "<group>"; };
@@ -383,6 +387,7 @@
 				5ACFF99529EC8A2400827A37 /* AVAssets+Ext.swift */,
 				5ACFF99729ED53FB00827A37 /* View+Ext.swift */,
 				5A3D13AD29F185400027E25E /* FileManager.swift */,
+				F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */,
 				5A3D13B529F190260027E25E /* Preview.swift */,
 				5AFA25C529FA7D9300B820D0 /* Color.swift */,
 				5A5E6F962A039EFD00F5EBF8 /* AVAudioSession+Ext.swift */,
@@ -472,6 +477,7 @@
 			isa = PBXGroup;
 			children = (
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
+				F485E5362E49EB64007A680B /* ConfigurationManager.swift */,
 				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
 				F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
@@ -659,6 +665,7 @@
 				5ACFF99629EC8A2400827A37 /* AVAssets+Ext.swift in Sources */,
 				F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */,
 				5AE2A2A029F465BD003D217F /* VideoEditor.swift in Sources */,
+				F485E5392E49EB81007A680B /* ConfigurationManager+Extensions.swift in Sources */,
 				5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */,
 				F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */,
 				F418B72B2E40919D0021E298 /* VideoPlayerSize.swift in Sources */,
@@ -708,6 +715,7 @@
 				F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */,
 				5AE2A2B029F88113003D217F /* FilteredImage.swift in Sources */,
 				5A5F95732A0166D90041C3F6 /* Swipe.swift in Sources */,
+				F485E5372E49EB64007A680B /* ConfigurationManager.swift in Sources */,
 				F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */,
 				5A3D13B029F186160027E25E /* CoreDataManager.swift in Sources */,
 				5A3D13A829F184000027E25E /* PersistenceController.swift in Sources */,

@@ -115,6 +115,7 @@ class TextEditorViewModel: ObservableObject{
         cancelTextEditor()
     }
     
+    // TODO: not sure if this works compared to removeTextBox()
     func deleteCurrentTextBox(){
         if isEditMode{
             // Remove the current text box from the array

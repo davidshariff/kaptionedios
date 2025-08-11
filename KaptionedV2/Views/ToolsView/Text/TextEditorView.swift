@@ -33,15 +33,45 @@ struct TextEditorView: View{
                                 )
                                 .frame(maxWidth: 300, maxHeight: 200)
 
-                            // Close button for text-only mode
-                            Button {
-                                viewModel.closeEditTextContent()
-                            } label: {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 44)) // Larger icon
-                                    .foregroundColor(.white)
-                                    .padding(20)
-                                    .background(Color.black.opacity(0.6), in: Circle())
+                            // Action buttons for text-only mode
+                            HStack(spacing: 20) {
+                                
+                                // Delete button
+                                Button {
+                                    showDeleteConfirmation = true
+                                } label: {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white)
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: "trash.circle.fill")
+                                            .font(.system(size: 44))
+                                            .foregroundColor(.red)
+                                    }
+                                }
+                                
+                                // Confirm button
+                                Button {
+                                    viewModel.closeEditTextContent()
+                                } label: {
+                                    ZStack {
+                                        Circle()
+                                            .fill(Color.white)
+                                            .frame(width: 44, height: 44)
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .font(.system(size: 44))
+                                            .foregroundColor(.green)
+                                    }
+                                }
+                            }
+                            .alert("Delete Text", isPresented: $showDeleteConfirmation) {
+                                Button("Delete", role: .destructive) {
+                                    viewModel.removeTextBox()
+                                    viewModel.closeEditTextContent()
+                                }
+                                Button("Cancel", role: .cancel) { }
+                            } message: {
+                                Text("Are you sure you want to delete this text? This action cannot be undone.")
                             }
                             
                         }

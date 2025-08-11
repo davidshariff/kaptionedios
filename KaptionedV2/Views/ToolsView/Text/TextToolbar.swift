@@ -194,37 +194,8 @@ struct TextToolbar: View {
                     .cornerRadius(12)
                     .shadow(color: .white.opacity(0.3), radius: 4, x: 0, y: 2)
                     
-                    Spacer()
-                        .frame(width: 20)
+
                     
-                    Button {
-                        // Handle Delete action
-                        showDeleteConfirmation = true
-                    } label: {
-                        VStack(spacing: 6) {
-                            Image(systemName: "trash")
-                                .font(.title2)
-                                .frame(width: 24, height: 24)
-                            Text("Delete")
-                                .font(.caption)
-                                .fontWeight(.medium)
-                        }
-                        .foregroundColor(.white)
-                        .frame(width: 80, height: 60)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 8)
-                    }
-                    .background(Color.red.opacity(0.5))
-                    .cornerRadius(12)
-                    .shadow(color: .white.opacity(0.3), radius: 4, x: 0, y: 2)
-                    .alert("Delete Text", isPresented: $showDeleteConfirmation) {
-                        Button("Delete", role: .destructive) {
-                            textEditor.removeTextBox()
-                        }
-                        Button("Cancel", role: .cancel) { }
-                    } message: {
-                        Text("Are you sure you want to delete this text? This action cannot be undone.")
-                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)

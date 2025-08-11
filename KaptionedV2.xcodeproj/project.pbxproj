@@ -71,7 +71,6 @@
 		F418B72B2E40919D0021E298 /* VideoPlayerSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = F418B72A2E40919D0021E298 /* VideoPlayerSize.swift */; };
 		F420A4D12E3F807200D0763E /* RulerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F420A4D02E3F807200D0763E /* RulerView.swift */; };
 		F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42230F32E350697001CCAE5 /* TranscriptionModels.swift */; };
-		F42364942E36567D00057C86 /* SubslistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364932E36567D00057C86 /* SubslistView.swift */; };
 		F42364982E3698A100057C86 /* GridTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364972E3698A100057C86 /* GridTestView.swift */; };
 		F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364992E373F0500057C86 /* WordTimelineSlider.swift */; };
 		F423FFC22E3E581D0024399E /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F423FFC12E3E581D0024399E /* PresetsListView.swift */; };
@@ -161,7 +160,6 @@
 		F418B72A2E40919D0021E298 /* VideoPlayerSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerSize.swift; sourceTree = "<group>"; };
 		F420A4D02E3F807200D0763E /* RulerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulerView.swift; sourceTree = "<group>"; };
 		F42230F32E350697001CCAE5 /* TranscriptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionModels.swift; sourceTree = "<group>"; };
-		F42364932E36567D00057C86 /* SubslistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubslistView.swift; sourceTree = "<group>"; };
 		F42364972E3698A100057C86 /* GridTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridTestView.swift; sourceTree = "<group>"; };
 		F42364992E373F0500057C86 /* WordTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTimelineSlider.swift; sourceTree = "<group>"; };
 		F423FFC12E3E581D0024399E /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
@@ -250,7 +248,6 @@
 			children = (
 				F4A4B7882E40DABC00016ED9 /* Style */,
 				F4AFDAEB2E3E301B00D3466A /* PresetsList */,
-				F42230F12E3505CB001CCAE5 /* Subslist */,
 				F42230EE2E350495001CCAE5 /* PresetsList */,
 				5A62B4772A0284E400E84093 /* Audio */,
 				5A5F95692A004BBF0041C3F6 /* Text */,
@@ -545,14 +542,6 @@
 			path = PresetsList;
 			sourceTree = "<group>";
 		};
-		F42230F12E3505CB001CCAE5 /* Subslist */ = {
-			isa = PBXGroup;
-			children = (
-				F42364932E36567D00057C86 /* SubslistView.swift */,
-			);
-			path = Subslist;
-			sourceTree = "<group>";
-		};
 		F4A4B7882E40DABC00016ED9 /* Style */ = {
 			isa = PBXGroup;
 			children = (
@@ -713,7 +702,6 @@
 				F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */,
 				5A3D13AC29F184330027E25E /* CoreDataContainer.xcdatamodeld in Sources */,
 				5AE2A2A829F6BA29003D217F /* ExporterViewModel.swift in Sources */,
-				F42364942E36567D00057C86 /* SubslistView.swift in Sources */,
 				5ACFF99D29ED5C4900827A37 /* SliderView.swift in Sources */,
 				F408C7812E407AB60091D316 /* TextToolbar.swift in Sources */,
 				5A5E6F9D2A03C88A00F5EBF8 /* AudioSheetView.swift in Sources */,

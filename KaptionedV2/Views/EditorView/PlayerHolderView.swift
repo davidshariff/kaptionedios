@@ -168,7 +168,7 @@ struct PlayerControl: View{
                 onChange: {
                     videoPlayer.scrubState = .scrubEnded(videoPlayer.currentTime)
                 },
-                timeLabelYOffset: 15,
+                timeLabelYOffset: 18,
                 tickYOffset: -10
             )
             .frame(width: 300)

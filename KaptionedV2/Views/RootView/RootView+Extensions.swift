@@ -117,6 +117,19 @@ extension RootView{
             VStack(spacing: 12) {
                 AnimatedBorderPhotosPickerFast(selection: $item)
                 
+                // Test subscription button (for development)
+                #if DEBUG
+                Button("Test Subscription Reset") {
+                    SubscriptionManager.shared.resetSubscription()
+                }
+                .foregroundColor(.orange)
+                .font(.caption)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(8)
+                #endif
+                
                 // Helpful tips
                 VStack(spacing: 12) {
                     HStack(spacing: 12) {
@@ -219,13 +232,35 @@ extension RootView{
                 // Show loader for at least 1 second so animation is visible
                 try await Task.sleep(for: .milliseconds(1000))
                 self.showLoader = false
-                self.showEditor.toggle()
+                
+                // Check subscription limits before showing editor
+                await MainActor.run {
+                    let subscriptionManager = SubscriptionManager.shared
+                    let canCreate = subscriptionManager.canCreateNewVideo()
+                    print("🔍 [RootView] Subscription check - canCreateNewVideo: \(canCreate)")
+                    print("🔍 [RootView] Current status: \(subscriptionManager.currentStatus.tier.displayName), videos: \(subscriptionManager.currentStatus.videosCreated)")
+                    
+                    if !canCreate {
+                        // Show subscription upgrade view
+                        print("🔍 [RootView] Showing upgrade sheet - user cannot create new video")
+                        showSubscriptionUpgradeSheet()
+                    } else {
+                        // Proceed to editor
+                        print("🔍 [RootView] Proceeding to editor - user can create new video")
+                        self.showEditor.toggle()
+                    }
+                }
                 
             } else {
                 print("Failed load video")
                 self.showLoader = false
             }
         }
+    }
+    
+    private func showSubscriptionUpgradeSheet() {
+        // Set the state to show the subscription upgrade sheet
+        showSubscriptionUpgrade = true
     }
 }
 

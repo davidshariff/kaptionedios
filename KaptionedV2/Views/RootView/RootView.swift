@@ -9,6 +9,7 @@ struct RootView: View {
     @State var showEditor: Bool = false
     @State var showDeleteConfirmation: Bool = false
     @State var projectToDelete: ProjectEntity?
+    @State var showSubscriptionUpgrade: Bool = false
     let columns = [
         GridItem(.adaptive(minimum: 150)),
         GridItem(.adaptive(minimum: 150)),
@@ -54,6 +55,10 @@ struct RootView: View {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Text("Kaptioned")
                             .font(.title2.bold())
+                    }
+                    
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        subscriptionStatusButton
                     }
                 }
             }
@@ -120,6 +125,33 @@ struct RootView: View {
             } message: {
                 Text("Are you sure you want to delete this project? This action cannot be undone.")
             }
+            .sheet(isPresented: $showSubscriptionUpgrade) {
+                SubscriptionUpgradeView(isPresented: $showSubscriptionUpgrade)
+            }
+        }
+    }
+    
+    // MARK: - Subscription Status Button
+    
+    private var subscriptionStatusButton: some View {
+        Button {
+            // Show subscription upgrade sheet
+            showSubscriptionUpgrade = true
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "crown.fill")
+                    .font(.caption)
+                    .foregroundColor(.yellow)
+                
+                Text(SubscriptionManager.shared.currentStatus.tier.displayName)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color(.systemGray6))
+            .cornerRadius(8)
         }
     }
 }

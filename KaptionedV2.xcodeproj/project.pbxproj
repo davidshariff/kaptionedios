@@ -85,6 +85,9 @@
 		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
 		F485E5372E49EB64007A680B /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E5362E49EB64007A680B /* ConfigurationManager.swift */; };
 		F485E5392E49EB81007A680B /* ConfigurationManager+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */; };
+		F485E53B2E4A0589007A680B /* SubscriptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E53A2E4A0589007A680B /* SubscriptionModel.swift */; };
+		F485E53D2E4A05B0007A680B /* SubscriptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E53C2E4A05B0007A680B /* SubscriptionManager.swift */; };
+		F485E53F2E4A05DA007A680B /* SubscriptionUpgradeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E53E2E4A05DA007A680B /* SubscriptionUpgradeView.swift */; };
 		F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */; };
 		F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90902E4876840031E9DF /* BottomSheetView.swift */; };
 		F48A90932E487EB40031E9DF /* LanguagePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */; };
@@ -176,6 +179,9 @@
 		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
 		F485E5362E49EB64007A680B /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 		F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationManager+Extensions.swift"; sourceTree = "<group>"; };
+		F485E53A2E4A0589007A680B /* SubscriptionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionModel.swift; sourceTree = "<group>"; };
+		F485E53C2E4A05B0007A680B /* SubscriptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionManager.swift; sourceTree = "<group>"; };
+		F485E53E2E4A05DA007A680B /* SubscriptionUpgradeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionUpgradeView.swift; sourceTree = "<group>"; };
 		F486E3482E43A37F000749B8 /* TextOnPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOnPlayerView.swift; sourceTree = "<group>"; };
 		F48A90902E4876840031E9DF /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerSheet.swift; sourceTree = "<group>"; };
@@ -343,6 +349,7 @@
 				5ACFF98629E949A900827A37 /* VideoItem.swift */,
 				5A8B3FCE29F0360B00FB9858 /* Video.swift */,
 				5AF25B5629F13EC7005E0467 /* ToolModel.swift */,
+				F485E53A2E4A0589007A680B /* SubscriptionModel.swift */,
 				F42230F32E350697001CCAE5 /* TranscriptionModels.swift */,
 				5AE2A2A529F6A949003D217F /* VideoQuality.swift */,
 				F418B72A2E40919D0021E298 /* VideoPlayerSize.swift */,
@@ -400,6 +407,7 @@
 		5ACFF99B29ED5C3500827A37 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
+				F485E53E2E4A05DA007A680B /* SubscriptionUpgradeView.swift */,
 				F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */,
 				F48A90902E4876840031E9DF /* BottomSheetView.swift */,
 				5ACFF9AA29EE8B8500827A37 /* Player */,
@@ -481,6 +489,7 @@
 				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
 				F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
+				F485E53C2E4A05B0007A680B /* SubscriptionManager.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
 				F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */,
 				5AE2A29F29F465BD003D217F /* VideoEditor.swift */,
@@ -634,8 +643,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F485E53F2E4A05DA007A680B /* SubscriptionUpgradeView.swift in Sources */,
 				F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */,
 				5A17E08629F15BEF00DB4A47 /* CropSheetView.swift in Sources */,
+				F485E53D2E4A05B0007A680B /* SubscriptionManager.swift in Sources */,
 				5A3D13B429F18E4D0027E25E /* RootViewModel.swift in Sources */,
 				5ACFF98B29E99A5600827A37 /* CameraPreviewView.swift in Sources */,
 				5A3D13B629F190260027E25E /* Preview.swift in Sources */,
@@ -684,6 +695,7 @@
 				F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */,
 				F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */,
 				F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */,
+				F485E53B2E4A0589007A680B /* SubscriptionModel.swift in Sources */,
 				5ACFF9B029EE8C6C00827A37 /* PlayerHolderView.swift in Sources */,
 				5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */,
 				5ACFF9B229EEA93400827A37 /* ToolsSectionView.swift in Sources */,

@@ -245,6 +245,12 @@ struct MainEditorView: View {
                 .zIndex(2500)
             }
             
+            // Subscription upgrade sheet
+            if editorVM.showSubscriptionUpgrade {
+                subscriptionUpgradeSheet
+                    .zIndex(3000)
+            }
+            
             // Centered cross overlay
             if showCrossOverlay {
                 CrossOverlayView()
@@ -762,7 +768,10 @@ extension MainEditorView{
         }
         return "Unknown"
     }
+    
+    // MARK: - Subscription Upgrade Sheet
+    
+    private var subscriptionUpgradeSheet: some View {
+        SubscriptionUpgradeView(isPresented: $editorVM.showSubscriptionUpgrade)
+    }
 }
-
-
-

@@ -682,5 +682,52 @@ The calibration system can be extended for other rendering differences:
 
 This approach ensures that all future text features maintain perfect WYSIWYG consistency across preview and export systems.
 
-  
-  
+## 🎯 **Subscription System**
+
+The app includes a comprehensive subscription system that enforces video creation limits based on subscription tiers:
+
+### **✅ Core Components Built:**
+
+1. **SubscriptionModel.swift** - Defines subscription tiers (Free: 1 video, Premium: 10 videos, Unlimited: unlimited)
+2. **SubscriptionManager.swift** - Handles encrypted storage and subscription logic
+3. **SubscriptionUpgradeView.swift** - Beautiful upgrade UI with tier selection
+4. **Integration Points** - Added to EditorViewModel, RootView, and MainEditorView
+
+### **🔐 Security Features:**
+
+- **AES-GCM Encryption** - Subscription data is encrypted with device-specific keys
+- **Device Binding** - Uses UUID + Bundle ID + Device Vendor ID for unique device identification
+- **Tamper Resistant** - Cannot be bypassed by clearing cache or reinstalling app
+- **Persistent Storage** - Data survives app updates and reinstallations
+
+### **🎨 User Experience:**
+
+- **Subscription Status** - Shows current tier in navigation bar with crown icon
+- **Upgrade Flow** - Beautiful upgrade view when limits are reached
+- **Clear Messaging** - User-friendly messages about limits and upgrades
+- **Seamless Integration** - No disruption to existing app flow
+
+### **🧪 Testing Features:**
+
+- **Debug Reset Button** - Test subscription reset in development builds
+- **Simulated Upgrades** - Test upgrade flow without payment integration
+- **Comprehensive Testing** - Easy to test all subscription scenarios
+
+## 🚀 **How It Works:**
+
+1. **User creates first video** → Works normally (free tier)
+2. **User tries to create second video** → Upgrade prompt appears
+3. **User upgrades** → Can create more videos based on tier
+4. **Data is encrypted** → Cannot be easily bypassed
+
+## 🎯 **Key Benefits:**
+
+- **Revenue Ready** - Easy to integrate real payment processing
+- **User Friendly** - Clear upgrade path with beautiful UI
+- **Secure** - Encrypted storage prevents simple workarounds
+- **Flexible** - Easy to modify limits and add new tiers
+- **Testable** - Comprehensive testing tools included
+
+The system is now ready to use! Users will get 1 free video, and then be prompted to upgrade when they try to create more. The encrypted storage ensures they can't simply reset the app to get more free videos.
+
+When you're ready to add real payments, just replace the placeholder payment logic in `SubscriptionUpgradeView.swift` with StoreKit or your preferred payment processor! 🎉

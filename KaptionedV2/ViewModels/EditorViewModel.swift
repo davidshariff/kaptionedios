@@ -17,6 +17,7 @@ class EditorViewModel: ObservableObject{
     
     @Published var showLanguagePicker: Bool = false
     @Published var isLanguagePickerFromNewProject: Bool = false
+    @Published var showSubscriptionUpgrade: Bool = false
     
     /// Check if the current video has existing subtitles
     var hasExistingSubtitles: Bool {
@@ -253,6 +254,9 @@ extension EditorViewModel{
                     
                     // Notify that subtitles have been generated
                     self.onSubtitlesGenerated?()
+                    
+                    // Record video creation when subtitles are successfully generated
+                    SubscriptionManager.shared.recordVideoCreation()
                     
                     completion?()
                     

@@ -245,11 +245,7 @@ struct MainEditorView: View {
                 .zIndex(2500)
             }
             
-            // Subscription upgrade sheet
-            if editorVM.showSubscriptionUpgrade {
-                subscriptionUpgradeSheet
-                    .zIndex(3000)
-            }
+            // Removed subscription upgrade sheet - now using RevenueCat paywall
             
             // Centered cross overlay
             if showCrossOverlay {
@@ -771,7 +767,5 @@ extension MainEditorView{
     
     // MARK: - Subscription Upgrade Sheet
     
-    private var subscriptionUpgradeSheet: some View {
-        SubscriptionUpgradeView(isPresented: $editorVM.showSubscriptionUpgrade)
-    }
+
 }

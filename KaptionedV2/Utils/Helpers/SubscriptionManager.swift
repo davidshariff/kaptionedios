@@ -2,8 +2,11 @@ import Foundation
 import CryptoKit
 import Combine
 import UIKit
+import RevenueCat
+import StoreKit
 
 /// Manages subscription status and enforces video creation limits with encrypted storage
+/// Now integrated with RevenueCat for real payment processing
 class SubscriptionManager: ObservableObject {
     static let shared = SubscriptionManager()
     
@@ -16,6 +19,18 @@ class SubscriptionManager: ObservableObject {
     
     private init() {
         loadSubscriptionStatus()
+        
+        // Sync with RevenueCat on init
+        Task {
+            await syncWithRevenueCat()
+        }
+    }
+    
+    /// Force refresh subscription status from RevenueCat
+    func refreshSubscriptionStatus() {
+        Task {
+            await syncWithRevenueCat()
+        }
     }
     
     // MARK: - Public Methods
@@ -45,27 +60,102 @@ class SubscriptionManager: ObservableObject {
         return currentStatus.remainingVideos
     }
     
-    /// Upgrades the user to a new subscription tier
-    func upgradeToTier(_ tier: SubscriptionTier) {
-        let newStatus = SubscriptionStatus(
-            tier: tier,
-            videosCreated: currentStatus.videosCreated,
-            subscriptionExpiryDate: tier == .free ? nil : Date().addingTimeInterval(30 * 24 * 60 * 60), // 30 days for paid tiers
-            isActive: true
-        )
-        currentStatus = newStatus
-        saveSubscriptionStatus(newStatus)
-        
-        print("[SubscriptionManager] Upgraded to \(tier.displayName) tier")
+    /// Show RevenueCat paywall for subscription upgrade
+    func showUpgradePaywall() {
+        Task { @MainActor in
+            RevenueCatManager.shared.presentPaywall()
+            print("[SubscriptionManager] Showing RevenueCat paywall")
+        }
     }
     
-    /// Resets subscription status (for testing purposes)
-    func resetSubscription() {
+
+    
+    /// Resets subscription status and clears all RevenueCat data (for testing purposes)
+    @MainActor
+    func resetSubscription() async {
+        // Reset local subscription status
         let newStatus = SubscriptionStatus()
         currentStatus = newStatus
         saveSubscriptionStatus(newStatus)
         
-        print("[SubscriptionManager] Subscription reset to free tier")
+        print("[SubscriptionManager] 🔄 Local subscription reset to free tier")
+        
+        // Clear RevenueCat data
+        await clearRevenueCatData()
+        
+        print("[SubscriptionManager] ✅ Complete subscription reset finished")
+    }
+    
+    /// Clears all RevenueCat data (local cache and remote user data)
+    @MainActor
+    private func clearRevenueCatData() async {
+        do {
+            // Log out current user (clears local cache)
+            let customerInfo = try await Purchases.shared.logOut()
+            print("[SubscriptionManager] 🔄 RevenueCat user logged out, cache cleared")
+            
+        } catch {
+            // Check if error is just "user already anonymous" - this is expected and OK
+            let errorMessage = error.localizedDescription
+            if errorMessage.contains("anonymous") {
+                print("[SubscriptionManager] ℹ️ User was already anonymous - no logout needed")
+            } else {
+                print("[SubscriptionManager] ⚠️ Error during RevenueCat logout: \(error)")
+            }
+        }
+        
+        // Always reset manager state (whether logout succeeded or not)
+        await RevenueCatManager.shared.resetState()
+        
+        // Clear StoreKit 2 transactions (for testing)
+        await clearStoreKitTransactions()
+        
+        // Create a fresh anonymous user with new UUID
+        do {
+            let newUserID = UUID().uuidString
+            let (customerInfo, created) = try await Purchases.shared.logIn(newUserID)
+            print("[SubscriptionManager] 🔄 Fresh anonymous RevenueCat user created: \(newUserID)")
+        } catch {
+            print("[SubscriptionManager] ⚠️ Error creating new anonymous user: \(error)")
+            // This is not critical - RevenueCat will work with default anonymous user
+        }
+    }
+    
+    // MARK: - RevenueCat Integration
+    
+    /// Sync local subscription status with RevenueCat
+    @MainActor
+    func syncWithRevenueCat() async {
+        print("[SubscriptionManager] 🔄 Starting sync with RevenueCat...")
+        await RevenueCatManager.shared.loadCustomerInfo()
+        
+        let revenueCatTier = RevenueCatManager.shared.currentSubscriptionTier
+        let revenueCatExpiry = RevenueCatManager.shared.subscriptionExpiryDate
+        
+        print("[SubscriptionManager] 📊 RevenueCat tier: \(revenueCatTier.displayName)")
+        print("[SubscriptionManager] 📊 Local tier before sync: \(currentStatus.tier.displayName)")
+        
+        // Update local status to match RevenueCat
+        let newStatus = SubscriptionStatus(
+            tier: revenueCatTier,
+            videosCreated: currentStatus.videosCreated, // Keep local video count
+            subscriptionExpiryDate: revenueCatExpiry,
+            isActive: RevenueCatManager.shared.hasActiveSubscription || revenueCatTier == .free
+        )
+        
+        // Always update to ensure UI reflects current state
+        currentStatus = newStatus
+        saveSubscriptionStatus(newStatus)
+        print("[SubscriptionManager] ✅ Synced with RevenueCat: \(revenueCatTier.displayName)")
+    }
+    
+    /// Restore purchases from RevenueCat
+    func restorePurchases() async -> Bool {
+        let success = await RevenueCatManager.shared.restorePurchases()
+        if success {
+            await syncWithRevenueCat()
+        }
+        return success
     }
     
     // MARK: - Private Methods
@@ -147,25 +237,25 @@ extension SubscriptionManager {
         switch status.tier {
         case .free:
             if status.videosCreated >= 1 {
-                let premiumMax = SubscriptionTier.premium.maxVideos
-                return "You've used your free video. Upgrade to Premium for \(premiumMax) videos or Unlimited for unlimited videos!"
+                let proMax = SubscriptionTier.pro.maxVideos
+                return "You've used your free video. Upgrade to Pro for \(proMax) videos or Unlimited for unlimited videos!"
             } else {
                 return "You have 1 free video remaining."
             }
-        case .premium:
+        case .pro:
             if status.remainingVideos == 0 {
                 if let expiryDate = status.subscriptionExpiryDate {
                     let daysUntilRenewal = Calendar.current.dateComponents([.day], from: Date(), to: expiryDate).day ?? 0
                     if daysUntilRenewal > 0 {
-                        return "You've reached your Premium limit of \(status.tier.maxVideos) videos. You'll be able to create videos again in \(daysUntilRenewal) day\(daysUntilRenewal == 1 ? "" : "s")."
+                        return "You've reached your Pro limit of \(status.tier.maxVideos) videos. You'll be able to create videos again in \(daysUntilRenewal) day\(daysUntilRenewal == 1 ? "" : "s")."
                     } else {
-                        return "You've reached your Premium limit of \(status.tier.maxVideos) videos. Your subscription will renew soon!"
+                        return "You've reached your Pro limit of \(status.tier.maxVideos) videos. Your subscription will renew soon!"
                     }
                 } else {
-                    return "You've reached your Premium limit of \(status.tier.maxVideos) videos. Upgrade to Unlimited for unlimited videos!"
+                    return "You've reached your Pro limit of \(status.tier.maxVideos) videos. Upgrade to Unlimited for unlimited videos!"
                 }
             } else {
-                return "You have \(status.remainingVideos) video\(status.remainingVideos == 1 ? "" : "s") remaining in your Premium plan."
+                return "You have \(status.remainingVideos) video\(status.remainingVideos == 1 ? "" : "s") remaining in your Pro plan."
             }
         case .unlimited:
             return "Unlimited videos with your Unlimited subscription!"
@@ -176,9 +266,9 @@ extension SubscriptionManager {
     func getUpgradeMessage() -> String {
         switch currentStatus.tier {
         case .free:
-            let premiumMax = SubscriptionTier.premium.maxVideos
-            return "Upgrade to Premium for \(premiumMax) videos per month or Unlimited for unlimited videos!"
-        case .premium:
+            let proMax = SubscriptionTier.pro.maxVideos
+            return "Upgrade to Pro for \(proMax) videos per month or Unlimited for unlimited videos!"
+        case .pro:
             return "Upgrade to Unlimited for unlimited videos and no monthly limits!"
         case .unlimited:
             return "You already have unlimited access to all features!"

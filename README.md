@@ -690,7 +690,7 @@ The app includes a comprehensive subscription system that enforces video creatio
 
 1. **SubscriptionModel.swift** - Defines subscription tiers (Free: 1 video, Premium: 10 videos, Unlimited: unlimited)
 2. **SubscriptionManager.swift** - Handles encrypted storage and subscription logic
-3. **SubscriptionUpgradeView.swift** - Beautiful upgrade UI with tier selection
+3. **RevenueCat Integration** - Professional subscription management
 4. **Integration Points** - Added to EditorViewModel, RootView, and MainEditorView
 
 ### **🔐 Security Features:**
@@ -730,4 +730,4 @@ The app includes a comprehensive subscription system that enforces video creatio
 
 The system is now ready to use! Users will get 1 free video, and then be prompted to upgrade when they try to create more. The encrypted storage ensures they can't simply reset the app to get more free videos.
 
-When you're ready to add real payments, just replace the placeholder payment logic in `SubscriptionUpgradeView.swift` with StoreKit or your preferred payment processor! 🎉
+The app now uses RevenueCat for professional subscription management with built-in paywall UI! 🎉

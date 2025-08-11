@@ -120,7 +120,9 @@ extension RootView{
                 // Test subscription button (for development)
                 #if DEBUG
                 Button("Test Subscription Reset") {
-                    SubscriptionManager.shared.resetSubscription()
+                    Task {
+                        await SubscriptionManager.shared.resetSubscription()
+                    }
                 }
                 .foregroundColor(.orange)
                 .font(.caption)
@@ -241,9 +243,9 @@ extension RootView{
                     print("🔍 [RootView] Current status: \(subscriptionManager.currentStatus.tier.displayName), videos: \(subscriptionManager.currentStatus.videosCreated)")
                     
                     if !canCreate {
-                        // Show subscription upgrade view
-                        print("🔍 [RootView] Showing upgrade sheet - user cannot create new video")
-                        showSubscriptionUpgradeSheet()
+                        // Show RevenueCat paywall
+                        print("🔍 [RootView] Showing RevenueCat paywall - user cannot create new video")
+                        subscriptionManager.showUpgradePaywall()
                     } else {
                         // Proceed to editor
                         print("🔍 [RootView] Proceeding to editor - user can create new video")
@@ -258,10 +260,7 @@ extension RootView{
         }
     }
     
-    private func showSubscriptionUpgradeSheet() {
-        // Set the state to show the subscription upgrade sheet
-        showSubscriptionUpgrade = true
-    }
+
 }
 
 // MARK: - Animated Border for Create New Project (Faster)

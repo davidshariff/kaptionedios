@@ -17,7 +17,8 @@ class EditorViewModel: ObservableObject{
     
     @Published var showLanguagePicker: Bool = false
     @Published var isLanguagePickerFromNewProject: Bool = false
-    @Published var showSubscriptionUpgrade: Bool = false
+
+    // Now using RevenueCat paywall directly
     
     /// Check if the current video has existing subtitles
     var hasExistingSubtitles: Bool {

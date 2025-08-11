@@ -28,7 +28,7 @@ The subscription system enforces video creation limits based on subscription tie
 
 1. **SubscriptionModel.swift** - Defines subscription tiers and status
 2. **SubscriptionManager.swift** - Manages subscription logic and encrypted storage
-3. **SubscriptionUpgradeView.swift** - UI for upgrade prompts
+3. **RevenueCat Integration** - Professional paywall and subscription management
 4. **Integration Points** - EditorViewModel, RootView, MainEditorView
 
 ### **Data Flow**
@@ -36,7 +36,7 @@ The subscription system enforces video creation limits based on subscription tie
 ```
 User tries to create video → EditorViewModel.setNewVideo() → 
 SubscriptionManager.canCreateNewVideo() → 
-If false: Show SubscriptionUpgradeView
+If false: Show RevenueCat paywall
 If true: SubscriptionManager.recordVideoCreation() → Continue
 ```
 
@@ -112,7 +112,7 @@ var maxVideos: Int {
 - Uses UIAlertController for testing
 
 ### **Future Integration**
-Replace the `showPaymentPlaceholder()` method in `SubscriptionUpgradeView.swift` with:
+The app now uses RevenueCat for real payments. Configure your products in the RevenueCat dashboard and they'll automatically appear in the paywall.
 
 1. **StoreKit Integration** for in-app purchases
 2. **RevenueCat** for subscription management

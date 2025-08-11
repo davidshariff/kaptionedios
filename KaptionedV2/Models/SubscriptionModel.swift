@@ -5,15 +5,15 @@ import Foundation
 /// Represents different subscription tiers
 enum SubscriptionTier: String, Codable, CaseIterable {
     case free = "free"
-    case premium = "premium"
+    case pro = "pro"
     case unlimited = "unlimited"
     
     var displayName: String {
         switch self {
         case .free:
             return "Free"
-        case .premium:
-            return "Premium"
+        case .pro:
+            return "Pro"
         case .unlimited:
             return "Unlimited"
         }
@@ -23,8 +23,8 @@ enum SubscriptionTier: String, Codable, CaseIterable {
         switch self {
         case .free:
             return 1
-        case .premium:
-            return 2
+        case .pro:
+            return 10
         case .unlimited:
             return Int.max
         }
@@ -47,7 +47,7 @@ struct SubscriptionStatus: Codable {
             return true
         }
         
-        if tier == .premium {
+        if tier == .pro {
             return videosCreated < tier.maxVideos
         }
         

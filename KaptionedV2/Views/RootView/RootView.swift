@@ -9,7 +9,8 @@ struct RootView: View {
     @State var showEditor: Bool = false
     @State var showDeleteConfirmation: Bool = false
     @State var projectToDelete: ProjectEntity?
-    @State var showSubscriptionUpgrade: Bool = false
+
+    // Now using RevenueCat's built-in paywall instead
     let columns = [
         GridItem(.adaptive(minimum: 150)),
         GridItem(.adaptive(minimum: 150)),
@@ -125,9 +126,7 @@ struct RootView: View {
             } message: {
                 Text("Are you sure you want to delete this project? This action cannot be undone.")
             }
-            .sheet(isPresented: $showSubscriptionUpgrade) {
-                SubscriptionUpgradeView(isPresented: $showSubscriptionUpgrade)
-            }
+            // Removed custom subscription sheet - now using RevenueCat paywall
         }
     }
     
@@ -135,8 +134,8 @@ struct RootView: View {
     
     private var subscriptionStatusButton: some View {
         Button {
-            // Show subscription upgrade sheet
-            showSubscriptionUpgrade = true
+            // Show RevenueCat paywall
+            SubscriptionManager.shared.showUpgradePaywall()
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "crown.fill")

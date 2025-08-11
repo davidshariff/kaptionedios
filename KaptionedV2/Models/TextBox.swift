@@ -370,6 +370,72 @@ struct SubtitleStyle: Identifiable, Equatable {
             shadowY: 2,
             shadowOpacity: 0.8,
             isKaraokePreset: false
+        ),
+        
+        // New modern social media styles
+        SubtitleStyle(
+            name: "Neon Glow",
+            fontSize: 36,
+            bgColor: .clear,
+            fontColor: Color(red: 0.0, green: 1.0, blue: 0.8), // Cyan
+            strokeColor: Color(red: 0.0, green: 0.8, blue: 1.0), // Light blue
+            strokeWidth: 3,
+            backgroundPadding: 0,
+            cornerRadius: 0,
+            shadowColor: Color(red: 0.0, green: 1.0, blue: 0.8),
+            shadowRadius: 8,
+            shadowX: 0,
+            shadowY: 0,
+            shadowOpacity: 0.9,
+            isKaraokePreset: false
+        ),
+        SubtitleStyle(
+            name: "Retro Wave",
+            fontSize: 38,
+            bgColor: Color(red: 0.8, green: 0.2, blue: 0.8), // Purple
+            fontColor: Color(red: 1.0, green: 0.8, blue: 0.0), // Gold
+            strokeColor: .black,
+            strokeWidth: 2,
+            backgroundPadding: 10,
+            cornerRadius: 12,
+            shadowColor: Color(red: 0.6, green: 0.0, blue: 0.8),
+            shadowRadius: 4,
+            shadowX: 2,
+            shadowY: 2,
+            shadowOpacity: 0.8,
+            isKaraokePreset: false
+        ),
+        SubtitleStyle(
+            name: "Minimal Dark",
+            fontSize: 30,
+            bgColor: Color.black.opacity(0.7),
+            fontColor: .white,
+            strokeColor: .clear,
+            strokeWidth: 0,
+            backgroundPadding: 16,
+            cornerRadius: 20,
+            shadowColor: .black,
+            shadowRadius: 6,
+            shadowX: 0,
+            shadowY: 3,
+            shadowOpacity: 0.4,
+            isKaraokePreset: false
+        ),
+        SubtitleStyle(
+            name: "Bubble Pop",
+            fontSize: 34,
+            bgColor: Color(red: 1.0, green: 0.4, blue: 0.6), // Pink
+            fontColor: .white,
+            strokeColor: Color(red: 0.8, green: 0.2, blue: 0.4), // Darker pink
+            strokeWidth: 1,
+            backgroundPadding: 14,
+            cornerRadius: 25,
+            shadowColor: Color(red: 0.6, green: 0.1, blue: 0.3),
+            shadowRadius: 8,
+            shadowX: 0,
+            shadowY: 4,
+            shadowOpacity: 0.6,
+            isKaraokePreset: false
         )
     ]
 }

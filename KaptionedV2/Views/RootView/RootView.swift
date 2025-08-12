@@ -9,6 +9,7 @@ struct RootView: View {
     @State var showEditor: Bool = false
     @State var showDeleteConfirmation: Bool = false
     @State var projectToDelete: ProjectEntity?
+    @State var showTestResetAlert: Bool = false
 
     // Now using RevenueCat's built-in paywall instead
     let columns = [
@@ -59,7 +60,30 @@ struct RootView: View {
                     }
                     
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        subscriptionStatusButton
+                        HStack(spacing: 8) {
+                            // Test subscription button (for development)
+                            #if DEBUG
+                            Button("Test Reset") {
+                                Task {
+                                    await SubscriptionManager.shared.resetSubscription()
+                                    showTestResetAlert = true
+                                }
+                            }
+                            .foregroundColor(.orange)
+                            .font(.caption)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color.orange.opacity(0.1))
+                            .cornerRadius(6)
+                            .alert("Test Reset Complete", isPresented: $showTestResetAlert) {
+                                Button("OK") { }
+                            } message: {
+                                Text("Don't forget to clear transactions from Xcode StoreKit!")
+                            }
+                            #endif
+                            
+                            subscriptionStatusButton
+                        }
                     }
                 }
             }

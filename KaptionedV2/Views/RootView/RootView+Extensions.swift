@@ -117,21 +117,6 @@ extension RootView{
             VStack(spacing: 12) {
                 AnimatedBorderPhotosPickerFast(selection: $item)
                 
-                // Test subscription button (for development)
-                #if DEBUG
-                Button("Test Subscription Reset") {
-                    Task {
-                        await SubscriptionManager.shared.resetSubscription()
-                    }
-                }
-                .foregroundColor(.orange)
-                .font(.caption)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.orange.opacity(0.1))
-                .cornerRadius(8)
-                #endif
-                
                 // Helpful tips
                 VStack(spacing: 12) {
                     HStack(spacing: 12) {

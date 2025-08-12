@@ -86,7 +86,6 @@
 		F480993B2E4A20AD00E9D936 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = F480993A2E4A20AD00E9D936 /* RevenueCat */; };
 		F480993D2E4A20AD00E9D936 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = F480993C2E4A20AD00E9D936 /* RevenueCatUI */; };
 		F48099402E4A258200E9D936 /* RevenueCatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F480993F2E4A258200E9D936 /* RevenueCatManager.swift */; };
-		F48099412E4A258200E9D936 /* RevenueCatConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F480993E2E4A258200E9D936 /* RevenueCatConfig.swift */; };
 		F48099432E4A27EF00E9D936 /* RevenueCatConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F48099422E4A27EF00E9D936 /* RevenueCatConfig.storekit */; };
 		F48099B02E4B1B5F00E9D936 /* AlreadySubscribedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48099AC2E4B1B5F00E9D936 /* AlreadySubscribedView.swift */; };
 		F48099B12E4B1B5F00E9D936 /* SubscriptionSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48099AE2E4B1B5F00E9D936 /* SubscriptionSuccessView.swift */; };
@@ -184,7 +183,6 @@
 		F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeColorSelectionView.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
 		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
-		F480993E2E4A258200E9D936 /* RevenueCatConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatConfig.swift; sourceTree = "<group>"; };
 		F480993F2E4A258200E9D936 /* RevenueCatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatManager.swift; sourceTree = "<group>"; };
 		F48099422E4A27EF00E9D936 /* RevenueCatConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = RevenueCatConfig.storekit; sourceTree = "<group>"; };
 		F48099AC2E4B1B5F00E9D936 /* AlreadySubscribedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlreadySubscribedView.swift; sourceTree = "<group>"; };
@@ -501,7 +499,6 @@
 			children = (
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
 				F485E5362E49EB64007A680B /* ConfigurationManager.swift */,
-				F480993E2E4A258200E9D936 /* RevenueCatConfig.swift */,
 				F480993F2E4A258200E9D936 /* RevenueCatManager.swift */,
 				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
 				F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */,
@@ -707,7 +704,6 @@
 				F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */,
 				5AE2A2A029F465BD003D217F /* VideoEditor.swift in Sources */,
 				F48099402E4A258200E9D936 /* RevenueCatManager.swift in Sources */,
-				F48099412E4A258200E9D936 /* RevenueCatConfig.swift in Sources */,
 				F485E5392E49EB81007A680B /* ConfigurationManager+Extensions.swift in Sources */,
 				5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */,
 				F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */,

@@ -27,11 +27,9 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     // RevenueCat Configuration
     private var apiKey: String = ""
-    private let proEntitlementID = RevenueCatConfig.Entitlements.proAccess
-    private let unlimitedEntitlementID = RevenueCatConfig.Entitlements.unlimitedAccess
     
     private override init() {
-        // Configuration is now handled by RevenueCatConfig
+        // Configuration is now handled by ConfigurationManager
         super.init()
     }
     

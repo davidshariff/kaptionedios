@@ -8,11 +8,15 @@ struct AppConfig: Codable {
     var api: APIConfig
     var transcription: TranscriptionConfig
     var features: FeatureConfig
+    var revenueCat: RevenueCatSettings
+    var paywall: PaywallConfig
     
     static let `default` = AppConfig(
         api: APIConfig.default,
         transcription: TranscriptionConfig.default,
-        features: FeatureConfig.default
+        features: FeatureConfig.default,
+        revenueCat: RevenueCatSettings.default,
+        paywall: PaywallConfig.default
     )
 }
 
@@ -56,6 +60,29 @@ struct FeatureConfig: Codable {
         enableAdvancedStyling: true,
         maxVideoDuration: 300.0, // 5 minutes
         supportedVideoFormats: ["mp4", "mov", "avi", "mkv"]
+    )
+}
+
+/// RevenueCat configuration settings
+struct RevenueCatSettings: Codable {
+    let paywallOffering: String
+    let useCustomPaywall: Bool
+    let enableAnalytics: Bool
+    
+    static let `default` = RevenueCatSettings(
+        paywallOffering: "1_tier_pro",
+        useCustomPaywall: true,
+        enableAnalytics: true
+    )
+}
+
+/// Paywall theme and appearance configuration
+struct PaywallConfig: Codable {
+    let theme: String
+    
+    // TODO: i don't think this works because we don't pass it to RevenueCatManager correctly
+    static let `default` = PaywallConfig(
+        theme: "dark"
     )
 }
 
@@ -197,14 +224,42 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.features.supportedVideoFormats
     }
     
+    // MARK: - RevenueCat Configuration Methods
+    
+    /// Gets the configured paywall offering identifier
+    func getPaywallOffering() -> String {
+        return currentConfig.revenueCat.paywallOffering
+    }
+    
+    /// Checks if custom paywall should be used
+    func shouldUseCustomPaywall() -> Bool {
+        return currentConfig.revenueCat.useCustomPaywall
+    }
+    
+    /// Checks if RevenueCat analytics should be enabled
+    func isRevenueCatAnalyticsEnabled() -> Bool {
+        return currentConfig.revenueCat.enableAnalytics
+    }
+    
+    // MARK: - Paywall Configuration Methods
+    
+    /// Gets the configured paywall theme
+    func getPaywallTheme() -> String {
+        return currentConfig.paywall.theme
+    }
+    
     // MARK: - Private Methods
     
     private func handleConfigResponse(_ response: ConfigResponse) {
         if response.success, let remoteConfig = response.config {
             // Merge remote config with defaults
             let mergedConfig = mergeConfigs(default: AppConfig.default, remote: remoteConfig)
-            currentConfig = mergedConfig
-            lastUpdateTime = Date() // Use current time since timestamp is now a string
+            
+            // Update on main thread for @Published property
+            DispatchQueue.main.async {
+                self.currentConfig = mergedConfig
+                self.lastUpdateTime = Date() // Use current time since timestamp is now a string
+            }
             
             // Cache the merged configuration
             cacheConfig(mergedConfig)
@@ -240,10 +295,24 @@ class ConfigurationManager: ObservableObject {
             supportedVideoFormats: remoteConfig.features.supportedVideoFormats.isEmpty ? defaultConfig.features.supportedVideoFormats : remoteConfig.features.supportedVideoFormats
         )
         
+        // Merge revenueCat config
+        let mergedRevenueCatConfig = RevenueCatSettings(
+            paywallOffering: remoteConfig.revenueCat.paywallOffering.isEmpty ? defaultConfig.revenueCat.paywallOffering : remoteConfig.revenueCat.paywallOffering,
+            useCustomPaywall: remoteConfig.revenueCat.useCustomPaywall,
+            enableAnalytics: remoteConfig.revenueCat.enableAnalytics
+        )
+        
+        // Merge paywall config
+        let mergedPaywallConfig = PaywallConfig(
+            theme: remoteConfig.paywall.theme.isEmpty ? defaultConfig.paywall.theme : remoteConfig.paywall.theme
+        )
+        
         return AppConfig(
             api: mergedAPIConfig,
             transcription: mergedTranscriptionConfig,
-            features: mergedFeatureConfig
+            features: mergedFeatureConfig,
+            revenueCat: mergedRevenueCatConfig,
+            paywall: mergedPaywallConfig
         )
     }
     
@@ -266,12 +335,17 @@ class ConfigurationManager: ObservableObject {
         
         do {
             let cachedConfig = try JSONDecoder().decode(AppConfig.self, from: data)
-            currentConfig = cachedConfig
-            lastUpdateTime = userDefaults.object(forKey: lastUpdateKey) as? Date
+            
+            // Update on main thread for @Published property
+            DispatchQueue.main.async {
+                self.currentConfig = cachedConfig
+                self.lastUpdateTime = self.userDefaults.object(forKey: self.lastUpdateKey) as? Date
+            }
+            
             print("[ConfigurationManager] Loaded cached configuration")
         } catch {
             print("[ConfigurationManager] Failed to load cached configuration: \(error), using defaults")
-            currentConfig = AppConfig.default
+            // Keep using the default config that was set in init
         }
     }
 

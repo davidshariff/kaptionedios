@@ -43,5 +43,29 @@ extension ConfigurationManager {
     var supportedVideoFormats: [String] {
         return getSupportedVideoFormats()
     }
+    
+    // MARK: - RevenueCat Configuration Convenience Properties
+    
+    /// Convenience method to get the configured paywall offering
+    var paywallOffering: String {
+        return getPaywallOffering()
+    }
+    
+    /// Convenience method to check if custom paywall should be used
+    var useCustomPaywall: Bool {
+        return shouldUseCustomPaywall()
+    }
+    
+    /// Convenience method to check if RevenueCat analytics should be enabled
+    var revenueCatAnalyticsEnabled: Bool {
+        return isRevenueCatAnalyticsEnabled()
+    }
+    
+    // MARK: - Paywall Configuration Convenience Properties
+    
+    /// Convenience method to get the configured paywall theme
+    var paywallTheme: String {
+        return getPaywallTheme()
+    }
 }
 

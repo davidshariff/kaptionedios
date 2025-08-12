@@ -20,6 +20,8 @@ struct AppConfig {
     var api: APIConfig           // API endpoints and settings
     var transcription: TranscriptionConfig  // Transcription service settings
     var features: FeatureConfig  // Feature flags and limits
+    var revenueCat: RevenueCatConfig  // RevenueCat paywall and analytics settings
+    var paywall: PaywallConfig   // Paywall theme and appearance settings
 }
 ```
 
@@ -35,6 +37,14 @@ let configManager = ConfigurationManager.shared
 let transcriptionURL = configManager.getTranscriptionURL()
 let defaultLanguage = configManager.getDefaultLanguage()
 let isKaraokeEnabled = configManager.isKaraokeEnabled()
+
+// RevenueCat configuration
+let paywallOffering = configManager.getPaywallOffering()
+let useCustomPaywall = configManager.shouldUseCustomPaywall()
+
+// Paywall configuration
+let paywallTheme = configManager.getPaywallTheme()
+let paywallAccentColor = configManager.getPaywallAccentColor()
 ```
 
 ### Using Convenience Extensions
@@ -44,6 +54,14 @@ let isKaraokeEnabled = configManager.isKaraokeEnabled()
 let url = AppConfig.transcriptionURL
 let language = AppConfig.defaultLanguage
 let karaokeEnabled = AppConfig.karaokeEnabled
+
+// RevenueCat configuration
+let offering = AppConfig.paywallOffering
+let customPaywall = AppConfig.useCustomPaywall
+
+// Paywall configuration
+let theme = AppConfig.paywallTheme
+let accentColor = AppConfig.paywallAccentColor
 ```
 
 ### In Views
@@ -160,3 +178,47 @@ To add new configuration options:
 3. Add a getter method in `ConfigurationManager.swift`
 4. Add a convenience property in `ConfigurationManager+Extensions.swift`
 5. Update the merging logic in `mergeConfigs` method if needed
+
+## Configuration Options
+
+### RevenueCat Configuration
+
+The `RevenueCatConfig` struct controls RevenueCat paywall and analytics settings:
+
+```swift
+struct RevenueCatConfig {
+    let paywallOffering: String    // Offering ID to use for paywall (default: "1_tier_pro")
+    let useCustomPaywall: Bool     // Whether to use custom paywall (default: true)
+    let enableAnalytics: Bool      // Whether to enable RevenueCat analytics (default: true)
+}
+```
+
+**Usage:**
+```swift
+let configManager = ConfigurationManager.shared
+let offering = configManager.getPaywallOffering() // Returns "1_tier_pro" by default
+let useCustom = configManager.shouldUseCustomPaywall()
+```
+
+### Paywall Configuration
+
+The `PaywallConfig` struct controls RevenueCat paywall appearance using basic theming:
+
+```swift
+struct PaywallConfig {
+    let theme: String              // Theme setting: "light", "dark", "automatic" (default: "light")
+}
+```
+
+**Usage:**
+```swift
+let configManager = ConfigurationManager.shared
+let theme = configManager.getPaywallTheme() // Returns "light" by default
+```
+
+**Theme Values:**
+- `"light"` - Forces light theme
+- `"dark"` - Forces dark theme  
+- `"automatic"` - Uses system setting (default for unknown values)
+
+The paywall theming applies basic background color changes to the PaywallViewController.

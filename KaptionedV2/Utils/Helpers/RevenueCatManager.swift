@@ -334,11 +334,32 @@ class RevenueCatManager: NSObject, ObservableObject {
             topController = presentedController
         }
         
-        let paywallViewController = PaywallViewController()
-        paywallViewController.delegate = self
+        // Get configured paywall offering from ConfigurationManager
+        let configuredOffering = ConfigurationManager.shared.getPaywallOffering()
         
-        topController.present(paywallViewController, animated: true)
-        print("✅ [RevenueCatManager] Paywall presented")
+        // Try to find the configured offering, fall back to default if not available
+        if let offerings = offerings,
+           let configuredOfferingObj = offerings.all[configuredOffering] {
+            // Use configured offering
+            let paywallViewController = PaywallViewController(offering: configuredOfferingObj)
+            paywallViewController.delegate = self
+            
+            // Apply paywall theme configuration
+            applyPaywallTheme(paywallViewController)
+            
+            topController.present(paywallViewController, animated: true)
+            print("✅ [RevenueCatManager] Paywall presented with configured offering: \(configuredOffering)")
+        } else {
+            // Fall back to default paywall
+            let paywallViewController = PaywallViewController()
+            paywallViewController.delegate = self
+            
+            // Apply paywall theme configuration
+            applyPaywallTheme(paywallViewController)
+            
+            topController.present(paywallViewController, animated: true)
+            print("⚠️ [RevenueCatManager] Paywall presented with default offering (configured offering '\(configuredOffering)' not found)")
+        }
     }
     
     /// Present paywall for specific offering
@@ -360,6 +381,26 @@ class RevenueCatManager: NSObject, ObservableObject {
         
         topController.present(paywallViewController, animated: true)
         print("✅ [RevenueCatManager] Paywall presented with offering: \(offering.identifier)")
+    }
+    
+    /// Apply paywall theme configuration
+    private func applyPaywallTheme(_ paywallViewController: PaywallViewController) {
+        let paywallTheme = ConfigurationManager.shared.getPaywallTheme()
+        
+        // Apply theme configuration to the paywall
+        switch paywallTheme.lowercased() {
+        case "light":
+            paywallViewController.view.backgroundColor = UIColor.white
+            // You can add more light theme styling here
+        case "dark":
+            paywallViewController.view.backgroundColor = UIColor.black
+            // You can add more dark theme styling here
+        default:
+            // Use system default
+            break
+        }
+        
+        print("🎨 [RevenueCatManager] Applied paywall theme: \(paywallTheme)")
     }
     
     // MARK: - Purchase Methods

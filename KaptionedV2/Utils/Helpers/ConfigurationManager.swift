@@ -11,6 +11,28 @@ struct AppConfig: Codable {
     var revenueCat: RevenueCatSettings
     var paywall: PaywallConfig
     
+    // Custom decoding to handle missing fields in old configs
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        api = try container.decode(APIConfig.self, forKey: .api)
+        transcription = try container.decode(TranscriptionConfig.self, forKey: .transcription)
+        features = try container.decode(FeatureConfig.self, forKey: .features)
+        
+        // Handle missing fields gracefully with defaults
+        revenueCat = try container.decodeIfPresent(RevenueCatSettings.self, forKey: .revenueCat) ?? RevenueCatSettings.default
+        paywall = try container.decodeIfPresent(PaywallConfig.self, forKey: .paywall) ?? PaywallConfig.default
+    }
+    
+    // Standard initializer
+    init(api: APIConfig, transcription: TranscriptionConfig, features: FeatureConfig, revenueCat: RevenueCatSettings, paywall: PaywallConfig) {
+        self.api = api
+        self.transcription = transcription
+        self.features = features
+        self.revenueCat = revenueCat
+        self.paywall = paywall
+    }
+    
     static let `default` = AppConfig(
         api: APIConfig.default,
         transcription: TranscriptionConfig.default,
@@ -65,12 +87,14 @@ struct FeatureConfig: Codable {
 
 /// RevenueCat configuration settings
 struct RevenueCatSettings: Codable {
+    let apiKey: String
     let paywallOffering: String
     let useCustomPaywall: Bool
     let enableAnalytics: Bool
     let allowUpgrades: Bool
     
     static let `default` = RevenueCatSettings(
+        apiKey: "appl_sArGgNOqlzovQItCyGBRZobhFNC", // Default/fallback key
         paywallOffering: "1_tier_pro",
         useCustomPaywall: true,
         enableAnalytics: true,
@@ -121,6 +145,7 @@ class ConfigurationManager: ObservableObject {
     
     @Published var currentConfig: AppConfig = AppConfig.default
     @Published var isLoading: Bool = false
+    @Published var isReady: Bool = true // Starts as ready with default config
     @Published var lastUpdateTime: Date?
     @Published var errorMessage: String?
     
@@ -140,6 +165,7 @@ class ConfigurationManager: ObservableObject {
         guard !isLoading else { return }
         
         isLoading = true
+        isReady = false // Mark as not ready while loading
         errorMessage = nil
         
         let configURL = URL(string: "\(AppConfig.default.api.baseURL)/configs")!
@@ -163,6 +189,7 @@ class ConfigurationManager: ObservableObject {
             .sink(
                 receiveCompletion: { [weak self] completion in
                     self?.isLoading = false
+                    self?.isReady = true // Mark as ready regardless of success/failure
                     
                     switch completion {
                     case .finished:
@@ -228,6 +255,11 @@ class ConfigurationManager: ObservableObject {
     
     // MARK: - RevenueCat Configuration Methods
     
+    /// Gets the configured RevenueCat API key
+    func getRevenueCatAPIKey() -> String {
+        return currentConfig.revenueCat.apiKey
+    }
+    
     /// Gets the configured paywall offering identifier
     func getPaywallOffering() -> String {
         return currentConfig.revenueCat.paywallOffering
@@ -253,6 +285,32 @@ class ConfigurationManager: ObservableObject {
     /// Gets the configured paywall theme
     func getPaywallTheme() -> String {
         return currentConfig.paywall.theme
+    }
+    
+    // MARK: - Async Configuration Loading
+    
+    /// Waits for configuration to be ready (either loaded successfully or failed)
+    func waitForConfigurationReady() async {
+        // If already ready, return immediately
+        if await isReady { return }
+        
+        // Wait for isReady to become true
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            var cancellable: AnyCancellable?
+            
+            cancellable = $isReady
+                .filter { $0 } // Wait for true
+                .first()
+                .sink { _ in
+                    continuation.resume()
+                    cancellable?.cancel() // Clean up the cancellable
+                }
+            
+            // Store the cancellable in the instance to prevent deallocation
+            cancellables.insert(cancellable!)
+        }
+        
+        print("[ConfigurationManager] Configuration ready state achieved")
     }
     
     // MARK: - Private Methods
@@ -304,6 +362,7 @@ class ConfigurationManager: ObservableObject {
         
         // Merge revenueCat config
         let mergedRevenueCatConfig = RevenueCatSettings(
+            apiKey: remoteConfig.revenueCat.apiKey.isEmpty ? defaultConfig.revenueCat.apiKey : remoteConfig.revenueCat.apiKey,
             paywallOffering: remoteConfig.revenueCat.paywallOffering.isEmpty ? defaultConfig.revenueCat.paywallOffering : remoteConfig.revenueCat.paywallOffering,
             useCustomPaywall: remoteConfig.revenueCat.useCustomPaywall,
             enableAnalytics: remoteConfig.revenueCat.enableAnalytics,

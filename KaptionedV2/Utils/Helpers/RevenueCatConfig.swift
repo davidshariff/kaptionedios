@@ -8,9 +8,9 @@ struct RevenueCatConfig {
     /// RevenueCat API Keys (replace with your actual keys from RevenueCat dashboard)
     struct APIKeys {
         #if DEBUG
-        static let debug = "appl_sArGgNOqlzovQItCyGBRZobhFNC"
+            static let debug = "appl_sArGgNOqlzovQItCyGBRZobhFNC"
         #else
-        static let release = "appl_YOUR_RELEASE_API_KEY_HERE"
+            static let release = "appl_sArGgNOqlzovQItCyGBRZobhFNC"
         #endif
         
         static var current: String {

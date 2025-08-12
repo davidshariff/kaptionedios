@@ -27,11 +27,21 @@ class SubscriptionManager: ObservableObject {
     private let deviceKey = "device_identifier"
     
     private init() {
-        // Sync with RevenueCat on init
+        // Only load local subscription status on init
+        // RevenueCat sync will be triggered manually after configuration is ready
         Task { @MainActor in
             loadSubscriptionStatus()
-            await syncWithRevenueCat()
+            print("[SubscriptionManager] 📱 Initialized with local subscription status only")
         }
+    }
+    
+    /// Initialize RevenueCat sync after configuration is ready
+    func initializeRevenueCatSync() async {
+        print("[SubscriptionManager] 🔄 Waiting for ConfigurationManager to be ready...")
+        await ConfigurationManager.shared.waitForConfigurationReady()
+        print("[SubscriptionManager] ✅ ConfigurationManager ready, proceeding with RevenueCat sync")
+        
+        await syncWithRevenueCat()
     }
     
     /// Force refresh subscription status from RevenueCat

@@ -22,25 +22,43 @@ struct VideoEditorSwiftUIApp: App {
                         print("🚀 App running in PRODUCTION mode")
                     #endif
 
-                    // Load remote configuration when app starts
-                    configManager.loadRemoteConfig()
-                    
-                    // Configure RevenueCat
-                    RevenueCatManager.shared.configure()
-                    
-                    // Refresh subscription status to sync with RevenueCat
-                    SubscriptionManager.shared.refreshSubscriptionStatus()
-                    
-                    // Debug RevenueCat setup after a short delay to let it load
+                    // Start the coordinated configuration loading sequence
                     Task {
-                        try? await Task.sleep(nanoseconds: 3_000_000_000) // 3 seconds
-                        await MainActor.run {
-                            print("\n" + RevenueCatManager.shared.getSubscriptionDebugInfo() + "\n")
-                        }
+                        await startupSequence()
                     }
 
                 }
                 //.debugRevenueCatOverlay()
         }
+    }
+    
+    // MARK: - Startup Sequence
+    
+    /// Coordinates the startup sequence: ConfigurationManager -> RevenueCat -> SubscriptionManager
+    private func startupSequence() async {
+        print("[App] 🚀 Starting coordinated configuration loading sequence...")
+        
+        // Step 1: Load remote configuration
+        print("[App] 📡 Step 1: Loading remote configuration...")
+        await MainActor.run {
+            configManager.loadRemoteConfig()
+        }
+        
+        // Step 2: Wait for configuration to be ready, then configure RevenueCat
+        print("[App] 💳 Step 2: Configuring RevenueCat...")
+        await RevenueCatManager.shared.configure()
+        
+        // Step 3: Now initialize SubscriptionManager's RevenueCat sync
+        print("[App] 📊 Step 3: Initializing SubscriptionManager RevenueCat sync...")
+        await SubscriptionManager.shared.initializeRevenueCatSync()
+        
+        // Step 4: Debug info after everything is loaded
+        print("[App] 🔍 Step 4: Generating debug info...")
+        try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
+        await MainActor.run {
+            print("\n" + RevenueCatManager.shared.getSubscriptionDebugInfo() + "\n")
+        }
+        
+        print("[App] ✅ Startup sequence completed!")
     }
 }

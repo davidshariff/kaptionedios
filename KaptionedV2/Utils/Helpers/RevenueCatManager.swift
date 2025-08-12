@@ -26,7 +26,7 @@ class RevenueCatManager: NSObject, ObservableObject {
     @Published var isConfigured = false
     
     // RevenueCat Configuration
-    private let apiKey: String = RevenueCatConfig.APIKeys.current
+    private var apiKey: String = ""
     private let proEntitlementID = RevenueCatConfig.Entitlements.proAccess
     private let unlimitedEntitlementID = RevenueCatConfig.Entitlements.unlimitedAccess
     
@@ -37,23 +37,32 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     // MARK: - Configuration
     
-    /// Configure RevenueCat on app launch
-    func configure() {
-        guard !apiKey.contains("YOUR_") else {
-            print("⚠️ [RevenueCatManager] Please set your RevenueCat API key")
+    /// Configure RevenueCat on app launch - now waits for ConfigurationManager
+    func configure() async {
+        print("[RevenueCatManager] 🔄 Waiting for ConfigurationManager to be ready...")
+        await ConfigurationManager.shared.waitForConfigurationReady()
+        
+        // Get API key from ConfigurationManager
+        apiKey = await ConfigurationManager.shared.getRevenueCatAPIKey()
+        print("[RevenueCatManager] 🔑 Using API key from ConfigurationManager: \(apiKey.prefix(12))...")
+        
+        guard !apiKey.contains("YOUR_") && !apiKey.isEmpty else {
+            print("⚠️ [RevenueCatManager] Invalid RevenueCat API key from configuration")
             isConfigured = false
             return
         }
         
         do {
+            #if canImport(RevenueCat)
             Purchases.logLevel = .debug
             Purchases.configure(withAPIKey: apiKey)
             
             // Set up delegate
             Purchases.shared.delegate = self
+            #endif
             
             isConfigured = true
-            print("✅ [RevenueCatManager] RevenueCat configured successfully")
+            print("✅ [RevenueCatManager] RevenueCat configured successfully with config from ConfigurationManager")
             
             // Load initial data
             Task {

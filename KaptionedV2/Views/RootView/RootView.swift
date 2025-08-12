@@ -3,6 +3,7 @@ import PhotosUI
 
 struct RootView: View {
     @ObservedObject var rootVM: RootViewModel
+    @ObservedObject private var subscriptionManager = SubscriptionManager.shared
     @State var item: PhotosPickerItem?
     @State var selectedVideoURL: URL?
     @State var showLoader: Bool = false
@@ -151,6 +152,35 @@ struct RootView: View {
                 Text("Are you sure you want to delete this project? This action cannot be undone.")
             }
             // Removed custom subscription sheet - now using RevenueCat paywall
+            .overlay {
+                // Subscription success popup
+                if subscriptionManager.showSubscriptionSuccess {
+                    SubscriptionSuccessView(
+                        isPresented: $subscriptionManager.showSubscriptionSuccess,
+                        subscriptionTier: subscriptionManager.successSubscriptionTier
+                    )
+                    .environment(\.isPresented, subscriptionManager.showSubscriptionSuccess)
+                }
+                
+                // Already subscribed view
+                if subscriptionManager.showAlreadySubscribed {
+                    AlreadySubscribedView(
+                        subscriptionTier: subscriptionManager.currentStatus.tier,
+                        videosRemaining: subscriptionManager.currentStatus.remainingVideos,
+                        expiryDate: subscriptionManager.currentStatus.subscriptionExpiryDate,
+                        isPresented: $subscriptionManager.showAlreadySubscribed
+                    )
+                }
+                
+                // No videos left view
+                if subscriptionManager.showNoVideosLeft {
+                    NoVideosLeftView(
+                        subscriptionTier: subscriptionManager.currentStatus.tier,
+                        expiryDate: subscriptionManager.currentStatus.subscriptionExpiryDate,
+                        isPresented: $subscriptionManager.showNoVideosLeft
+                    )
+                }
+            }
         }
     }
     

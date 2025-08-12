@@ -239,6 +239,7 @@ class RevenueCatManager: NSObject, ObservableObject {
         
         print("[RevenueCatManager] 📊 Checking entitlements...")
         print("[RevenueCatManager] 📊 All available entitlements: \(Array(customerInfo.entitlements.all.keys))")
+        print("[RevenueCatManager] 📊 Active subscriptions: \(customerInfo.activeSubscriptions)")
         
         // Debug all entitlements with their product identifiers
         for (key, entitlement) in customerInfo.entitlements.all {
@@ -258,27 +259,57 @@ class RevenueCatManager: NSObject, ObservableObject {
         // Get tier mapping from offerings
         let tierMapping = detectTierMapping()
         
+        // FIRST: Check active subscriptions for unlimited products (most reliable)
+        print("[RevenueCatManager] 📊 Checking active subscriptions for tier detection...")
+        for activeSubscription in customerInfo.activeSubscriptions {
+            print("[RevenueCatManager] 📊 Active subscription: \(activeSubscription)")
+            if let mappedTier = tierMapping[activeSubscription] {
+                print("[RevenueCatManager] 📊 Detected tier: \(mappedTier.displayName) (from active subscription: \(activeSubscription))")
+                return mappedTier
+            }
+            
+            // Fallback: Check product name for unlimited indicators
+            if activeSubscription.lowercased().contains("unlimited") {
+                print("[RevenueCatManager] 📊 Detected tier: Unlimited (from active subscription name: \(activeSubscription))")
+                return .unlimited
+            }
+        }
+        
         // Analyze active entitlements to determine tier
+        // First, check if we have any unlimited entitlements (highest priority)
         for (entitlementKey, entitlement) in activeEntitlements {
             let productId = entitlement.productIdentifier
             let entitlementName = entitlementKey.lowercased()
             
             print("[RevenueCatManager] 📊 Analyzing entitlement '\(entitlementKey)' with product '\(productId)'")
             
-            // First, try to use the tier mapping from offerings
-            if let mappedTier = tierMapping[productId] {
-                print("[RevenueCatManager] 📊 Detected tier: \(mappedTier.displayName) (mapped from product: \(productId))")
-                return mappedTier
-            }
-            
-            // Fallback: Check entitlement and product names for tier indicators
+            // Check for unlimited indicators first (highest priority)
             if entitlementName.contains("unlimited") || productId.lowercased().contains("unlimited") {
-                print("[RevenueCatManager] 📊 Detected tier: Unlimited (entitlement: \(entitlementKey))")
+                print("[RevenueCatManager] 📊 Detected tier: Unlimited (entitlement: \(entitlementKey), product: \(productId))")
                 return .unlimited
             }
             
+            // Check tier mapping for unlimited products
+            if let mappedTier = tierMapping[productId], mappedTier == .unlimited {
+                print("[RevenueCatManager] 📊 Detected tier: Unlimited (mapped from product: \(productId))")
+                return .unlimited
+            }
+        }
+        
+        // Then check for pro entitlements
+        for (entitlementKey, entitlement) in activeEntitlements {
+            let productId = entitlement.productIdentifier
+            let entitlementName = entitlementKey.lowercased()
+            
+            // Check for pro indicators
             if entitlementName.contains("pro") || productId.lowercased().contains("pro") {
-                print("[RevenueCatManager] 📊 Detected tier: Pro (entitlement: \(entitlementKey))")
+                print("[RevenueCatManager] 📊 Detected tier: Pro (entitlement: \(entitlementKey), product: \(productId))")
+                return .pro
+            }
+            
+            // Check tier mapping for pro products
+            if let mappedTier = tierMapping[productId], mappedTier == .pro {
+                print("[RevenueCatManager] 📊 Detected tier: Pro (mapped from product: \(productId))")
                 return .pro
             }
         }
@@ -381,6 +412,46 @@ class RevenueCatManager: NSObject, ObservableObject {
         
         topController.present(paywallViewController, animated: true)
         print("✅ [RevenueCatManager] Paywall presented with offering: \(offering.identifier)")
+    }
+    
+    /// Present paywall for specific offering identifier
+    func presentPaywall(offeringIdentifier: String) {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first,
+              let rootViewController = window.rootViewController else {
+            print("❌ [RevenueCatManager] Could not find root view controller for paywall")
+            return
+        }
+        
+        // Find the topmost presented view controller
+        var topController = rootViewController
+        while let presentedController = topController.presentedViewController {
+            topController = presentedController
+        }
+        
+        // Try to find the specific offering
+        if let offerings = offerings,
+           let targetOffering = offerings.all[offeringIdentifier] {
+            // Use the specific offering
+            let paywallViewController = PaywallViewController(offering: targetOffering)
+            paywallViewController.delegate = self
+            
+            // Apply paywall theme configuration
+            applyPaywallTheme(paywallViewController)
+            
+            topController.present(paywallViewController, animated: true)
+            print("✅ [RevenueCatManager] Paywall presented with specific offering: \(offeringIdentifier)")
+        } else {
+            // Fall back to default paywall if specific offering not found
+            let paywallViewController = PaywallViewController()
+            paywallViewController.delegate = self
+            
+            // Apply paywall theme configuration
+            applyPaywallTheme(paywallViewController)
+            
+            topController.present(paywallViewController, animated: true)
+            print("⚠️ [RevenueCatManager] Specific offering '\(offeringIdentifier)' not found, presented default paywall")
+        }
     }
     
     /// Apply paywall theme configuration
@@ -495,6 +566,70 @@ class RevenueCatManager: NSObject, ObservableObject {
         // Prefer monthly packages
         return packages.first { $0.packageType == .monthly } ?? packages.first
     }
+    
+    // MARK: - Subscription Upgrade Handling
+    
+    /// Handles subscription upgrade scenarios, particularly pro to unlimited
+    @MainActor
+    private func handleSubscriptionUpgrade(from previousTier: SubscriptionTier, to currentTier: SubscriptionTier) async {
+        // Check if upgrades are allowed via configuration
+        let upgradesAllowed = ConfigurationManager.shared.areUpgradesAllowed()
+        
+        // Check if this is a pro to unlimited upgrade
+        if previousTier == .pro && currentTier == .unlimited {
+            if upgradesAllowed {
+                print("🔄 [RevenueCatManager] Detected pro to unlimited upgrade (upgrades enabled)")
+                
+                // For iOS App Store, Apple handles the subscription upgrade automatically
+                // when products are in the same subscription group. The old subscription
+                // is automatically cancelled and prorated.
+                
+                // Log the upgrade for analytics/debugging
+                await logSubscriptionUpgrade(from: previousTier, to: currentTier)
+                
+                // Additional cleanup or analytics can be added here
+                print("✅ [RevenueCatManager] Pro to unlimited upgrade handled successfully")
+                print("ℹ️ [RevenueCatManager] Apple automatically cancelled pro subscription and applied proration")
+            } else {
+                print("⚠️ [RevenueCatManager] Pro to unlimited upgrade detected but upgrades are disabled in config")
+                print("⚠️ [RevenueCatManager] This upgrade should not have been possible - check paywall logic")
+            }
+            
+        } else if previousTier == currentTier && previousTier == .pro {
+            // Special case: User purchased unlimited but tier detection still shows pro
+            // This might happen if RevenueCat entitlements haven't updated yet
+            print("⚠️ [RevenueCatManager] Potential upgrade detected but tier unchanged")
+            print("⚠️ [RevenueCatManager] This might indicate RevenueCat configuration issues:")
+            print("⚠️ [RevenueCatManager] 1. Ensure unlimited products grant 'unlimited_access' entitlement")
+            print("⚠️ [RevenueCatManager] 2. Ensure products are in the same subscription group")
+            print("⚠️ [RevenueCatManager] 3. Check RevenueCat dashboard for proper entitlement mapping")
+            
+            // Force refresh customer info to check for updates
+            print("🔄 [RevenueCatManager] Force refreshing customer info...")
+            await loadCustomerInfo()
+            
+        } else if previousTier != currentTier {
+            // Handle other tier changes
+            print("🔄 [RevenueCatManager] Subscription tier changed from \(previousTier.displayName) to \(currentTier.displayName)")
+            await logSubscriptionUpgrade(from: previousTier, to: currentTier)
+        }
+    }
+    
+    /// Logs subscription upgrade for analytics and debugging
+    @MainActor
+    private func logSubscriptionUpgrade(from previousTier: SubscriptionTier, to currentTier: SubscriptionTier) async {
+        print("📊 [RevenueCatManager] Subscription upgrade logged:")
+        print("📊 [RevenueCatManager]   From: \(previousTier.displayName)")
+        print("📊 [RevenueCatManager]   To: \(currentTier.displayName)")
+        print("📊 [RevenueCatManager]   Timestamp: \(Date())")
+        
+        // Here you could add analytics tracking if needed
+        // Analytics.track("subscription_upgrade", properties: [
+        //     "previous_tier": previousTier.rawValue,
+        //     "new_tier": currentTier.rawValue,
+        //     "upgrade_type": previousTier == .pro && currentTier == .unlimited ? "pro_to_unlimited" : "other"
+        // ])
+    }
 }
 
 // MARK: - PurchasesDelegate
@@ -513,11 +648,26 @@ extension RevenueCatManager: PurchasesDelegate {
 extension RevenueCatManager: PaywallViewControllerDelegate {
     nonisolated func paywallViewController(_ controller: PaywallViewController, didFinishPurchasingWith customerInfo: CustomerInfo) {
         Task { @MainActor in
+            // Store previous tier before updating
+            let previousTier = SubscriptionManager.shared.currentStatus.tier
+            
             self.customerInfo = customerInfo
             print("✅ [RevenueCatManager] Paywall purchase completed successfully")
             
             // Sync with local subscription manager
             await SubscriptionManager.shared.syncWithRevenueCat()
+            
+            // Get the current subscription tier after sync
+            let currentTier = SubscriptionManager.shared.currentStatus.tier
+            
+            // Reset video count for successful subscription purchase
+            await SubscriptionManager.shared.resetVideoCountForNewSubscription()
+            
+            // Handle pro to unlimited upgrade scenario
+            await handleSubscriptionUpgrade(from: previousTier, to: currentTier)
+            
+            // Show success popup
+            SubscriptionManager.shared.showSubscriptionSuccessPopup(for: currentTier)
             
             // Dismiss the paywall
             controller.dismiss(animated: true)

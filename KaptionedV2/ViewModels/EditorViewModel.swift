@@ -257,7 +257,9 @@ extension EditorViewModel{
                     self.onSubtitlesGenerated?()
                     
                     // Record video creation when subtitles are successfully generated
-                    SubscriptionManager.shared.recordVideoCreation()
+                    Task { @MainActor in
+                        SubscriptionManager.shared.recordVideoCreation()
+                    }
                     
                     completion?()
                     

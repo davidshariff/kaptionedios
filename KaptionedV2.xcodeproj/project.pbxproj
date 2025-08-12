@@ -88,6 +88,9 @@
 		F48099402E4A258200E9D936 /* RevenueCatManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F480993F2E4A258200E9D936 /* RevenueCatManager.swift */; };
 		F48099412E4A258200E9D936 /* RevenueCatConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = F480993E2E4A258200E9D936 /* RevenueCatConfig.swift */; };
 		F48099432E4A27EF00E9D936 /* RevenueCatConfig.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F48099422E4A27EF00E9D936 /* RevenueCatConfig.storekit */; };
+		F48099B02E4B1B5F00E9D936 /* AlreadySubscribedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48099AC2E4B1B5F00E9D936 /* AlreadySubscribedView.swift */; };
+		F48099B12E4B1B5F00E9D936 /* SubscriptionSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48099AE2E4B1B5F00E9D936 /* SubscriptionSuccessView.swift */; };
+		F48099B22E4B1B5F00E9D936 /* NoVideosLeftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48099AD2E4B1B5F00E9D936 /* NoVideosLeftView.swift */; };
 		F485E5372E49EB64007A680B /* ConfigurationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E5362E49EB64007A680B /* ConfigurationManager.swift */; };
 		F485E5392E49EB81007A680B /* ConfigurationManager+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */; };
 		F485E53B2E4A0589007A680B /* SubscriptionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F485E53A2E4A0589007A680B /* SubscriptionModel.swift */; };
@@ -184,6 +187,9 @@
 		F480993E2E4A258200E9D936 /* RevenueCatConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatConfig.swift; sourceTree = "<group>"; };
 		F480993F2E4A258200E9D936 /* RevenueCatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatManager.swift; sourceTree = "<group>"; };
 		F48099422E4A27EF00E9D936 /* RevenueCatConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = RevenueCatConfig.storekit; sourceTree = "<group>"; };
+		F48099AC2E4B1B5F00E9D936 /* AlreadySubscribedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlreadySubscribedView.swift; sourceTree = "<group>"; };
+		F48099AD2E4B1B5F00E9D936 /* NoVideosLeftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoVideosLeftView.swift; sourceTree = "<group>"; };
+		F48099AE2E4B1B5F00E9D936 /* SubscriptionSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionSuccessView.swift; sourceTree = "<group>"; };
 		F485E5362E49EB64007A680B /* ConfigurationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationManager.swift; sourceTree = "<group>"; };
 		F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationManager+Extensions.swift"; sourceTree = "<group>"; };
 		F485E53A2E4A0589007A680B /* SubscriptionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionModel.swift; sourceTree = "<group>"; };
@@ -343,6 +349,7 @@
 		5ACFF97D29E9451100827A37 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				F48099AF2E4B1B5F00E9D936 /* Subscriptions */,
 				5A17E08729F1743500DB4A47 /* RootView */,
 				5ACFF99B29ED5C3500827A37 /* ViewComponents */,
 				5A9EDCFE29F03D800014A1CF /* ToolsView */,
@@ -567,6 +574,16 @@
 			path = PresetsList;
 			sourceTree = "<group>";
 		};
+		F48099AF2E4B1B5F00E9D936 /* Subscriptions */ = {
+			isa = PBXGroup;
+			children = (
+				F48099AC2E4B1B5F00E9D936 /* AlreadySubscribedView.swift */,
+				F48099AD2E4B1B5F00E9D936 /* NoVideosLeftView.swift */,
+				F48099AE2E4B1B5F00E9D936 /* SubscriptionSuccessView.swift */,
+			);
+			path = Subscriptions;
+			sourceTree = "<group>";
+		};
 		F4A4B7882E40DABC00016ED9 /* Style */ = {
 			isa = PBXGroup;
 			children = (
@@ -714,6 +731,9 @@
 				5ACFF9B029EE8C6C00827A37 /* PlayerHolderView.swift in Sources */,
 				5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */,
 				5ACFF9B229EEA93400827A37 /* ToolsSectionView.swift in Sources */,
+				F48099B02E4B1B5F00E9D936 /* AlreadySubscribedView.swift in Sources */,
+				F48099B12E4B1B5F00E9D936 /* SubscriptionSuccessView.swift in Sources */,
+				F48099B22E4B1B5F00E9D936 /* NoVideosLeftView.swift in Sources */,
 				5A5F95712A0135490041C3F6 /* TextEditorViewModel.swift in Sources */,
 				5A9EDD0029F03DCD0014A1CF /* VideoSpeedSlider.swift in Sources */,
 				5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */,

@@ -24,7 +24,7 @@ enum SubscriptionTier: String, Codable, CaseIterable {
         case .free:
             return 1
         case .pro:
-            return 10
+            return 2
         case .unlimited:
             return Int.max
         }

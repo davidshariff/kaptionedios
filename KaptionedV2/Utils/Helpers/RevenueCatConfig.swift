@@ -97,7 +97,10 @@ struct RevenueCatConfig {
  
  1. 📱 APP STORE CONNECT SETUP:
     - Create your in-app purchase products with the IDs above
-    - Set up subscription groups
+    - ⚠️ IMPORTANT: Set up subscription groups correctly for upgrades
+      * Put ALL pro and unlimited products in the SAME subscription group
+      * Set subscription levels: Pro = Level 1, Unlimited = Level 2
+      * This enables automatic upgrade/downgrade with proration
     - Configure pricing and availability
     - Submit for review
  

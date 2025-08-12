@@ -68,11 +68,13 @@ struct RevenueCatSettings: Codable {
     let paywallOffering: String
     let useCustomPaywall: Bool
     let enableAnalytics: Bool
+    let allowUpgrades: Bool
     
     static let `default` = RevenueCatSettings(
         paywallOffering: "1_tier_pro",
         useCustomPaywall: true,
-        enableAnalytics: true
+        enableAnalytics: true,
+        allowUpgrades: false
     )
 }
 
@@ -241,6 +243,11 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.revenueCat.enableAnalytics
     }
     
+    /// Checks if subscription upgrades are allowed
+    func areUpgradesAllowed() -> Bool {
+        return currentConfig.revenueCat.allowUpgrades
+    }
+    
     // MARK: - Paywall Configuration Methods
     
     /// Gets the configured paywall theme
@@ -299,7 +306,8 @@ class ConfigurationManager: ObservableObject {
         let mergedRevenueCatConfig = RevenueCatSettings(
             paywallOffering: remoteConfig.revenueCat.paywallOffering.isEmpty ? defaultConfig.revenueCat.paywallOffering : remoteConfig.revenueCat.paywallOffering,
             useCustomPaywall: remoteConfig.revenueCat.useCustomPaywall,
-            enableAnalytics: remoteConfig.revenueCat.enableAnalytics
+            enableAnalytics: remoteConfig.revenueCat.enableAnalytics,
+            allowUpgrades: remoteConfig.revenueCat.allowUpgrades
         )
         
         // Merge paywall config

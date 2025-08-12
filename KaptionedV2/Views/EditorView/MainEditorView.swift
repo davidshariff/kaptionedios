@@ -244,16 +244,13 @@ struct MainEditorView: View {
                 )
                 .zIndex(2500)
             }
-            
-            // Removed subscription upgrade sheet - now using RevenueCat paywall
-            
+                        
             // Centered cross overlay
             if showCrossOverlay {
                 CrossOverlayView()
                     .zIndex(1500)
             }
-            
-
+    
             
             // Style Editor View as overlay
             if textEditor.selectedStyleOptionToEdit != nil {
@@ -381,37 +378,40 @@ extension MainEditorView{
             
             // Center buttons container
             HStack(spacing: 20) {
-                // Video player size toggle button
-                Button {
-                    // Cycle through video player sizes (excluding custom)
-                    let cycleSizes: [VideoPlayerSize] = [.quarter, .half, .threeQuarters, .full]
-                    if let currentIndex = cycleSizes.firstIndex(of: editorVM.videoPlayerSize) {
-                        let nextIndex = (currentIndex + 1) % cycleSizes.count
-                        editorVM.videoPlayerSize = cycleSizes[nextIndex]
-                    } else {
-                        // If current size is custom, go to half
-                        editorVM.videoPlayerSize = .half
-                    }
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: editorVM.videoPlayerSize.iconName)
-                        Text(editorVM.videoPlayerSize.displayName)
-                            .font(.caption2)
-                    }
-                }
-                .foregroundColor(editorVM.videoPlayerSize == .custom ? .green : .white)
                 
-                // Cross overlay toggle button
-                Button {
-                    showCrossOverlay.toggle()
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: showCrossOverlay ? "plus.circle.fill" : "plus.circle")
-                        Text("Cross")
-                        .font(.caption2)
+                #if DEBUG
+                    // Video player size toggle button
+                    Button {
+                        // Cycle through video player sizes (excluding custom)
+                        let cycleSizes: [VideoPlayerSize] = [.quarter, .half, .threeQuarters, .full]
+                        if let currentIndex = cycleSizes.firstIndex(of: editorVM.videoPlayerSize) {
+                            let nextIndex = (currentIndex + 1) % cycleSizes.count
+                            editorVM.videoPlayerSize = cycleSizes[nextIndex]
+                        } else {
+                            // If current size is custom, go to half
+                            editorVM.videoPlayerSize = .half
+                        }
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: editorVM.videoPlayerSize.iconName)
+                            Text(editorVM.videoPlayerSize.displayName)
+                                .font(.caption2)
+                        }
                     }
-                }
-                .foregroundColor(showCrossOverlay ? .yellow : .white)
+                    .foregroundColor(editorVM.videoPlayerSize == .custom ? .green : .white)
+                    
+                    // Cross overlay toggle button
+                    Button {
+                        showCrossOverlay.toggle()
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: showCrossOverlay ? "plus.circle.fill" : "plus.circle")
+                            Text("Cross")
+                            .font(.caption2)
+                        }
+                    }
+                    .foregroundColor(showCrossOverlay ? .yellow : .white)
+                #endif
                 
                 // Saving indicator
                 if isSaving {

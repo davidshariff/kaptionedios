@@ -1,17 +1,29 @@
 import Foundation
-import UIKit
+
+#if canImport(RevenueCat)
 import RevenueCat
+#endif
+
+#if canImport(RevenueCatUI)
 import RevenueCatUI
+#endif
+
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// RevenueCat integration manager for handling subscriptions and purchases
 @MainActor
 class RevenueCatManager: NSObject, ObservableObject {
     static let shared = RevenueCatManager()
     
+    #if canImport(RevenueCat)
     @Published var customerInfo: CustomerInfo?
     @Published var offerings: Offerings?
+    #endif
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var isConfigured = false
     
     // RevenueCat Configuration
     private let apiKey: String = RevenueCatConfig.APIKeys.current
@@ -29,26 +41,38 @@ class RevenueCatManager: NSObject, ObservableObject {
     func configure() {
         guard !apiKey.contains("YOUR_") else {
             print("⚠️ [RevenueCatManager] Please set your RevenueCat API key")
+            isConfigured = false
             return
         }
         
-        Purchases.logLevel = .debug
-        Purchases.configure(withAPIKey: apiKey)
-        
-        // Set up delegate
-        Purchases.shared.delegate = self
-        
-        print("✅ [RevenueCatManager] RevenueCat configured successfully")
-        
-        // Load initial data
-        Task {
-            await loadCustomerInfo()
-            await loadOfferings()
+        do {
+            Purchases.logLevel = .debug
+            Purchases.configure(withAPIKey: apiKey)
+            
+            // Set up delegate
+            Purchases.shared.delegate = self
+            
+            isConfigured = true
+            print("✅ [RevenueCatManager] RevenueCat configured successfully")
+            
+            // Load initial data
+            Task {
+                await loadCustomerInfo()
+                await loadOfferings()
+            }
+        } catch {
+            print("❌ [RevenueCatManager] Failed to configure RevenueCat: \(error)")
+            isConfigured = false
         }
     }
     
     /// Identify user with RevenueCat
     func identifyUser(userID: String) {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot identify user - RevenueCat not configured")
+            return
+        }
+        
         Task {
             do {
                 let (customerInfo, _) = try await Purchases.shared.logIn(userID)
@@ -69,6 +93,15 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Load customer information
     func loadCustomerInfo() async {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot load customer info - RevenueCat not configured")
+            await MainActor.run { 
+                self.isLoading = false
+                self.customerInfo = nil
+            }
+            return
+        }
+        
         await MainActor.run { isLoading = true }
         
         do {
@@ -89,6 +122,14 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Load available offerings
     func loadOfferings() async {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot load offerings - RevenueCat not configured")
+            await MainActor.run { 
+                self.offerings = nil
+            }
+            return
+        }
+        
         do {
             let offerings = try await Purchases.shared.offerings()
             await MainActor.run {
@@ -232,6 +273,11 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Get current subscription tier based on RevenueCat entitlements
     var currentSubscriptionTier: SubscriptionTier {
+        guard isConfigured else {
+            print("[RevenueCatManager] 📊 RevenueCat not configured, returning .free")
+            return .free
+        }
+        
         guard let customerInfo = customerInfo else { 
             print("[RevenueCatManager] 📊 No customer info available, returning .free")
             return .free 
@@ -323,11 +369,19 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Check if user has active subscription
     var hasActiveSubscription: Bool {
+        guard isConfigured else {
+            print("[RevenueCatManager] 📊 RevenueCat not configured, returning false for hasActiveSubscription")
+            return false
+        }
         return currentSubscriptionTier != .free
     }
     
     /// Get subscription expiry date
     var subscriptionExpiryDate: Date? {
+        guard isConfigured else {
+            print("[RevenueCatManager] 📊 RevenueCat not configured, returning nil for subscriptionExpiryDate")
+            return nil
+        }
         guard let customerInfo = customerInfo else { return nil }
         
         // Get the active entitlements
@@ -352,12 +406,22 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Present RevenueCat's built-in paywall
     func presentPaywall() {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot present paywall - RevenueCat not configured")
+            return
+        }
+        
+        #if canImport(UIKit)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first,
               let rootViewController = window.rootViewController else {
             print("❌ [RevenueCatManager] Could not find root view controller for paywall")
             return
         }
+        #else
+        print("❌ [RevenueCatManager] UIKit not available, cannot present paywall")
+        return
+        #endif
         
         // Find the topmost presented view controller
         var topController = rootViewController
@@ -395,12 +459,22 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Present paywall for specific offering
     func presentPaywall(offering: Offering) {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot present paywall - RevenueCat not configured")
+            return
+        }
+        
+        #if canImport(UIKit)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first,
               let rootViewController = window.rootViewController else {
             print("❌ [RevenueCatManager] Could not find root view controller for paywall")
             return
         }
+        #else
+        print("❌ [RevenueCatManager] UIKit not available, cannot present paywall")
+        return
+        #endif
         
         var topController = rootViewController
         while let presentedController = topController.presentedViewController {
@@ -416,12 +490,22 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Present paywall for specific offering identifier
     func presentPaywall(offeringIdentifier: String) {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot present paywall - RevenueCat not configured")
+            return
+        }
+        
+        #if canImport(UIKit)
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first,
               let rootViewController = window.rootViewController else {
             print("❌ [RevenueCatManager] Could not find root view controller for paywall")
             return
         }
+        #else
+        print("❌ [RevenueCatManager] UIKit not available, cannot present paywall")
+        return
+        #endif
         
         // Find the topmost presented view controller
         var topController = rootViewController
@@ -478,6 +562,12 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Purchase a subscription package (now mainly used internally)
     func purchasePackage(_ package: Package) async -> Bool {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot purchase package - RevenueCat not configured")
+            await MainActor.run { isLoading = false }
+            return false
+        }
+        
         await MainActor.run { isLoading = true }
         
         do {
@@ -504,6 +594,12 @@ class RevenueCatManager: NSObject, ObservableObject {
     
     /// Restore purchases
     func restorePurchases() async -> Bool {
+        guard isConfigured else {
+            print("⚠️ [RevenueCatManager] Cannot restore purchases - RevenueCat not configured")
+            await MainActor.run { isLoading = false }
+            return false
+        }
+        
         await MainActor.run { isLoading = true }
         
         do {

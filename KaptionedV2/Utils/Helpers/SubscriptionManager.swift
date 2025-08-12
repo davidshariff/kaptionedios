@@ -1,8 +1,14 @@
 import Foundation
 import CryptoKit
 import Combine
-import UIKit
+
+#if canImport(RevenueCat)
 import RevenueCat
+#endif
+
+#if canImport(UIKit)
+import UIKit
+#endif
 
 /// Manages subscription status and enforces video creation limits with encrypted storage
 /// Now integrated with RevenueCat for real payment processing
@@ -175,6 +181,11 @@ class SubscriptionManager: ObservableObject {
     /// Clears all RevenueCat data (local cache and remote user data)
     @MainActor
     private func clearRevenueCatData() async {
+        guard await RevenueCatManager.shared.isConfigured else {
+            print("[SubscriptionManager] ⚠️ RevenueCat not configured, skipping data clear")
+            return
+        }
+        
         do {
             // Log out current user (clears local cache)
             let customerInfo = try await Purchases.shared.logOut()
@@ -193,14 +204,16 @@ class SubscriptionManager: ObservableObject {
         // Always reset manager state (whether logout succeeded or not)
         await RevenueCatManager.shared.resetState()
         
-        // Create a fresh anonymous user with new UUID
-        do {
-            let newUserID = UUID().uuidString
-            let (customerInfo, created) = try await Purchases.shared.logIn(newUserID)
-            print("[SubscriptionManager] 🔄 Fresh anonymous RevenueCat user created: \(newUserID)")
-        } catch {
-            print("[SubscriptionManager] ⚠️ Error creating new anonymous user: \(error)")
-            // This is not critical - RevenueCat will work with default anonymous user
+        // Create a fresh anonymous user with new UUID (only if RevenueCat is configured)
+        if await RevenueCatManager.shared.isConfigured {
+            do {
+                let newUserID = UUID().uuidString
+                let (customerInfo, created) = try await Purchases.shared.logIn(newUserID)
+                print("[SubscriptionManager] 🔄 Fresh anonymous RevenueCat user created: \(newUserID)")
+            } catch {
+                print("[SubscriptionManager] ⚠️ Error creating new anonymous user: \(error)")
+                // This is not critical - RevenueCat will work with default anonymous user
+            }
         }
     }
     
@@ -210,6 +223,13 @@ class SubscriptionManager: ObservableObject {
     @MainActor
     func syncWithRevenueCat() async {
         print("[SubscriptionManager] 🔄 Starting sync with RevenueCat...")
+        
+        // Check if RevenueCat is configured
+        guard await RevenueCatManager.shared.isConfigured else {
+            print("[SubscriptionManager] ⚠️ RevenueCat not configured, skipping sync")
+            return
+        }
+        
         await RevenueCatManager.shared.loadCustomerInfo()
         
         let revenueCatTier = RevenueCatManager.shared.currentSubscriptionTier
@@ -240,6 +260,11 @@ class SubscriptionManager: ObservableObject {
     
     /// Restore purchases from RevenueCat
     func restorePurchases() async -> Bool {
+        guard await RevenueCatManager.shared.isConfigured else {
+            print("[SubscriptionManager] ⚠️ RevenueCat not configured, cannot restore purchases")
+            return false
+        }
+        
         let success = await RevenueCatManager.shared.restorePurchases()
         if success {
             let previousTier = currentStatus.tier
@@ -319,7 +344,12 @@ class SubscriptionManager: ObservableObject {
         }
         
         // Generate a unique device identifier as last resort
-        let deviceKey = UUID().uuidString + Bundle.main.bundleIdentifier! + UIDevice.current.identifierForVendor!.uuidString
+        #if canImport(UIKit)
+        let vendorID = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        #else
+        let vendorID = UUID().uuidString
+        #endif
+        let deviceKey = UUID().uuidString + Bundle.main.bundleIdentifier! + vendorID
         let deviceKeyData = deviceKey.data(using: .utf8)!
         let hashedKey = SHA256.hash(data: deviceKeyData)
         let keyString = hashedKey.compactMap { String(format: "%02x", $0) }.joined()
@@ -332,6 +362,11 @@ class SubscriptionManager: ObservableObject {
     /// Get RevenueCat user ID for persistent video count tracking
     @MainActor
     private func getRevenueCatUserID() -> String? {
+        guard RevenueCatManager.shared.isConfigured else {
+            print("[SubscriptionManager] RevenueCat not configured, cannot get user ID")
+            return nil
+        }
+        
         guard let customerInfo = RevenueCatManager.shared.customerInfo else {
             print("[SubscriptionManager] No RevenueCat customer info available")
             return nil
@@ -405,7 +440,12 @@ class SubscriptionManager: ObservableObject {
         }
         
         // Generate the same key that would have been created originally
-        let deviceKey = UUID().uuidString + Bundle.main.bundleIdentifier! + UIDevice.current.identifierForVendor!.uuidString
+        #if canImport(UIKit)
+        let vendorID = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        #else
+        let vendorID = UUID().uuidString
+        #endif
+        let deviceKey = UUID().uuidString + Bundle.main.bundleIdentifier! + vendorID
         let deviceKeyData = deviceKey.data(using: .utf8)!
         let hashedKey = SHA256.hash(data: deviceKeyData)
         let keyString = hashedKey.compactMap { String(format: "%02x", $0) }.joined()

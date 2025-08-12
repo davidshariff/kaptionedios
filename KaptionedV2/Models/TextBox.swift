@@ -243,7 +243,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         // Karaoke presets - see below struct KaraokePreset for more info
         SubtitleStyle(
             name: "Highlight by word", // confirmed style: https://www.tiktok.com/@healthy.tips15/video/7520399199410588950?is_from_webapp=1&sender_device=pc
-            fontSize: 32,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,
@@ -259,7 +259,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Background by word", // confirmed style: https://www.tiktok.com/t/ZT6aERhMF/
-            fontSize: 32,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,
@@ -275,7 +275,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Word & Scale", // confirmed style.
-            fontSize: 32,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,
@@ -293,7 +293,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         // Non-karaoke presets
         SubtitleStyle(
             name: "Modern White", // confirmed style
-            fontSize: 32,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,
@@ -309,7 +309,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Outlined", // confirmed style
-            fontSize: 32,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .yellow,
             strokeColor: .black,
@@ -325,7 +325,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Minimalist", // confirmed style
-            fontSize: 28,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .clear,
@@ -341,7 +341,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Bold Shadow Pop", // confirmed style: https://www.tiktok.com/@debatedigest5/video/7515131366774803754?is_from_webapp=1&sender_device=pc
-            fontSize: 42,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,
@@ -357,7 +357,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Pop Art Bold", // confirmed style: https://www.tiktok.com/@mattpaige68/video/7530643035198065934?is_from_webapp=1&sender_device=pc
-            fontSize: 44,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .yellow,
             strokeColor: .black,
@@ -375,7 +375,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         // New modern social media styles
         SubtitleStyle(
             name: "Neon Glow",
-            fontSize: 36,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: Color(red: 0.0, green: 1.0, blue: 0.8), // Cyan
             strokeColor: Color(red: 0.0, green: 0.8, blue: 1.0), // Light blue
@@ -391,7 +391,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Retro Wave", // confirmed style
-            fontSize: 38,
+            fontSize: 24,
             bgColor: Color(red: 0.8, green: 0.2, blue: 0.8), // Purple
             fontColor: Color(red: 1.0, green: 0.8, blue: 0.0), // Gold
             strokeColor: .black,
@@ -407,7 +407,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Minimal Dark", // confirmed style
-            fontSize: 30,
+            fontSize: 24,
             bgColor: Color.black.opacity(1),
             fontColor: .white,
             strokeColor: .clear,
@@ -423,7 +423,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         ),
         SubtitleStyle(
             name: "Bubble Pop", // confirmed style
-            fontSize: 34,
+            fontSize: 24,
             bgColor: Color(red: 1.0, green: 0.4, blue: 0.6), // Pink
             fontColor: .white,
             strokeColor: Color(red: 0.8, green: 0.2, blue: 0.4), // Darker pink

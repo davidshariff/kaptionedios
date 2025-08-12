@@ -37,7 +37,6 @@
 		5AADA50329F919800064EA7E /* FiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADA50229F919800064EA7E /* FiltersViewModel.swift */; };
 		5AADA50629F9204A0064EA7E /* CorrectionsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADA50529F9204A0064EA7E /* CorrectionsToolView.swift */; };
 		5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */; };
-		5ACFF97329E944FC00827A37 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ACFF97229E944FC00827A37 /* Assets.xcassets */; };
 		5ACFF97629E944FC00827A37 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ACFF97529E944FC00827A37 /* Preview Assets.xcassets */; };
 		5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98029E9454200827A37 /* VideoPlayerManager.swift */; };
 		5ACFF98329E945C300827A37 /* MainEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98229E945C300827A37 /* MainEditorView.swift */; };
@@ -74,6 +73,7 @@
 		F42364982E3698A100057C86 /* GridTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364972E3698A100057C86 /* GridTestView.swift */; };
 		F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42364992E373F0500057C86 /* WordTimelineSlider.swift */; };
 		F423FFC22E3E581D0024399E /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F423FFC12E3E581D0024399E /* PresetsListView.swift */; };
+		F4486D892E4B3DA7002A8A12 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4486D882E4B3DA7002A8A12 /* LaunchScreen.storyboard */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F7782E34D32C006E9DD1 /* ColorFilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */; };
 		F459F7792E34D32C006E9DD1 /* FilterHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7752E34D32C006E9DD1 /* FilterHelper.swift */; };
@@ -138,7 +138,6 @@
 		5AADA50529F9204A0064EA7E /* CorrectionsToolView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectionsToolView.swift; sourceTree = "<group>"; };
 		5ACFF96B29E944FA00827A37 /* KaptionedV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KaptionedV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEditorSwiftUIApp.swift; sourceTree = "<group>"; };
-		5ACFF97229E944FC00827A37 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5ACFF97529E944FC00827A37 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5ACFF98029E9454200827A37 /* VideoPlayerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerManager.swift; sourceTree = "<group>"; };
 		5ACFF98229E945C300827A37 /* MainEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainEditorView.swift; sourceTree = "<group>"; };
@@ -175,6 +174,7 @@
 		F42364972E3698A100057C86 /* GridTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridTestView.swift; sourceTree = "<group>"; };
 		F42364992E373F0500057C86 /* WordTimelineSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTimelineSlider.swift; sourceTree = "<group>"; };
 		F423FFC12E3E581D0024399E /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
+		F4486D882E4B3DA7002A8A12 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorFilterHelper.swift; sourceTree = "<group>"; };
 		F459F7752E34D32C006E9DD1 /* FilterHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterHelper.swift; sourceTree = "<group>"; };
 		F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeSubsHelper.swift; sourceTree = "<group>"; };
@@ -298,6 +298,7 @@
 		5ACFF96229E944FA00827A37 = {
 			isa = PBXGroup;
 			children = (
+				F4486D882E4B3DA7002A8A12 /* LaunchScreen.storyboard */,
 				F4D376852E4B35DA0056C00B /* Assets.xcassets */,
 				5ACFF96D29E944FA00827A37 /* KaptionedV2 */,
 				5ACFF96C29E944FA00827A37 /* Products */,
@@ -322,7 +323,6 @@
 				5ACFF97D29E9451100827A37 /* Views */,
 				5ACFF97C29E9450000827A37 /* Service */,
 				5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */,
-				5ACFF97229E944FC00827A37 /* Assets.xcassets */,
 				5ACFF97429E944FC00827A37 /* Preview Content */,
 			);
 			path = KaptionedV2;
@@ -662,7 +662,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5ACFF97629E944FC00827A37 /* Preview Assets.xcassets in Resources */,
-				5ACFF97329E944FC00827A37 /* Assets.xcassets in Resources */,
+				F4486D892E4B3DA7002A8A12 /* LaunchScreen.storyboard in Resources */,
 				F4D376862E4B35DA0056C00B /* Assets.xcassets in Resources */,
 				F48099432E4A27EF00E9D936 /* RevenueCatConfig.storekit in Resources */,
 			);
@@ -898,12 +898,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Kaptioned;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarHidden = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -936,12 +937,13 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Kaptioned;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.video";
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarHidden = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";

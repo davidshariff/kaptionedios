@@ -8,36 +8,48 @@ struct LanguagePickerSheet: View {
     
     @State private var selectedLanguage: String = ConfigurationManager.shared.getDefaultLanguage()
     @State private var showReplaceWarning: Bool = false
+    @State private var searchText: String = ""
+    @FocusState private var isSearchFocused: Bool
     
     // Languages for transcription - use supported languages from config
     private var languages: [(String, String)] {
         let supportedLanguages = ConfigurationManager.shared.getSupportedLanguages()
         let languageNames: [String: String] = [
             "en": "English",
-            "es": "Spanish", 
-            "fr": "French",
-            "de": "German",
-            "it": "Italian",
-            "pt": "Portuguese",
-            "ru": "Russian",
-            "ja": "Japanese",
-            "ko": "Korean",
-            "zh": "Chinese",
-            "ar": "Arabic",
-            "hi": "Hindi",
-            "nl": "Dutch",
-            "sv": "Swedish",
-            "no": "Norwegian",
-            "da": "Danish",
-            "fi": "Finnish",
-            "pl": "Polish",
-            "tr": "Turkish"
+            "es": "Spanish - Español", 
+            "fr": "French - Français",
+            "de": "German - Deutsch",
+            "it": "Italian - Italiano",
+            "pt": "Portuguese - Português",
+            "ru": "Russian - Русский",
+            "ja": "Japanese - 日本語",
+            "ko": "Korean - 한국어",
+            "zh": "Chinese - 中文",
+            "ar": "Arabic - العربية",
+            "hi": "Hindi - हिन्दी",
+            "nl": "Dutch - Nederlands",
+            "sv": "Swedish - Svenska",
+            "no": "Norwegian - Norsk",
+            "da": "Danish - Dansk",
+            "fi": "Finnish - Suomi",
+            "pl": "Polish - Polski",
+            "tr": "Turkish - Türkçe"
         ]
         
-        return supportedLanguages.compactMap { code in
+        let allLanguages: [(String, String)] = supportedLanguages.compactMap { code in
             guard let name = languageNames[code] else { return nil }
             return (name, code)
-        }.sorted { $0.0 < $1.0 } // Sort by language name
+        }
+        
+        // Filter languages based on search text
+        if searchText.isEmpty {
+            return allLanguages
+        } else {
+            return allLanguages.filter { language in
+                language.0.localizedCaseInsensitiveContains(searchText) ||
+                language.1.localizedCaseInsensitiveContains(searchText)
+            }
+        }
     }
     
     var body: some View {
@@ -64,6 +76,34 @@ struct LanguagePickerSheet: View {
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.leading)
                 
+                // Search field
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                        .font(.system(size: 16))
+                    
+                    TextField("Search languages...", text: $searchText)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .font(.body)
+                        .focused($isSearchFocused)
+                    
+                    if !searchText.isEmpty {
+                        Button(action: {
+                            searchText = ""
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 16))
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(.systemGray6))
+                )
+                
                 // Language list
                 ScrollView {
                     LazyVStack(spacing: 0) {
@@ -74,6 +114,8 @@ struct LanguagePickerSheet: View {
                                 isSelected: selectedLanguage == language.1
                             ) {
                                 selectedLanguage = language.1
+                                // Dismiss keyboard when language is selected
+                                isSearchFocused = false
                             }
                         }
                     }

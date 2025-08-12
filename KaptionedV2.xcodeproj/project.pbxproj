@@ -102,6 +102,7 @@
 		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
+		F4D376862E4B35DA0056C00B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4D376852E4B35DA0056C00B /* Assets.xcassets */; };
 		F4D67B712E47C46700164273 /* SubtitleGenerationLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */; };
 /* End PBXBuildFile section */
 
@@ -200,6 +201,7 @@
 		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
+		F4D376852E4B35DA0056C00B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleGenerationLoader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -296,6 +298,7 @@
 		5ACFF96229E944FA00827A37 = {
 			isa = PBXGroup;
 			children = (
+				F4D376852E4B35DA0056C00B /* Assets.xcassets */,
 				5ACFF96D29E944FA00827A37 /* KaptionedV2 */,
 				5ACFF96C29E944FA00827A37 /* Products */,
 			);
@@ -660,6 +663,7 @@
 			files = (
 				5ACFF97629E944FC00827A37 /* Preview Assets.xcassets in Resources */,
 				5ACFF97329E944FC00827A37 /* Assets.xcassets in Resources */,
+				F4D376862E4B35DA0056C00B /* Assets.xcassets in Resources */,
 				F48099432E4A27EF00E9D936 /* RevenueCatConfig.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -893,7 +897,7 @@
 				DEVELOPMENT_TEAM = JDAS9UK2R4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kaptioned V2";
+				INFOPLIST_KEY_CFBundleDisplayName = Kaptioned;
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -931,7 +935,7 @@
 				DEVELOPMENT_TEAM = JDAS9UK2R4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Kaptioned V2";
+				INFOPLIST_KEY_CFBundleDisplayName = Kaptioned;
 				INFOPLIST_KEY_NSCameraUsageDescription = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";

@@ -224,7 +224,37 @@ final class VideoPlayerManager: ObservableObject{
     private func removeTimeObserver(){
         if let timeObserver = timeObserver {
             videoPlayer.removeTimeObserver(timeObserver)
+            self.timeObserver = nil
         }
+    }
+    
+    /// Completely unloads the video player and frees memory
+    func unloadVideo() {
+        // Pause any playing video
+        pause()
+        
+        // Remove time observer
+        removeTimeObserver()
+        
+        // Clear players by replacing with empty ones
+        videoPlayer = AVPlayer()
+        audioPlayer = AVPlayer()
+        
+        // Reset state
+        currentTime = .zero
+        loadState = .unknown
+        isPlaying = false
+        isSetAudio = false
+        currentDurationRange = nil
+        scrubState = .reset
+        
+        // Cancel all subscriptions
+        cancellable.removeAll()
+        
+        // Re-initialize subscriptions for future use
+        onSubsUrl()
+        
+        print("Video player unloaded and memory freed")
     }
     
 }

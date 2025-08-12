@@ -286,6 +286,7 @@ struct MainEditorView: View {
         .confirmationDialog("Are you sure?", isPresented: $showBackConfirmation) {
             Button("Yes", role: .destructive) {
                 editorVM.updateProject()
+                videoPlayer.unloadVideo()
                 dismiss()
             }
             Button("Cancel", role: .cancel) {
@@ -304,6 +305,10 @@ struct MainEditorView: View {
         .statusBar(hidden: true)
         .onChange(of: scenePhase) { phase in
             saveProject(phase)
+        }
+        .onDisappear {
+            // Unload video player to free memory when exiting the view
+            videoPlayer.unloadVideo()
         }
         .blur(radius: textEditor.showEditor && !textEditor.showEditTextContent ? 10 : 0)
         .ignoresSafeArea(.keyboard, edges: .bottom)

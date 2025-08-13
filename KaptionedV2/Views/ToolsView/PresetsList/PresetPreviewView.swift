@@ -141,19 +141,19 @@ struct PresetPreviewView: View {
 #Preview {
     VStack(spacing: 20) {
         PresetPreviewView(
-            preset: SubtitleStyle.allPresets.first(where: { $0.name == "Basic" })!,
+            preset: SubtitleStyle.availablePresets.first(where: { $0.name == "Basic" }) ?? SubtitleStyle.allPresets.first!,
             previewText: "Sample Text"
         )
         
         PresetPreviewView(
-            preset: SubtitleStyle.allPresets.first(where: { $0.name == "Highlight by word" })!,
+            preset: SubtitleStyle.availablePresets.first(where: { $0.name == "Highlight by word" }) ?? SubtitleStyle.allPresets.first!,
             previewText: "Animated Karaoke Text",
             highlightColor: .orange,
             animateKaraoke: true
         )
         
         PresetPreviewView(
-            preset: SubtitleStyle.allPresets.first(where: { $0.name == "Background by word" })!,
+            preset: SubtitleStyle.availablePresets.first(where: { $0.name == "Background by word" }) ?? SubtitleStyle.allPresets.first!,
             previewText: "Background Karaoke",
             wordBGColor: .blue,
             fontColor: .white,

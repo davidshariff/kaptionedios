@@ -80,7 +80,7 @@ struct TextBox: Identifiable{
     ) {
         // If presetName is provided, use the preset values if they are not provided,
         // otherwise use the provided values
-        if let presetName = presetName, let preset = SubtitleStyle.allPresets.first(where: { $0.name == presetName }) {
+        if let presetName = presetName, let preset = SubtitleStyle.availablePresets.first(where: { $0.name == presetName }) {
 
             self.text = text ?? ""
             self.fontSize = (fontSize != nil && fontSize != 0) ? fontSize! : preset.fontSize
@@ -236,6 +236,63 @@ struct SubtitleStyle: Identifiable, Equatable {
         return box
     }
 
+    // Convert remote preset to local SubtitleStyle
+    static func fromRemote(_ remote: RemoteSubtitleStyle) -> SubtitleStyle {
+        return SubtitleStyle(
+            name: remote.name,
+            fontSize: CGFloat(remote.fontSize),
+            bgColor: Color(hex: remote.bgColor),
+            fontColor: Color(hex: remote.fontColor),
+            strokeColor: Color(hex: remote.strokeColor),
+            strokeWidth: CGFloat(remote.strokeWidth),
+            backgroundPadding: CGFloat(remote.backgroundPadding),
+            cornerRadius: CGFloat(remote.cornerRadius),
+            shadowColor: Color(hex: remote.shadowColor),
+            shadowRadius: CGFloat(remote.shadowRadius),
+            shadowX: CGFloat(remote.shadowX),
+            shadowY: CGFloat(remote.shadowY),
+            shadowOpacity: remote.shadowOpacity,
+            isKaraokePreset: remote.isKaraokePreset
+        )
+    }
+    
+    // Get all available presets (merged built-in + remote, minus excluded)
+    static var availablePresets: [SubtitleStyle] {
+        let configManager = ConfigurationManager.shared
+        var presets: [SubtitleStyle] = []
+        
+        // Start with built-in presets
+        presets = allPresets
+        
+        // Add remote presets if available
+        if let remotePresets = configManager.getRemotePresets() {
+            let remoteStyles = remotePresets.map { SubtitleStyle.fromRemote($0) }
+            
+            // Merge remote presets (replace existing ones with same name, add new ones)
+            for remoteStyle in remoteStyles {
+                if let existingIndex = presets.firstIndex(where: { $0.name == remoteStyle.name }) {
+                    // Replace existing preset with remote version
+                    presets[existingIndex] = remoteStyle
+                    print("[SubtitleStyle] Replaced built-in preset '\(remoteStyle.name)' with remote version")
+                } else {
+                    // Add new remote preset
+                    presets.append(remoteStyle)
+                    print("[SubtitleStyle] Added new remote preset '\(remoteStyle.name)'")
+                }
+            }
+        }
+        
+        // Remove excluded presets
+        let excludedPresets = configManager.getExcludedPresets()
+        if !excludedPresets.isEmpty {
+            presets = presets.filter { !excludedPresets.contains($0.name) }
+            print("[SubtitleStyle] Excluded \(excludedPresets.count) presets: \(excludedPresets.joined(separator: ", "))")
+        }
+        
+        print("[SubtitleStyle] Final preset count: \(presets.count) (built-in + remote - excluded)")
+        return presets
+    }
+    
     static let allPresets: [SubtitleStyle] = [
 
         // Karaoke presets - see below struct KaraokePreset for more info

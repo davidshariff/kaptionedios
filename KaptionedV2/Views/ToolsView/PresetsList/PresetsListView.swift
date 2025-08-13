@@ -38,7 +38,7 @@ struct PresetsListView: View {
             
             ScrollView {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 12) {
-                    ForEach(SubtitleStyle.allPresets) { style in
+                    ForEach(SubtitleStyle.availablePresets) { style in
                         Button(action: {
                             if style.isKaraokePreset {
                                 print("DEBUG: Selected karaoke preset: \(style.name)")

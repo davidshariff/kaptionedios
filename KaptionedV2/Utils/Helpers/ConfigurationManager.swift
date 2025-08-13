@@ -70,13 +70,43 @@ struct TranscriptionConfig: Codable {
     let maxWordsPerLine: Int
     let supportedLanguages: [String]
     let defaultPreset: String
+    let presets: [RemoteSubtitleStyle]?
+    let excludePresets: [String]?
+    
+    // Custom decoding to handle missing fields in old cached configs
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        endpoint = try container.decode(String.self, forKey: .endpoint)
+        defaultLanguage = try container.decode(String.self, forKey: .defaultLanguage)
+        maxWordsPerLine = try container.decode(Int.self, forKey: .maxWordsPerLine)
+        supportedLanguages = try container.decode([String].self, forKey: .supportedLanguages)
+        
+        // Handle missing fields gracefully with defaults
+        defaultPreset = try container.decodeIfPresent(String.self, forKey: .defaultPreset) ?? "Modern White"
+        presets = try container.decodeIfPresent([RemoteSubtitleStyle].self, forKey: .presets)
+        excludePresets = try container.decodeIfPresent([String].self, forKey: .excludePresets)
+    }
+    
+    // Standard initializer
+    init(endpoint: String, defaultLanguage: String, maxWordsPerLine: Int, supportedLanguages: [String], defaultPreset: String, presets: [RemoteSubtitleStyle]?, excludePresets: [String]?) {
+        self.endpoint = endpoint
+        self.defaultLanguage = defaultLanguage
+        self.maxWordsPerLine = maxWordsPerLine
+        self.supportedLanguages = supportedLanguages
+        self.defaultPreset = defaultPreset
+        self.presets = presets
+        self.excludePresets = excludePresets
+    }
     
     static let `default` = TranscriptionConfig(
         endpoint: "/transcribe",
         defaultLanguage: "en",
         maxWordsPerLine: 1,
         supportedLanguages: ["en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko"],
-        defaultPreset: "Pop Art Bold"
+        defaultPreset: "Modern White",
+        presets: nil, // Will merge with built-in presets
+        excludePresets: nil // No presets excluded by default
     )
 }
 
@@ -192,6 +222,34 @@ public enum TakeoverType: String, Codable, CaseIterable {
         case .error: return "red"
         }
     }
+}
+
+/// Remote subtitle style configuration
+struct RemoteSubtitleStyle: Codable {
+    let name: String
+    let fontSize: Double
+    let bgColor: String // Hex color
+    let fontColor: String // Hex color
+    let strokeColor: String // Hex color
+    let strokeWidth: Double
+    let backgroundPadding: Double
+    let cornerRadius: Double
+    let shadowColor: String // Hex color
+    let shadowRadius: Double
+    let shadowX: Double
+    let shadowY: Double
+    let shadowOpacity: Double
+    let isKaraokePreset: Bool
+    let karaokeConfig: RemoteKaraokeConfig?
+}
+
+/// Remote karaoke configuration
+struct RemoteKaraokeConfig: Codable {
+    let type: String // "word", "wordbg", "wordAndScale"
+    let highlightColor: String // Hex color
+    let wordBGColor: String // Hex color
+    let previewWordSpacing: Double
+    let exportWordSpacing: Double
 }
 
 /// Subscription limits configuration
@@ -353,6 +411,28 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.transcription.defaultPreset
     }
     
+    /// Gets remote presets if available
+    func getRemotePresets() -> [RemoteSubtitleStyle]? {
+        return currentConfig.transcription.presets
+    }
+    
+    /// Checks if remote presets are available
+    func hasRemotePresets() -> Bool {
+        return currentConfig.transcription.presets != nil && !currentConfig.transcription.presets!.isEmpty
+    }
+    
+    /// Gets excluded preset names
+    func getExcludedPresets() -> [String] {
+        return currentConfig.transcription.excludePresets ?? []
+    }
+    
+    /// Clears cached configuration to force fresh remote load
+    func clearCachedConfig() {
+        userDefaults.removeObject(forKey: configKey)
+        userDefaults.removeObject(forKey: lastUpdateKey)
+        print("[ConfigurationManager] Cached configuration cleared")
+    }
+    
     // MARK: - RevenueCat Configuration Methods
     
     /// Gets the configured RevenueCat API key
@@ -499,7 +579,9 @@ class ConfigurationManager: ObservableObject {
             defaultLanguage: remoteConfig.transcription.defaultLanguage.isEmpty ? defaultConfig.transcription.defaultLanguage : remoteConfig.transcription.defaultLanguage,
             maxWordsPerLine: remoteConfig.transcription.maxWordsPerLine > 0 ? remoteConfig.transcription.maxWordsPerLine : defaultConfig.transcription.maxWordsPerLine,
             supportedLanguages: remoteConfig.transcription.supportedLanguages.isEmpty ? defaultConfig.transcription.supportedLanguages : remoteConfig.transcription.supportedLanguages,
-            defaultPreset: remoteConfig.transcription.defaultPreset.isEmpty ? defaultConfig.transcription.defaultPreset : remoteConfig.transcription.defaultPreset
+            defaultPreset: remoteConfig.transcription.defaultPreset.isEmpty ? defaultConfig.transcription.defaultPreset : remoteConfig.transcription.defaultPreset,
+            presets: remoteConfig.transcription.presets ?? defaultConfig.transcription.presets,
+            excludePresets: remoteConfig.transcription.excludePresets ?? defaultConfig.transcription.excludePresets
         )
         
         // Merge feature config

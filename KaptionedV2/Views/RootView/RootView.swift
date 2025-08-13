@@ -95,6 +95,8 @@ struct RootView: View {
                                 .padding(.vertical, 4)
                                 .background(Color.purple.opacity(0.1))
                                 .cornerRadius(6)
+                                
+
                             #endif
                             
                             subscriptionStatusButton

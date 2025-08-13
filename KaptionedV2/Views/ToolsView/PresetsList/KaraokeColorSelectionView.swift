@@ -345,7 +345,7 @@ struct KaraokeColorSelectionView: View {
 #Preview {
     KaraokeColorSelectionView(
         isPresented: .constant(true),
-        selectedPreset: SubtitleStyle.allPresets.first(where: { $0.name == "Highlight by word" })!,
+        selectedPreset: SubtitleStyle.availablePresets.first(where: { $0.name == "Highlight by word" }) ?? SubtitleStyle.allPresets.first!,
         currentSubtitleText: "Sample text for preview",
         currentHighlightColor: .blue,
         currentWordBGColor: .clear,

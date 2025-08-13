@@ -11,6 +11,7 @@ struct AppConfig: Codable {
     var revenueCat: RevenueCatSettings
     var paywall: PaywallConfig
     var takeover: TakeoverConfig
+    var subscription: SubscriptionConfig
     
     // Custom decoding to handle missing fields in old configs
     init(from decoder: Decoder) throws {
@@ -24,16 +25,18 @@ struct AppConfig: Codable {
         revenueCat = try container.decodeIfPresent(RevenueCatSettings.self, forKey: .revenueCat) ?? RevenueCatSettings.default
         paywall = try container.decodeIfPresent(PaywallConfig.self, forKey: .paywall) ?? PaywallConfig.default
         takeover = try container.decodeIfPresent(TakeoverConfig.self, forKey: .takeover) ?? TakeoverConfig.default
+        subscription = try container.decodeIfPresent(SubscriptionConfig.self, forKey: .subscription) ?? SubscriptionConfig.default
     }
     
     // Standard initializer
-    init(api: APIConfig, transcription: TranscriptionConfig, features: FeatureConfig, revenueCat: RevenueCatSettings, paywall: PaywallConfig, takeover: TakeoverConfig) {
+    init(api: APIConfig, transcription: TranscriptionConfig, features: FeatureConfig, revenueCat: RevenueCatSettings, paywall: PaywallConfig, takeover: TakeoverConfig, subscription: SubscriptionConfig) {
         self.api = api
         self.transcription = transcription
         self.features = features
         self.revenueCat = revenueCat
         self.paywall = paywall
         self.takeover = takeover
+        self.subscription = subscription
     }
     
     static let `default` = AppConfig(
@@ -42,7 +45,8 @@ struct AppConfig: Codable {
         features: FeatureConfig.default,
         revenueCat: RevenueCatSettings.default,
         paywall: PaywallConfig.default,
-        takeover: TakeoverConfig.default
+        takeover: TakeoverConfig.default,
+        subscription: SubscriptionConfig.default
     )
 }
 
@@ -186,6 +190,19 @@ public enum TakeoverType: String, Codable, CaseIterable {
         case .error: return "red"
         }
     }
+}
+
+/// Subscription limits configuration
+struct SubscriptionConfig: Codable {
+    let freeVideos: Int
+    let proVideos: Int
+    let unlimitedVideos: Int // Should always be Int.max
+    
+    static let `default` = SubscriptionConfig(
+        freeVideos: 1,
+        proVideos: 10,
+        unlimitedVideos: Int.max
+    )
 }
 
 // MARK: - API Response Models
@@ -390,6 +407,28 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.takeover.forceUpgrade
     }
     
+    // MARK: - Subscription Configuration Methods
+    
+    /// Gets video limit for free tier
+    func getFreeVideoLimit() -> Int {
+        return currentConfig.subscription.freeVideos
+    }
+    
+    /// Gets video limit for pro tier
+    func getProVideoLimit() -> Int {
+        return currentConfig.subscription.proVideos
+    }
+    
+    /// Gets video limit for unlimited tier
+    func getUnlimitedVideoLimit() -> Int {
+        return currentConfig.subscription.unlimitedVideos
+    }
+    
+    /// Gets the subscription configuration
+    func getSubscriptionConfig() -> SubscriptionConfig {
+        return currentConfig.subscription
+    }
+    
     // MARK: - Async Configuration Loading
     
     /// Waits for configuration to be ready (either loaded successfully or failed)
@@ -494,13 +533,21 @@ class ConfigurationManager: ObservableObject {
             forceUpgrade: remoteConfig.takeover.forceUpgrade
         )
         
+        // Merge subscription config
+        let mergedSubscriptionConfig = SubscriptionConfig(
+            freeVideos: remoteConfig.subscription.freeVideos > 0 ? remoteConfig.subscription.freeVideos : defaultConfig.subscription.freeVideos,
+            proVideos: remoteConfig.subscription.proVideos > 0 ? remoteConfig.subscription.proVideos : defaultConfig.subscription.proVideos,
+            unlimitedVideos: remoteConfig.subscription.unlimitedVideos > 0 ? remoteConfig.subscription.unlimitedVideos : defaultConfig.subscription.unlimitedVideos
+        )
+        
         return AppConfig(
             api: mergedAPIConfig,
             transcription: mergedTranscriptionConfig,
             features: mergedFeatureConfig,
             revenueCat: mergedRevenueCatConfig,
             paywall: mergedPaywallConfig,
-            takeover: mergedTakeoverConfig
+            takeover: mergedTakeoverConfig,
+            subscription: mergedSubscriptionConfig
         )
     }
     

@@ -20,18 +20,19 @@ enum SubscriptionTier: String, Codable, CaseIterable {
     }
     
     var maxVideos: Int {
+        let config = ConfigurationManager.shared.getSubscriptionConfig()
         switch self {
         case .free:
-            return 1
+            return config.freeVideos
         case .pro:
-            return 2
+            return config.proVideos
         case .unlimited:
-            return Int.max
+            return config.unlimitedVideos
         }
     }
     
     var canCreateNewVideo: Bool {
-        return self != .free // Free tier has special handling
+        return true // All tiers can create videos, limits handled in SubscriptionStatus
     }
 }
 
@@ -47,12 +48,8 @@ struct SubscriptionStatus: Codable {
             return true
         }
         
-        if tier == .pro {
-            return videosCreated < tier.maxVideos
-        }
-        
-        // Free tier: only allow 1 video
-        return videosCreated < 1
+        // Both free and pro tiers check against their maxVideos limit
+        return videosCreated < tier.maxVideos
     }
     
     var remainingVideos: Int {

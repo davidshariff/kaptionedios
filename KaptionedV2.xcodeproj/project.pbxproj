@@ -82,6 +82,9 @@
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
+		F4740A002E4CEB1400AEF471 /* TakeoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47409FF2E4CEB1400AEF471 /* TakeoverView.swift */; };
+		F4740A022E4CEB7E00AEF471 /* TakeoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4740A012E4CEB7E00AEF471 /* TakeoverManager.swift */; };
+		F4740A042E4CEB8300AEF471 /* TakeoverExamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4740A032E4CEB8300AEF471 /* TakeoverExamples.swift */; };
 		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
 		F480993B2E4A20AD00E9D936 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = F480993A2E4A20AD00E9D936 /* RevenueCat */; };
 		F480993D2E4A20AD00E9D936 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = F480993C2E4A20AD00E9D936 /* RevenueCatUI */; };
@@ -183,6 +186,9 @@
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeColorSelectionView.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
+		F47409FF2E4CEB1400AEF471 /* TakeoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TakeoverView.swift; sourceTree = "<group>"; };
+		F4740A012E4CEB7E00AEF471 /* TakeoverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TakeoverManager.swift; sourceTree = "<group>"; };
+		F4740A032E4CEB8300AEF471 /* TakeoverExamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TakeoverExamples.swift; sourceTree = "<group>"; };
 		F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetPreviewView.swift; sourceTree = "<group>"; };
 		F480993F2E4A258200E9D936 /* RevenueCatManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatManager.swift; sourceTree = "<group>"; };
 		F48099422E4A27EF00E9D936 /* RevenueCatConfig.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = RevenueCatConfig.storekit; sourceTree = "<group>"; };
@@ -424,6 +430,7 @@
 		5ACFF99B29ED5C3500827A37 /* ViewComponents */ = {
 			isa = PBXGroup;
 			children = (
+				F47409FF2E4CEB1400AEF471 /* TakeoverView.swift */,
 				F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */,
 				F48A90902E4876840031E9DF /* BottomSheetView.swift */,
 				5ACFF9AA29EE8B8500827A37 /* Player */,
@@ -503,9 +510,11 @@
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
 				F485E5362E49EB64007A680B /* ConfigurationManager.swift */,
 				F4E9C1C02E4C4FB000DD5330 /* TextSizingHelper.swift */,
+				F4740A032E4CEB8300AEF471 /* TakeoverExamples.swift */,
 				F480993F2E4A258200E9D936 /* RevenueCatManager.swift */,
 				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
+				F4740A012E4CEB7E00AEF471 /* TakeoverManager.swift */,
 				F485E53C2E4A05B0007A680B /* SubscriptionManager.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
 				F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */,
@@ -676,6 +685,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F486E3492E43A37F000749B8 /* TextOnPlayerView.swift in Sources */,
+				F4740A042E4CEB8300AEF471 /* TakeoverExamples.swift in Sources */,
 				5A17E08629F15BEF00DB4A47 /* CropSheetView.swift in Sources */,
 				F485E53D2E4A05B0007A680B /* SubscriptionManager.swift in Sources */,
 				5A3D13B429F18E4D0027E25E /* RootViewModel.swift in Sources */,
@@ -748,9 +758,11 @@
 				F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */,
 				5A5E6F9B2A03A24B00F5EBF8 /* AudioButtonView.swift in Sources */,
 				5ACFF99F29ED709B00827A37 /* RangeSliderView.swift in Sources */,
+				F4740A002E4CEB1400AEF471 /* TakeoverView.swift in Sources */,
 				5A5E6F972A039EFD00F5EBF8 /* AVAudioSession+Ext.swift in Sources */,
 				F4D67B712E47C46700164273 /* SubtitleGenerationLoader.swift in Sources */,
 				5A08FC7429EFD5E400AB877C /* NewTimelineSlider.swift in Sources */,
+				F4740A022E4CEB7E00AEF471 /* TakeoverManager.swift in Sources */,
 				5AF25B5929F14270005E0467 /* CropView.swift in Sources */,
 				5AE2A2A229F66EE9003D217F /* VideoExporterBottomSheetView.swift in Sources */,
 				5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */,

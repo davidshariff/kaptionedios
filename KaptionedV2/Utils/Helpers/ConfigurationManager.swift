@@ -10,6 +10,7 @@ struct AppConfig: Codable {
     var features: FeatureConfig
     var revenueCat: RevenueCatSettings
     var paywall: PaywallConfig
+    var takeover: TakeoverConfig
     
     // Custom decoding to handle missing fields in old configs
     init(from decoder: Decoder) throws {
@@ -22,15 +23,17 @@ struct AppConfig: Codable {
         // Handle missing fields gracefully with defaults
         revenueCat = try container.decodeIfPresent(RevenueCatSettings.self, forKey: .revenueCat) ?? RevenueCatSettings.default
         paywall = try container.decodeIfPresent(PaywallConfig.self, forKey: .paywall) ?? PaywallConfig.default
+        takeover = try container.decodeIfPresent(TakeoverConfig.self, forKey: .takeover) ?? TakeoverConfig.default
     }
     
     // Standard initializer
-    init(api: APIConfig, transcription: TranscriptionConfig, features: FeatureConfig, revenueCat: RevenueCatSettings, paywall: PaywallConfig) {
+    init(api: APIConfig, transcription: TranscriptionConfig, features: FeatureConfig, revenueCat: RevenueCatSettings, paywall: PaywallConfig, takeover: TakeoverConfig) {
         self.api = api
         self.transcription = transcription
         self.features = features
         self.revenueCat = revenueCat
         self.paywall = paywall
+        self.takeover = takeover
     }
     
     static let `default` = AppConfig(
@@ -38,7 +41,8 @@ struct AppConfig: Codable {
         transcription: TranscriptionConfig.default,
         features: FeatureConfig.default,
         revenueCat: RevenueCatSettings.default,
-        paywall: PaywallConfig.default
+        paywall: PaywallConfig.default,
+        takeover: TakeoverConfig.default
     )
 }
 
@@ -110,6 +114,78 @@ struct PaywallConfig: Codable {
     static let `default` = PaywallConfig(
         theme: "dark"
     )
+}
+
+/// Takeover configuration for full-screen app takeovers
+public struct TakeoverConfig: Codable {
+    let isEnabled: Bool
+    let type: TakeoverType
+    let title: String
+    let message: String
+    let actionButtonText: String
+    let cancelButtonText: String
+    let actionURL: String?
+    let backgroundColor: String?
+    let textColor: String?
+    let buttonColor: String?
+    let icon: String?
+    let dismissible: Bool
+    let forceUpgrade: Bool
+    
+    static let `default` = TakeoverConfig(
+        isEnabled: false,
+        type: .message,
+        title: "",
+        message: "",
+        actionButtonText: "OK",
+        cancelButtonText: "Cancel",
+        actionURL: nil,
+        backgroundColor: nil,
+        textColor: nil,
+        buttonColor: nil,
+        icon: nil,
+        dismissible: true,
+        forceUpgrade: false
+    )
+}
+
+/// Types of takeover screens
+public enum TakeoverType: String, Codable, CaseIterable {
+    case message = "message"
+    case upgrade = "upgrade"
+    case maintenance = "maintenance"
+    case announcement = "announcement"
+    case error = "error"
+    
+    var displayName: String {
+        switch self {
+        case .message: return "Message"
+        case .upgrade: return "Upgrade Required"
+        case .maintenance: return "Maintenance"
+        case .announcement: return "Announcement"
+        case .error: return "Error"
+        }
+    }
+    
+    var defaultIcon: String {
+        switch self {
+        case .message: return "message.circle.fill"
+        case .upgrade: return "crown.fill"
+        case .maintenance: return "wrench.and.screwdriver.fill"
+        case .announcement: return "megaphone.fill"
+        case .error: return "exclamationmark.triangle.fill"
+        }
+    }
+    
+    var defaultBackgroundColor: String {
+        switch self {
+        case .message: return "blue"
+        case .upgrade: return "purple"
+        case .maintenance: return "orange"
+        case .announcement: return "green"
+        case .error: return "red"
+        }
+    }
 }
 
 // MARK: - API Response Models
@@ -287,6 +363,33 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.paywall.theme
     }
     
+    // MARK: - Takeover Configuration Methods
+    
+    /// Checks if takeover is enabled
+    func isTakeoverEnabled() -> Bool {
+        return currentConfig.takeover.isEnabled
+    }
+    
+    /// Gets the takeover configuration
+    func getTakeoverConfig() -> TakeoverConfig {
+        return currentConfig.takeover
+    }
+    
+    /// Gets the takeover type
+    func getTakeoverType() -> TakeoverType {
+        return currentConfig.takeover.type
+    }
+    
+    /// Checks if takeover is dismissible
+    func isTakeoverDismissible() -> Bool {
+        return currentConfig.takeover.dismissible
+    }
+    
+    /// Checks if takeover forces upgrade
+    func isTakeoverForceUpgrade() -> Bool {
+        return currentConfig.takeover.forceUpgrade
+    }
+    
     // MARK: - Async Configuration Loading
     
     /// Waits for configuration to be ready (either loaded successfully or failed)
@@ -374,12 +477,30 @@ class ConfigurationManager: ObservableObject {
             theme: remoteConfig.paywall.theme.isEmpty ? defaultConfig.paywall.theme : remoteConfig.paywall.theme
         )
         
+        // Merge takeover config
+        let mergedTakeoverConfig = TakeoverConfig(
+            isEnabled: remoteConfig.takeover.isEnabled,
+            type: remoteConfig.takeover.type,
+            title: remoteConfig.takeover.title.isEmpty ? defaultConfig.takeover.title : remoteConfig.takeover.title,
+            message: remoteConfig.takeover.message.isEmpty ? defaultConfig.takeover.message : remoteConfig.takeover.message,
+            actionButtonText: remoteConfig.takeover.actionButtonText.isEmpty ? defaultConfig.takeover.actionButtonText : remoteConfig.takeover.actionButtonText,
+            cancelButtonText: remoteConfig.takeover.cancelButtonText.isEmpty ? defaultConfig.takeover.cancelButtonText : remoteConfig.takeover.cancelButtonText,
+            actionURL: remoteConfig.takeover.actionURL ?? defaultConfig.takeover.actionURL,
+            backgroundColor: remoteConfig.takeover.backgroundColor ?? defaultConfig.takeover.backgroundColor,
+            textColor: remoteConfig.takeover.textColor ?? defaultConfig.takeover.textColor,
+            buttonColor: remoteConfig.takeover.buttonColor ?? defaultConfig.takeover.buttonColor,
+            icon: remoteConfig.takeover.icon ?? defaultConfig.takeover.icon,
+            dismissible: remoteConfig.takeover.dismissible,
+            forceUpgrade: remoteConfig.takeover.forceUpgrade
+        )
+        
         return AppConfig(
             api: mergedAPIConfig,
             transcription: mergedTranscriptionConfig,
             features: mergedFeatureConfig,
             revenueCat: mergedRevenueCatConfig,
-            paywall: mergedPaywallConfig
+            paywall: mergedPaywallConfig,
+            takeover: mergedTakeoverConfig
         )
     }
     

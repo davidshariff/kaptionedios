@@ -14,6 +14,7 @@ struct VideoEditorSwiftUIApp: App {
         WindowGroup {
             RootView(rootVM: rootVM)
                 .preferredColorScheme(.dark)
+                .withTakeover() // Add takeover support
                 .onAppear {
 
                     #if DEBUG
@@ -34,7 +35,7 @@ struct VideoEditorSwiftUIApp: App {
     
     // MARK: - Startup Sequence
     
-    /// Coordinates the startup sequence: ConfigurationManager -> RevenueCat -> SubscriptionManager
+    /// Coordinates the startup sequence: ConfigurationManager -> RevenueCat -> SubscriptionManager -> Takeover
     private func startupSequence() async {
         print("[App] 🚀 Starting coordinated configuration loading sequence...")
         
@@ -52,8 +53,14 @@ struct VideoEditorSwiftUIApp: App {
         print("[App] 📊 Step 3: Initializing SubscriptionManager RevenueCat sync...")
         await SubscriptionManager.shared.initializeRevenueCatSync()
         
-        // Step 4: Debug info after everything is loaded
-        print("[App] 🔍 Step 4: Generating debug info...")
+        // Step 4: Check for takeovers after configuration is loaded
+        print("[App] 🚨 Step 4: Checking for takeovers...")
+        await MainActor.run {
+            TakeoverManager.shared.checkAndShowTakeover()
+        }
+        
+        // Step 5: Debug info after everything is loaded
+        print("[App] 🔍 Step 5: Generating debug info...")
         try? await Task.sleep(nanoseconds: 2_000_000_000) // 2 seconds
         await MainActor.run {
             print("\n" + RevenueCatManager.shared.getSubscriptionDebugInfo() + "\n")

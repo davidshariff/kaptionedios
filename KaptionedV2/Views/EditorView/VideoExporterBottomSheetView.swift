@@ -438,6 +438,7 @@ extension VideoExporterBottomSheetView{
             Image(systemName: icon)
                 .imageScale(.large)
                 .padding(10)
+                .padding(.bottom, 4)
                 .background(Color(.systemGray), in: Circle())
             Text(label)
         }

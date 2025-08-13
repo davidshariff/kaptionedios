@@ -90,7 +90,6 @@ private func explodeLongWord(
 ) -> [WordWithTiming] {
     if measureWidth(word.text, font: font) <= maxWidth { return [word] }
 
-    print("✂️ Splitting long word: '\(word.text)'")
     stats.splits += 1
 
     let chars = Array(word.text)
@@ -117,7 +116,6 @@ private func explodeLongWord(
         let fraction = Double(p.count) / Double(totalCount)
         let dur = (word.end - word.start) * fraction
         let seg = WordWithTiming(text: p, start: accStart, end: accStart + dur)
-        print("   → Part: '\(p)' \(String(format: "%.2f", seg.start)) → \(String(format: "%.2f", seg.end))")
         result.append(seg)
         accStart += dur
         if i == parts.count - 1 {
@@ -161,7 +159,6 @@ private func packSegments(
         if measureWidth(candidate, font: font) <= maxWidth {
             lineText = candidate
         } else {
-            print("📏 Line break at: '\(lineText)'")
             stats.lineBreaks += 1
             segments.append((startIdx, i - 1))
             startIdx = i
@@ -236,7 +233,6 @@ private func normalizeTiming(
         let newDur = newEnd - out[i].start
 
         if abs(newDur - originalDur) > 0.05 {
-            print("⏱ Adjust '\(out[i].text)' \(String(format: "%.2f", originalDur))s → \(String(format: "%.2f", newDur))s")
             stats.durationAdjusted += 1
         }
         out[i] = TimedSegment(text: out[i].text, start: out[i].start, end: newEnd)
@@ -293,8 +289,6 @@ func buildSingleLineTimedSegments(
         stats: &stats
     )
 
-    // One-line summary + font used
-    print("🔎 Summary: splits=\(stats.splits), breaks=\(stats.lineBreaks), adjusted=\(stats.durationAdjusted) | font=\(String(format: "%.2f", font.pointSize))pt")
     return normalized
 }
 
@@ -340,10 +334,6 @@ func buildTextBoxesFromWordTimings(
         expandShortCues: expandShortCues,
         sentenceWindow: (originalTextBox.timeRange.lowerBound, originalTextBox.timeRange.upperBound)
     )
-
-    print("--------------------------------")
-    print("!!!!!!!! Font point size: \(font.pointSize)")
-    print("--------------------------------")
     
     // Convert segments to TextBox objects, preserving all original styling
     return segments.map { segment in
@@ -403,18 +393,10 @@ func processTextBoxesForLayout(
     let maxWidth = videoRect.width * 0.92
     let textBoxes = subs
     
-    print("--------------------------------")
-    print("🎬 Video Player Size: \(editorVM.videoPlayerSize)")
-    print("📝 Video Rect: \(videoRect)")
-    print("📝 Font Size: \(fontSize)")
-    print("📝 Max Width: \(maxWidth)")
-    print("--------------------------------")
-    
     var processedTextBoxes: [TextBox] = []
     
     for textBox in textBoxes {
         let wordCount = textBox.wordTimings?.count ?? 0
-        print("🔍 Processing textBox: '\(textBox.text)' with \(wordCount) words")
         
         let newBoxes = buildTextBoxesFromWordTimings(
             originalTextBox: textBox,
@@ -428,7 +410,6 @@ func processTextBoxesForLayout(
             expandShortCues: expandShortCues
         )
         
-        print("📊 Result: \(newBoxes.count) text boxes from \(wordCount) words")
         processedTextBoxes.append(contentsOf: newBoxes)
     }
     

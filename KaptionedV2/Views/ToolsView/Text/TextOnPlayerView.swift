@@ -56,13 +56,6 @@ struct TextOnPlayerView: View {
             // Use a more precise condition to avoid showing multiple text boxes
             let isInTimeRange = textBox.timeRange.lowerBound <= currentTime && currentTime < textBox.timeRange.upperBound
             if isInTimeRange {
-                // Debug: Print current textbox on screen with styling info
-                let _ = print("📝 Showing TextBox: '\(textBox.text)'")
-                let _ = print("   📐 Range: \(textBox.timeRange) | Current Time: \(currentTime)")
-                let _ = print("   🎨 Font: \(textBox.fontSize)pt | Color: \(textBox.fontColor)")
-                let _ = print("   🔲 Background: \(textBox.bgColor) | Stroke: \(textBox.strokeColor) \(textBox.strokeWidth)pt")
-                let _ = print("   📍 Offset: \(textBox.offset) | Shadow: \(textBox.shadowColor) \(textBox.shadowRadius)pt")
-                let _ = print("   ⚡ Karaoke: \(textBox.isKaraokePreset) | Type: \(textBox.karaokeType ?? .none)")
                 textBoxView(textBox: textBox, isSelected: isSelected)
             }
         }
@@ -70,7 +63,6 @@ struct TextOnPlayerView: View {
     
     @ViewBuilder
     private func textBoxView(textBox: TextBox, isSelected: Bool) -> some View {
-        let _ = print("🎭 Creating textBoxView for: '\(textBox.text)' | Selected: \(isSelected)")
         ZStack(alignment: .topLeading) {
 
             textContent(textBox: textBox, isSelected: isSelected)
@@ -169,9 +161,6 @@ struct TextOnPlayerView: View {
     
     @ViewBuilder
     private func textOverlay(textBox: TextBox, isSelected: Bool) -> some View {
-        let _ = print("🎤 textOverlay - isKaraokePreset: \(textBox.isKaraokePreset)")
-        let _ = print("   🎵 wordTimings: \(textBox.wordTimings != nil) | karaokeType: \(textBox.karaokeType) | highlightColor: \(textBox.highlightColor)")
-
         if textBox.isKaraokePreset {
             if let wordTimings = textBox.wordTimings, 
                     let karaokeType = textBox.karaokeType,

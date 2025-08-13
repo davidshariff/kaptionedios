@@ -291,7 +291,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         // Non-karaoke presets
         SubtitleStyle(
             name: "Modern White", // confirmed style
-            fontSize: 50,
+            fontSize: 24,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,

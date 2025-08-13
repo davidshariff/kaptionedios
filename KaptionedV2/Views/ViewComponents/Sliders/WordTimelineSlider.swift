@@ -111,7 +111,6 @@ struct WordTimelineSlider<T: View, A: View>: View {
                     // Deselect when tapping the background
                     if selectedTextBox != nil {
                         selectedTextBox = nil
-                        print("🔄 Text box deselected - background tap")
                     }
                 }
 
@@ -120,15 +119,15 @@ struct WordTimelineSlider<T: View, A: View>: View {
             .allowsHitTesting(true)
 
         }
-        .onAppear {
-            let rulerStartValue = rulerStartInParentX?.wrappedValue ?? 0
-            print("📏 WordTimelineSlider - rulerStartInParentX: \(rulerStartValue)")
-            print("📏 WordTimelineSlider - textBoxes count: \(textBoxes.count)")
-        }
-        .onChange(of: rulerStartInParentX?.wrappedValue) { newValue in
-            let rulerStartValue = newValue ?? 0
-            print("📏 WordTimelineSlider - rulerStartInParentX changed to: \(rulerStartValue)")
-        }
+        // .onAppear {
+        //     let rulerStartValue = rulerStartInParentX?.wrappedValue ?? 0
+        //     print("📏 WordTimelineSlider - rulerStartInParentX: \(rulerStartValue)")
+        //     print("📏 WordTimelineSlider - textBoxes count: \(textBoxes.count)")
+        // }
+        // .onChange(of: rulerStartInParentX?.wrappedValue) { newValue in
+        //     let rulerStartValue = newValue ?? 0
+        //     print("📏 WordTimelineSlider - rulerStartInParentX changed to: \(rulerStartValue)")
+        // }
     }
     
 }
@@ -310,7 +309,6 @@ struct TimelineTextBox: View {
                                                 dragStartTime = textBox.timeRange.lowerBound
                                                 originalTimeRange = textBox.timeRange
                                                 showTimeTooltip = true
-                                                print("🔄 Text box drag started - original start: \(dragStartTime)")
                                             }
                                             
                                             // Calculate new position based on drag
@@ -322,8 +320,6 @@ struct TimelineTextBox: View {
                                             
                                             // Update tooltip time
                                             currentDragTime = newStartTime
-                                            
-                                            print("🔄 Text box drag - new start time: \(newStartTime), new end time: \(newEndTime)")
                                             
                                             // Update the text box time range
                                             textBox.timeRange = newStartTime...newEndTime
@@ -344,11 +340,9 @@ struct TimelineTextBox: View {
                                         // Text box drag ended
                                         isDraggingTextBox = false
                                         showTimeTooltip = false
-                                        print("🔄 Text box drag ended")
                                         
                                         // Update the video player text boxes with the new time range
                                         onTextBoxUpdate?(textBox)
-                                        print("🔄 Text box drag - calling onTextBoxUpdate with time range: \(textBox.timeRange)")
                                         
                                     } else if dragDistance < 5 && !isZooming {
                                         // Small drag - treat as tap
@@ -435,14 +429,12 @@ struct TimelineTextBox: View {
                             .gesture(
                                 DragGesture()
                                     .onChanged { value in
-                                        print("🔄 Left edge drag - translation: \(value.translation.width)")
                                         
                                         if !isDraggingLeftEdge {
                                             isDraggingLeftEdge = true
                                             dragStartTime = textBox.timeRange.lowerBound
                                             originalTimeRange = textBox.timeRange
                                             showTimeTooltip = true
-                                            print("🔄 Left edge drag started - original start: \(dragStartTime)")
                                         }
                                         
                                         // Calculate new start time based on drag
@@ -458,21 +450,15 @@ struct TimelineTextBox: View {
                                         // Update tooltip time
                                         currentDragTime = clampedStartTime
                                         
-                                        print("🔄 Left edge drag - new start time: \(clampedStartTime), original: \(textBox.timeRange.lowerBound)")
-                                        
                                         // Update the text box time range
                                         textBox.timeRange = clampedStartTime...textBox.timeRange.upperBound
-                                        
-                                        print("🔄 Left edge drag - updated time range: \(textBox.timeRange)")
                                     }
                                     .onEnded { value in
                                         isDraggingLeftEdge = false
                                         showTimeTooltip = false
-                                        print("🔄 Left edge drag ended")
                                         
                                         // Update the video player text boxes with the new time range
                                         onTextBoxUpdate?(textBox)
-                                        print("🔄 Left edge drag - calling onTextBoxUpdate with time range: \(textBox.timeRange)")
                                     }
                             )
                     }
@@ -502,14 +488,12 @@ struct TimelineTextBox: View {
                             .gesture(
                                 DragGesture()
                                     .onChanged { value in
-                                        print("🔄 Right edge drag - translation: \(value.translation.width)")
                                         
                                         if !isDraggingRightEdge {
                                             isDraggingRightEdge = true
                                             dragStartTime = textBox.timeRange.upperBound
                                             originalTimeRange = textBox.timeRange
                                             showTimeTooltip = true
-                                            print("🔄 Right edge drag started - original end: \(dragStartTime)")
                                         }
                                         
                                         // Calculate new end time based on drag
@@ -525,21 +509,15 @@ struct TimelineTextBox: View {
                                         // Update tooltip time
                                         currentDragTime = clampedEndTime
                                         
-                                        print("🔄 Right edge drag - new end time: \(clampedEndTime), original: \(textBox.timeRange.upperBound)")
-                                        
                                         // Update the text box time range
                                         textBox.timeRange = textBox.timeRange.lowerBound...clampedEndTime
-                                        
-                                        print("🔄 Right edge drag - updated time range: \(textBox.timeRange)")
                                     }
                                     .onEnded { value in
                                         isDraggingRightEdge = false
                                         showTimeTooltip = false
-                                        print("🔄 Right edge drag ended")
                                         
                                         // Update the video player text boxes with the new time range
                                         onTextBoxUpdate?(textBox)
-                                        print("🔄 Right edge drag - calling onTextBoxUpdate with time range: \(textBox.timeRange)")
                                     }
                             )
                     }

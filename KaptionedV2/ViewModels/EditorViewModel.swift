@@ -124,15 +124,18 @@ class EditorViewModel: ObservableObject{
         currentVideo?.toolsApplied = project.wrappedTools
         currentVideo?.filterName = project.filterName
         currentVideo?.colorCorrection = .init(brightness: project.brightness, contrast: project.contrast, saturation: project.saturation)
+
         let frame = VideoFrames(scaleValue: project.frameScale, frameColor: project.wrappedColor)
         currentVideo?.videoFrames = frame
+
         self.frames = frame
         currentVideo?.updateThumbnails(geo)
         currentVideo?.textBoxes = project.wrappedTextBoxes
+
         if let audio = project.audio?.audioModel{
             currentVideo?.audio = audio
         }
-        debugPrintTextBoxes()
+        //debugPrintTextBoxes()
     }
 
     func debugPrintTextBoxes(){
@@ -176,16 +179,12 @@ extension EditorViewModel{
     
     
     func setText(_ textBox: [TextBox]){
-        print("DEBUG: setText called with \(textBox.count) text boxes")
         currentVideo?.textBoxes = textBox
         setTools()
         // Trigger saving indicator and update project
-        print("DEBUG: Calling onSaving callback")
         onSaving?()
-        print("DEBUG: Calling updateProject")
         updateProject()
         // Notify the TextEditorViewModel about the updated text boxes
-        print("DEBUG: Calling onTextBoxesUpdated callback")
         onTextBoxesUpdated?(textBox)
     }
     
@@ -305,11 +304,6 @@ extension EditorViewModel{
                         gap: 0.08,
                         expandShortCues: false
                     )
-
-                    // INSERT_YOUR_CODE
-                    if let firstTextBox = optimizedTextBoxes.first {
-                        print("First optimizedTextBox font size: \(firstTextBox.fontSize)")
-                    }
                     
                     // Update the text boxes - this will automatically save to the project
                     self.setText(optimizedTextBoxes)

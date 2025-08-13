@@ -299,8 +299,8 @@ struct SubtitleStyle: Identifiable, Equatable {
             backgroundPadding: 8,
             cornerRadius: 8,
             shadowColor: .black,
-            shadowRadius: 6,
-            shadowX: 0,
+            shadowRadius: 2,
+            shadowX: 2,
             shadowY: 2,
             shadowOpacity: 0.7,
             isKaraokePreset: false

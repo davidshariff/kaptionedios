@@ -69,12 +69,14 @@ struct TranscriptionConfig: Codable {
     let defaultLanguage: String
     let maxWordsPerLine: Int
     let supportedLanguages: [String]
+    let defaultPreset: String
     
     static let `default` = TranscriptionConfig(
         endpoint: "/transcribe",
         defaultLanguage: "en",
         maxWordsPerLine: 1,
-        supportedLanguages: ["en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko"]
+        supportedLanguages: ["en", "es", "fr", "de", "it", "pt", "ru", "zh", "ja", "ko"],
+        defaultPreset: "Pop Art Bold"
     )
 }
 
@@ -346,6 +348,11 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.features.supportedVideoFormats
     }
     
+    /// Gets the default preset name for subtitle generation
+    func getDefaultPreset() -> String {
+        return currentConfig.transcription.defaultPreset
+    }
+    
     // MARK: - RevenueCat Configuration Methods
     
     /// Gets the configured RevenueCat API key
@@ -491,7 +498,8 @@ class ConfigurationManager: ObservableObject {
             endpoint: remoteConfig.transcription.endpoint.isEmpty ? defaultConfig.transcription.endpoint : remoteConfig.transcription.endpoint,
             defaultLanguage: remoteConfig.transcription.defaultLanguage.isEmpty ? defaultConfig.transcription.defaultLanguage : remoteConfig.transcription.defaultLanguage,
             maxWordsPerLine: remoteConfig.transcription.maxWordsPerLine > 0 ? remoteConfig.transcription.maxWordsPerLine : defaultConfig.transcription.maxWordsPerLine,
-            supportedLanguages: remoteConfig.transcription.supportedLanguages.isEmpty ? defaultConfig.transcription.supportedLanguages : remoteConfig.transcription.supportedLanguages
+            supportedLanguages: remoteConfig.transcription.supportedLanguages.isEmpty ? defaultConfig.transcription.supportedLanguages : remoteConfig.transcription.supportedLanguages,
+            defaultPreset: remoteConfig.transcription.defaultPreset.isEmpty ? defaultConfig.transcription.defaultPreset : remoteConfig.transcription.defaultPreset
         )
         
         // Merge feature config

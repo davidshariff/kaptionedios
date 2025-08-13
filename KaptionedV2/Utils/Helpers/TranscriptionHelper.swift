@@ -121,7 +121,7 @@ class TranscriptionHelper {
                             text: segment.sentence,
                             timeRange: start...end,
                             wordTimings: wordTimings,
-                            presetName: "Modern White"
+                            presetName: configManager.getDefaultPreset()
                         )
                     }
 

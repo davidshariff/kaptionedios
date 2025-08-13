@@ -52,6 +52,59 @@ class EditorViewModel: ObservableObject{
             return 200 // Custom height when presets bottom sheet is open
         }
     }
+    
+    /// Returns the actual rendered rect of the video on screen
+    /// Takes into account the current video player size, aspect ratio, rotation, and scaling
+    var videoRect: CGRect {
+        guard let video = currentVideo else {
+            return .zero
+        }
+        
+        // Get the video's natural size
+        let naturalSize = video.frameSize
+        guard naturalSize.width > 0 && naturalSize.height > 0 else {
+            return .zero
+        }
+        
+        // Get screen dimensions
+        let screenBounds = UIScreen.main.bounds
+        let screenWidth = screenBounds.width
+        let screenHeight = screenBounds.height
+        let headerHeight: CGFloat = 140 // Approximate header height
+        
+        // Calculate the container height based on current videoPlayerSize
+        let containerHeight = calculateVideoPlayerHeight(for: videoPlayerSize, screenHeight: screenHeight, headerHeight: headerHeight)
+        let containerWidth = screenWidth
+        
+        // Account for rotation - swap dimensions if rotated 90° or 270°
+        let isRotated = Int(video.rotation) % 180 != 0
+        let videoWidth = isRotated ? naturalSize.height : naturalSize.width
+        let videoHeight = isRotated ? naturalSize.width : naturalSize.height
+        
+        // Calculate aspect ratio and fit within container
+        let aspectRatio = videoWidth / videoHeight
+        var renderedWidth = containerWidth
+        var renderedHeight = containerWidth / aspectRatio
+        
+        // If height exceeds container, scale down
+        if renderedHeight > containerHeight {
+            renderedHeight = containerHeight
+            renderedWidth = containerHeight * aspectRatio
+        }
+        
+        // Apply video frames scaling if active
+        if let frames = video.videoFrames, frames.isActive {
+            let scale = frames.scale
+            renderedWidth *= scale
+            renderedHeight *= scale
+        }
+        
+        // Center the video in the container
+        let x = (containerWidth - renderedWidth) / 2
+        let y = (containerHeight - renderedHeight) / 2
+        
+        return CGRect(x: x, y: y, width: renderedWidth, height: renderedHeight)
+    }
 
     func setNewVideo(_ url: URL, geo: GeometryProxy){
         currentVideo = .init(url: url)
@@ -131,6 +184,9 @@ extension EditorViewModel{
         onSaving?()
         print("DEBUG: Calling updateProject")
         updateProject()
+        // Notify the TextEditorViewModel about the updated text boxes
+        print("DEBUG: Calling onTextBoxesUpdated callback")
+        onTextBoxesUpdated?(textBox)
     }
     
     func setFrames(){
@@ -230,7 +286,7 @@ extension EditorViewModel{
         
         self.isLoading = true
         TranscriptionHelper.shared.transcribeVideo(fileURL: video.url, language: language, max_words_per_line: maxWordsPerLine) { [weak self] result in
-            DispatchQueue.main.async {
+            DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
                 self.isLoading = false
@@ -239,13 +295,21 @@ extension EditorViewModel{
                     print("🎬 [EditorViewModel] Transcription completed with \(subs.count) subtitle segments")
                     
                     // Optimize all subtitles at once
-                    let optimizedTextBoxes = TextLayoutHelper.splitSubtitleSegments(
-                        textBoxes: subs,
-                        videoWidth: video.frameSize.width,
-                        padding: 0
+                    let optimizedTextBoxes = processTextBoxesForLayout(
+                        subs: subs,
+                        editorVM: self,
+                        joiner: " ",
+                        targetCPS: 15,
+                        minDur: 0.5,
+                        maxDur: 4.5,
+                        gap: 0.08,
+                        expandShortCues: false
                     )
-                    
-                    print("🎬 [EditorViewModel] Optimized textBoxes count: \(optimizedTextBoxes.count)")
+
+                    // INSERT_YOUR_CODE
+                    if let firstTextBox = optimizedTextBoxes.first {
+                        print("First optimizedTextBox font size: \(firstTextBox.fontSize)")
+                    }
                     
                     // Update the text boxes - this will automatically save to the project
                     self.setText(optimizedTextBoxes)

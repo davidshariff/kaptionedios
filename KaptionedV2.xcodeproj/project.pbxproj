@@ -99,11 +99,11 @@
 		F48A90932E487EB40031E9DF /* LanguagePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */; };
 		F48A90992E4893290031E9DF /* RootView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90982E4893290031E9DF /* RootView+Extensions.swift */; };
 		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
-		F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
 		F4D376862E4B35DA0056C00B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4D376852E4B35DA0056C00B /* Assets.xcassets */; };
 		F4D67B712E47C46700164273 /* SubtitleGenerationLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */; };
+		F4E9C1C12E4C4FB000DD5330 /* TextSizingHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E9C1C02E4C4FB000DD5330 /* TextSizingHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -198,11 +198,11 @@
 		F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerSheet.swift; sourceTree = "<group>"; };
 		F48A90982E4893290031E9DF /* RootView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView+Extensions.swift"; sourceTree = "<group>"; };
 		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
-		F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextLayoutHelper.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
 		F4D376852E4B35DA0056C00B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubtitleGenerationLoader.swift; sourceTree = "<group>"; };
+		F4E9C1C02E4C4FB000DD5330 /* TextSizingHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizingHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -502,9 +502,9 @@
 			children = (
 				F459F7742E34D32C006E9DD1 /* ColorFilterHelper.swift */,
 				F485E5362E49EB64007A680B /* ConfigurationManager.swift */,
+				F4E9C1C02E4C4FB000DD5330 /* TextSizingHelper.swift */,
 				F480993F2E4A258200E9D936 /* RevenueCatManager.swift */,
 				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
-				F4A83CC12E43292C00663936 /* TextLayoutHelper.swift */,
 				F459F7752E34D32C006E9DD1 /* FilterHelper.swift */,
 				F485E53C2E4A05B0007A680B /* SubscriptionManager.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
@@ -697,6 +697,7 @@
 				F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */,
 				5A5E6F9F2A03CA1800F5EBF8 /* AudioModel.swift in Sources */,
 				5ACFF99A29ED57BC00827A37 /* ThumbnailsSliderView.swift in Sources */,
+				F4E9C1C12E4C4FB000DD5330 /* TextSizingHelper.swift in Sources */,
 				5ACFF98529E945E000827A37 /* EditorViewModel.swift in Sources */,
 				F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */,
 				5ACFF9A929EE878500827A37 /* ToolButtonView.swift in Sources */,
@@ -753,7 +754,6 @@
 				5AF25B5929F14270005E0467 /* CropView.swift in Sources */,
 				5AE2A2A229F66EE9003D217F /* VideoExporterBottomSheetView.swift in Sources */,
 				5AFA25C829FC186F00B820D0 /* TextBox.swift in Sources */,
-				F4A83CC22E43292C00663936 /* TextLayoutHelper.swift in Sources */,
 				5A3D13AC29F184330027E25E /* CoreDataContainer.xcdatamodeld in Sources */,
 				5AE2A2A829F6BA29003D217F /* ExporterViewModel.swift in Sources */,
 				5ACFF99D29ED5C4900827A37 /* SliderView.swift in Sources */,

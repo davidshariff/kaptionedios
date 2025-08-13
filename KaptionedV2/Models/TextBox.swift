@@ -53,70 +53,66 @@ struct TextBox: Identifiable{
     var presetName: String? = nil
     
     init(
-        text: String = "",
-        fontSize: CGFloat = 20,
-        lastFontSize: CGFloat = .zero,
-        bgColor: Color = .white,
-        fontColor: Color = .black,
-        strokeColor: Color = .clear,
-        strokeWidth: CGFloat = 0,
-        timeRange: ClosedRange<Double> = 0...3,
-        offset: CGSize = .zero,
-        lastOffset: CGSize = .zero,
-        backgroundPadding: CGFloat = 8,
-        cornerRadius: CGFloat = 0,
-        shadowColor: Color = .black,
-        shadowRadius: CGFloat = 0,
-        shadowX: CGFloat = 0,
-        shadowY: CGFloat = 0,
-        shadowOpacity: Double = 0.5,
+        text: String? = nil,
+        fontSize: CGFloat? = nil,
+        lastFontSize: CGFloat? = nil,
+        bgColor: Color? = nil,
+        fontColor: Color? = nil,
+        strokeColor: Color? = nil,
+        strokeWidth: CGFloat? = nil,
+        timeRange: ClosedRange<Double>? = nil,
+        offset: CGSize? = nil,
+        lastOffset: CGSize? = nil,
+        backgroundPadding: CGFloat? = nil,
+        cornerRadius: CGFloat? = nil,
+        shadowColor: Color? = nil,
+        shadowRadius: CGFloat? = nil,
+        shadowX: CGFloat? = nil,
+        shadowY: CGFloat? = nil,
+        shadowOpacity: Double? = nil,
         wordTimings: [WordWithTiming]? = nil,
-        isKaraokePreset: Bool = false,
+        isKaraokePreset: Bool? = nil,
         karaokeType: KaraokeType? = nil,
         highlightColor: Color? = nil,
         wordBGColor: Color? = nil,
-        activeWordScale: CGFloat = 1.2,
+        activeWordScale: CGFloat? = nil,
         presetName: String? = nil
     ) {
-        // If presetName is provided, find and apply the preset values
+        // If presetName is provided, use the preset values if they are not provided,
+        // otherwise use the provided values
         if let presetName = presetName, let preset = SubtitleStyle.allPresets.first(where: { $0.name == presetName }) {
-            self.text = text
-            self.fontSize = preset.fontSize
-            self.lastFontSize = lastFontSize
-            self.bgColor = preset.bgColor
-            self.fontColor = preset.fontColor // Use preset's fontColor
-            self.strokeColor = preset.strokeColor
-            self.strokeWidth = preset.strokeWidth
-            self.timeRange = timeRange
-            self.offset = offset
-            self.lastOffset = lastOffset
-            self.backgroundPadding = preset.backgroundPadding
-            self.cornerRadius = preset.cornerRadius
-            self.shadowColor = preset.shadowColor
-            self.shadowRadius = preset.shadowRadius
-            self.shadowX = preset.shadowX
-            self.shadowY = preset.shadowY
-            self.shadowOpacity = preset.shadowOpacity
+
+            self.text = text ?? ""
+            self.fontSize = (fontSize != nil && fontSize != 0) ? fontSize! : preset.fontSize
+            self.lastFontSize = lastFontSize ?? .zero
+            self.bgColor = (bgColor != nil && bgColor != .clear) ? bgColor! : preset.bgColor
+            self.fontColor = (fontColor != nil && fontColor != .clear) ? fontColor! : preset.fontColor
+            self.strokeColor = (strokeColor != nil && strokeColor != .clear) ? strokeColor! : preset.strokeColor
+            self.strokeWidth = (strokeWidth != nil && strokeWidth != 0) ? strokeWidth! : preset.strokeWidth
+            self.timeRange = timeRange ?? 0...3
+            self.offset = offset ?? .zero
+            self.lastOffset = lastOffset ?? .zero
+            self.backgroundPadding = (backgroundPadding != nil && backgroundPadding != 0) ? backgroundPadding! : preset.backgroundPadding
+            self.cornerRadius = (cornerRadius != nil && cornerRadius != 0) ? cornerRadius! : preset.cornerRadius
+            self.shadowColor = (shadowColor != nil && shadowColor != .clear) ? shadowColor! : preset.shadowColor
+            self.shadowRadius = (shadowRadius != nil && shadowRadius != 0) ? shadowRadius! : preset.shadowRadius
+            self.shadowX = (shadowX != nil && shadowX != 0) ? shadowX! : preset.shadowX
+            self.shadowY = (shadowY != nil && shadowY != 0) ? shadowY! : preset.shadowY
+            self.shadowOpacity = (shadowOpacity != nil && shadowOpacity != 0) ? shadowOpacity! : preset.shadowOpacity
             self.wordTimings = wordTimings
-            self.isKaraokePreset = isKaraokePreset
-            if isKaraokePreset {
-                self.karaokeType = karaokeType
-                self.highlightColor = highlightColor
-                self.wordBGColor = wordBGColor
-            }
             
             // If this is a karaoke preset, set the karaoke colors from the preset
             if preset.isKaraokePreset {
                 let karaokePreset: KaraokePreset
                 switch preset.name {
-                case "Highlight by word":
-                    karaokePreset = .word
-                case "Background by word":
-                    karaokePreset = .wordbg
-                case "Word & Scale":
-                    karaokePreset = .wordAndScale
-                default:
-                    karaokePreset = .word
+                    case "Highlight by word":
+                        karaokePreset = .word
+                    case "Background by word":
+                        karaokePreset = .wordbg
+                    case "Word & Scale":
+                        karaokePreset = .wordAndScale
+                    default:
+                        karaokePreset = .word
                 }
                 self.isKaraokePreset = true
                 self.karaokeType = karaokePreset.karaokeType
@@ -128,36 +124,38 @@ struct TextBox: Identifiable{
                     self.wordBGColor = karaokePreset.wordBGColor
                 }
             }
-            self.activeWordScale = activeWordScale
+
+            self.activeWordScale = activeWordScale ?? 1.2
             self.presetName = presetName
+            
         } else {
             print("DEBUG: No presetName provided during TextBox initialization 🟡")
             // Use provided values (default behavior)
-            self.text = text
-            self.fontSize = fontSize
-            self.lastFontSize = lastFontSize
-            self.bgColor = bgColor
-            self.fontColor = fontColor
-            self.strokeColor = strokeColor
-            self.strokeWidth = strokeWidth
-            self.timeRange = timeRange
-            self.offset = offset
-            self.lastOffset = lastOffset
-            self.backgroundPadding = backgroundPadding
-            self.cornerRadius = cornerRadius
-            self.shadowColor = shadowColor
-            self.shadowRadius = shadowRadius
-            self.shadowX = shadowX
-            self.shadowY = shadowY
-            self.shadowOpacity = shadowOpacity
+            self.text = text ?? ""
+            self.fontSize = fontSize ?? 20
+            self.lastFontSize = lastFontSize ?? .zero
+            self.bgColor = bgColor ?? .white
+            self.fontColor = fontColor ?? .black
+            self.strokeColor = strokeColor ?? .clear
+            self.strokeWidth = strokeWidth ?? 0
+            self.timeRange = timeRange ?? 0...3
+            self.offset = offset ?? .zero
+            self.lastOffset = lastOffset ?? .zero
+            self.backgroundPadding = backgroundPadding ?? 8
+            self.cornerRadius = cornerRadius ?? 0
+            self.shadowColor = shadowColor ?? .black
+            self.shadowRadius = shadowRadius ?? 0
+            self.shadowX = shadowX ?? 0
+            self.shadowY = shadowY ?? 0
+            self.shadowOpacity = shadowOpacity ?? 0.5
             self.wordTimings = wordTimings
-            self.isKaraokePreset = isKaraokePreset
-            if isKaraokePreset {
+            self.isKaraokePreset = isKaraokePreset ?? false
+            if isKaraokePreset == true {
                 self.karaokeType = karaokeType
                 self.highlightColor = highlightColor
                 self.wordBGColor = wordBGColor
             }
-            self.activeWordScale = activeWordScale
+            self.activeWordScale = activeWordScale ?? 1.2
             self.presetName = presetName
         }
     }
@@ -293,7 +291,7 @@ struct SubtitleStyle: Identifiable, Equatable {
         // Non-karaoke presets
         SubtitleStyle(
             name: "Modern White", // confirmed style
-            fontSize: 24,
+            fontSize: 50,
             bgColor: .clear,
             fontColor: .white,
             strokeColor: .black,

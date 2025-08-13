@@ -33,6 +33,45 @@ struct Video: Identifiable{
         rangeDuration.upperBound - rangeDuration.lowerBound
     }
     
+    /// Returns the actual rendered rect of the video within its container
+    /// Note: This uses the stored geometrySize. For dynamic sizing based on videoPlayerSize, 
+    /// use the videoRect method in EditorViewModel instead.
+    var videoRect: CGRect {
+        guard frameSize.width > 0 && frameSize.height > 0,
+              geometrySize.width > 0 && geometrySize.height > 0 else {
+            return .zero
+        }
+        
+        // Account for rotation - swap dimensions if rotated 90° or 270°
+        let isRotated = Int(rotation) % 180 != 0
+        let videoWidth = isRotated ? frameSize.height : frameSize.width
+        let videoHeight = isRotated ? frameSize.width : frameSize.height
+        
+        // Calculate aspect ratio and fit within container
+        let aspectRatio = videoWidth / videoHeight
+        var renderedWidth = geometrySize.width
+        var renderedHeight = geometrySize.width / aspectRatio
+        
+        // If height exceeds container, scale down
+        if renderedHeight > geometrySize.height {
+            renderedHeight = geometrySize.height
+            renderedWidth = geometrySize.height * aspectRatio
+        }
+        
+        // Apply video frames scaling if active
+        if let frames = videoFrames, frames.isActive {
+            let scale = frames.scale
+            renderedWidth *= scale
+            renderedHeight *= scale
+        }
+        
+        // Center the video in the container
+        let x = (geometrySize.width - renderedWidth) / 2
+        let y = (geometrySize.height - renderedHeight) / 2
+        
+        return CGRect(x: x, y: y, width: renderedWidth, height: renderedHeight)
+    }
+    
     init(url: URL){
         self.url = url
         self.asset = AVAsset(url: url)

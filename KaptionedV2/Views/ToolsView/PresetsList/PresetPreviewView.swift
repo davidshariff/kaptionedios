@@ -14,7 +14,10 @@ struct PresetPreviewView: View {
     @State private var animationTimer: Timer?
     
     private var previewWords: [String] {
-        return previewText.split(separator: " ").map(String.init)
+        return previewText.trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(separator: " ")
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
     }
     
     init(preset: SubtitleStyle, previewText: String = "Sample Text", highlightColor: Color? = nil, wordBGColor: Color? = nil, fontColor: Color? = nil, animateKaraoke: Bool = false, fontSize: CGFloat = 12) {
@@ -39,6 +42,7 @@ struct PresetPreviewView: View {
                             Text(word)
                                 .font(.system(size: fontSize))
                                 .foregroundColor(getWordColor(for: index))
+                                .lineLimit(1)
                                 .background(
                                     RoundedRectangle(cornerRadius: 1)
                                         .fill(getWordBackground(for: index))
@@ -50,9 +54,10 @@ struct PresetPreviewView: View {
                         }
                     } else {
                         // Regular preview
-                        Text(previewText)
+                        Text(previewText.trimmingCharacters(in: .whitespacesAndNewlines))
                             .font(.system(size: fontSize))
                             .foregroundColor(fontColor ?? preset.fontColor)
+                            .lineLimit(1)
                             .shadow(color: preset.shadowColor.opacity(preset.shadowOpacity), radius: preset.shadowRadius, x: preset.shadowX, y: preset.shadowY)
                     }
                 }

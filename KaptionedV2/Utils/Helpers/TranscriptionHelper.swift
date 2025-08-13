@@ -121,8 +121,6 @@ class TranscriptionHelper {
                             text: segment.sentence,
                             timeRange: start...end,
                             wordTimings: wordTimings,
-                            isKaraokePreset: true,
-                            karaokeType: .word,
                             presetName: "Modern White"
                         )
                     }

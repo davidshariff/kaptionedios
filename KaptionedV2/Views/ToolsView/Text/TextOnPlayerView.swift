@@ -56,8 +56,13 @@ struct TextOnPlayerView: View {
             // Use a more precise condition to avoid showing multiple text boxes
             let isInTimeRange = textBox.timeRange.lowerBound <= currentTime && currentTime < textBox.timeRange.upperBound
             if isInTimeRange {
-                // Debug: Print current textbox on screen
-                // let _ = print("📝 Current TextBox: \(textBox) | Time: \(currentTime) | Selected: \(isSelected)")
+                // Debug: Print current textbox on screen with styling info
+                let _ = print("📝 Showing TextBox: '\(textBox.text)'")
+                let _ = print("   📐 Range: \(textBox.timeRange) | Current Time: \(currentTime)")
+                let _ = print("   🎨 Font: \(textBox.fontSize)pt | Color: \(textBox.fontColor)")
+                let _ = print("   🔲 Background: \(textBox.bgColor) | Stroke: \(textBox.strokeColor) \(textBox.strokeWidth)pt")
+                let _ = print("   📍 Offset: \(textBox.offset) | Shadow: \(textBox.shadowColor) \(textBox.shadowRadius)pt")
+                let _ = print("   ⚡ Karaoke: \(textBox.isKaraokePreset) | Type: \(textBox.karaokeType ?? .none)")
                 textBoxView(textBox: textBox, isSelected: isSelected)
             }
         }
@@ -65,6 +70,7 @@ struct TextOnPlayerView: View {
     
     @ViewBuilder
     private func textBoxView(textBox: TextBox, isSelected: Bool) -> some View {
+        let _ = print("🎭 Creating textBoxView for: '\(textBox.text)' | Selected: \(isSelected)")
         ZStack(alignment: .topLeading) {
 
             textContent(textBox: textBox, isSelected: isSelected)
@@ -163,6 +169,8 @@ struct TextOnPlayerView: View {
     
     @ViewBuilder
     private func textOverlay(textBox: TextBox, isSelected: Bool) -> some View {
+        let _ = print("🎤 textOverlay - isKaraokePreset: \(textBox.isKaraokePreset)")
+        let _ = print("   🎵 wordTimings: \(textBox.wordTimings != nil) | karaokeType: \(textBox.karaokeType) | highlightColor: \(textBox.highlightColor)")
 
         if textBox.isKaraokePreset {
             if let wordTimings = textBox.wordTimings, 
@@ -234,47 +242,57 @@ struct TextOnPlayerView: View {
                 .padding(.horizontal, textBox.backgroundPadding)
                 .padding(.vertical, textBox.backgroundPadding / 2)
             } 
+            else {
+                // Fallback: Karaoke preset but missing required data - render as regular text
+                let _ = print("⚠️ Karaoke preset fallback - rendering as regular text")
+                regularTextOverlay(textBox: textBox, isSelected: isSelected)
+            }
         }
         else {
-            // For non-karaoke presets, use two-layer approach for clean stroke rendering
+            regularTextOverlay(textBox: textBox, isSelected: isSelected)
+        }
+    }
+    
+    @ViewBuilder
+    private func regularTextOverlay(textBox: TextBox, isSelected: Bool) -> some View {
+        // For non-karaoke presets, use two-layer approach for clean stroke rendering
+        ZStack {
+            // Background with padding and rounded corners
+            RoundedRectangle(cornerRadius: textBox.cornerRadius)
+                .fill(textBox.bgColor)
+            
+            // Text layers with internal padding
             ZStack {
-                // Background with padding and rounded corners
-                RoundedRectangle(cornerRadius: textBox.cornerRadius)
-                    .fill(textBox.bgColor)
-                
-                // Text layers with internal padding
-                ZStack {
-                    // Stroke layer (background) - only if stroke is enabled
-                    if let strokeAttr = createStrokeAttr(textBox) {
-                        AttributedTextOverlay(
-                            attributedString: strokeAttr,
-                            offset: .zero,
-                            isSelected: false,
-                            bgColor: .clear,
-                            cornerRadius: 0,
-                            shadowColor: UIColor.clear,
-                            shadowRadius: 0,
-                            shadowX: 0,
-                            shadowY: 0
-                        )
-                    }
-                    
-                    // Main text layer (foreground)
+                // Stroke layer (background) - only if stroke is enabled
+                if let strokeAttr = createStrokeAttr(textBox) {
                     AttributedTextOverlay(
-                        attributedString: createNSAttr(textBox),
+                        attributedString: strokeAttr,
                         offset: .zero,
-                        isSelected: isSelected,
+                        isSelected: false,
                         bgColor: .clear,
                         cornerRadius: 0,
-                        shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
-                        shadowRadius: textBox.shadowRadius,
-                        shadowX: textBox.shadowX,
-                        shadowY: textBox.shadowY
+                        shadowColor: UIColor.clear,
+                        shadowRadius: 0,
+                        shadowX: 0,
+                        shadowY: 0
                     )
                 }
-                .padding(.horizontal, textBox.backgroundPadding)
-                .padding(.vertical, textBox.backgroundPadding / 2)
+                
+                // Main text layer (foreground)
+                AttributedTextOverlay(
+                    attributedString: createNSAttr(textBox),
+                    offset: .zero,
+                    isSelected: isSelected,
+                    bgColor: .clear,
+                    cornerRadius: 0,
+                    shadowColor: UIColor(textBox.shadowColor).withAlphaComponent(textBox.shadowOpacity),
+                    shadowRadius: textBox.shadowRadius,
+                    shadowX: textBox.shadowX,
+                    shadowY: textBox.shadowY
+                )
             }
+            .padding(.horizontal, textBox.backgroundPadding)
+            .padding(.vertical, textBox.backgroundPadding / 2)
         }
     }
     

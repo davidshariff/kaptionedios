@@ -113,8 +113,11 @@ struct MainEditorView: View {
                      
                      // Set callback for automatic text box updates
                      editorVM.onTextBoxesUpdated = { textBoxes in
-                         print("DEBUG: onTextBoxesUpdated callback triggered with \(textBoxes.count) text boxes")
+                         for (index, textBox) in textBoxes.prefix(3).enumerated() {
+                             print("   [\(index)] '\(textBox.text)' time: \(textBox.timeRange)")
+                         }
                          textEditor.textBoxes = textBoxes
+                         print("DEBUG: Updated textEditor.textBoxes to \(textEditor.textBoxes.count) items")
                      }
                      
                      // Set callback for auto-starting video after subtitle generation
@@ -411,6 +414,33 @@ extension MainEditorView{
                         }
                     }
                     .foregroundColor(showCrossOverlay ? .yellow : .white)
+
+                    Button {
+
+                        let processedTextBoxes = processTextBoxesForLayout(
+                            subs: editorVM.currentVideo?.textBoxes ?? [],
+                            editorVM: editorVM,
+                            joiner: " ",
+                            targetCPS: 15,
+                            minDur: 0.5,
+                            maxDur: 4.5,
+                            gap: 0.08,
+                            expandShortCues: false
+                        )
+
+                        // Update the video with the processed text boxes
+                        editorVM.setText(processedTextBoxes)
+
+                        
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: "rectangle.3.offgrid")
+                            Text("Layout")
+                                .font(.caption2)
+                        }
+                    }
+                    .foregroundColor(.white)
+
                 #endif
                 
                 // Saving indicator

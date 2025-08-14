@@ -23,7 +23,7 @@ class VideoEditor{
         do{
             await progressCallback?("processing", 0.0)
             let url = try await resizeAndLayerOperation(video: video, videoQuality: videoQuality, progressCallback: progressCallback)
-            await progressCallback?("completed", 1.0)
+            // Don't call completed here - let resizeAndLayerOperation handle the final stage
             print("✅ [VideoEditor] Finished render – output: \(url)")
             return url
         }catch{
@@ -137,6 +137,8 @@ class VideoEditor{
         } else {
             if let url = session.outputURL{
                 print("✅ [VideoEditor] Export finished: \(url)")
+                // Call finalizing stage before returning
+                await progressCallback?("finalizing", 1.0)
                 return url
             }
             throw ExporterError.failed
@@ -225,6 +227,11 @@ extension VideoEditor{
         }
         
         print("✅ [VideoEditor] Export stage '\(stage)' completed")
+        
+        // If this was the processing stage, transition to finalizing
+        if stage == "processing" {
+            await progressCallback("finalizing", 0.0)
+        }
     }
     
     /// Monitor export session progress and call progress callback

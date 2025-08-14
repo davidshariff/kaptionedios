@@ -4,6 +4,7 @@ import PermissionsSwiftUIPhoto
 struct VideoExporterBottomSheetView: View {
     @Binding var isPresented: Bool
     @StateObject private var viewModel: ExporterViewModel
+    @State private var lastStage: ExporterViewModel.ExportStage = .preparing
     
     init(isPresented: Binding<Bool>, video: Video) {
         self._isPresented = isPresented
@@ -117,6 +118,25 @@ struct VideoQualityPopapView2_Previews: PreviewProvider {
 
 extension VideoExporterBottomSheetView{
     
+    private var shouldAnimate: Bool {
+        // Animate for all active stages except completed
+        switch viewModel.currentStage {
+        case .completed:
+            return false
+        default:
+            return true
+        }
+    }
+    
+    private var isActiveStage: Bool {
+        // Check if this is an active working stage (processing or finalizing)
+        switch viewModel.currentStage {
+        case .firstPass, .saving:
+            return true
+        default:
+            return false
+        }
+    }
     
     private var list: some View{
         Group{
@@ -136,41 +156,17 @@ extension VideoExporterBottomSheetView{
             VStack(spacing: 24) {
                 // Stage indicator with enhanced icon
                 VStack(spacing: 20) {
-                    ZStack {
-                        // Background circle
-                        Circle()
-                            .fill(Color.blue.opacity(0.1))
-                            .frame(width: 80, height: 80)
-                        
-                        // Animated ring
-                        Circle()
-                            .stroke(Color.blue.opacity(0.3), lineWidth: 2)
-                            .frame(width: 80, height: 80)
-                            .scaleEffect(viewModel.currentStage == .firstPass ? 1.3 : 1.0)
-                            .opacity(viewModel.currentStage == .firstPass ? 0.3 : 0.8)
-                            .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: viewModel.currentStage == .firstPass)
-                        
-                        // Second animated ring for ripple effect
-                        if viewModel.currentStage == .firstPass {
-                            Circle()
-                                .stroke(Color.blue.opacity(0.2), lineWidth: 1)
-                                .frame(width: 80, height: 80)
-                                .scaleEffect(1.6)
-                                .opacity(0.2)
-                                .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(0.7), value: viewModel.currentStage == .firstPass)
-                        }
-                        
-                        // Main icon with stage-specific animations
-                        Image(systemName: viewModel.currentStage.icon)
-                            .font(.system(size: 28, weight: .medium))
-                            .foregroundColor(.blue)
-                            .rotationEffect(.degrees(viewModel.currentStage == .firstPass ? 360 : 0))
-                            .animation(
-                                viewModel.currentStage == .firstPass ? 
-                                .linear(duration: 2.0).repeatForever(autoreverses: false) :
-                                .easeInOut(duration: 0.3), 
-                                value: viewModel.currentStage == .firstPass
-                            )
+                    AnimatedStageIcon(
+                        icon: viewModel.currentStage.icon,
+                        isActive: isActiveStage,
+                        shouldAnimate: shouldAnimate
+                    )
+                    .id(viewModel.currentStage.rawValue) // Force recreation when stage changes
+                    .onChange(of: viewModel.currentStage) { newStage in
+                        print("🎭 [UI] Stage changed: \(lastStage.rawValue) -> \(newStage.rawValue)")
+                        print("🎭 [UI] New stage icon should be: \(newStage.icon)")
+                        print("🎭 [UI] isActiveStage: \(isActiveStage), shouldAnimate: \(shouldAnimate)")
+                        lastStage = newStage
                     }
                     
                     VStack(spacing: 8) {
@@ -230,9 +226,10 @@ extension VideoExporterBottomSheetView{
                         
                         // Enhanced animated indicator
                         HStack(spacing: 6) {
-                            Text("Processing")
+                            Text(viewModel.currentStage.rawValue)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
+                                .id(viewModel.currentStage.rawValue) // Force refresh when stage changes
                             
                             AnimatedDotsView()
                         }
@@ -242,9 +239,9 @@ extension VideoExporterBottomSheetView{
             .padding(.horizontal, 24)
             .padding(.vertical, 20)
             
-            // Minimal stage indicators (simplified)
+            // Minimal stage indicators (simplified) - show only the stages we actually use
             HStack(spacing: 16) {
-                ForEach(ExporterViewModel.ExportStage.allCases.prefix(3), id: \.self) { stage in
+                ForEach([ExporterViewModel.ExportStage.preparing, .firstPass, .saving], id: \.self) { stage in
                     enhancedStageIndicator(for: stage)
                 }
             }
@@ -272,7 +269,9 @@ extension VideoExporterBottomSheetView{
     @ViewBuilder
     private func enhancedStageIndicator(for stage: ExporterViewModel.ExportStage) -> some View {
         let isActive = viewModel.currentStage == stage
-        let isCompleted = ExporterViewModel.ExportStage.allCases.firstIndex(of: viewModel.currentStage)! >= ExporterViewModel.ExportStage.allCases.firstIndex(of: stage)!
+        let currentStageIndex = ExporterViewModel.ExportStage.allCases.firstIndex(of: viewModel.currentStage) ?? 0
+        let stageIndex = ExporterViewModel.ExportStage.allCases.firstIndex(of: stage) ?? 0
+        let isCompleted = currentStageIndex > stageIndex  // Only completed if we've moved PAST this stage
         
         VStack(spacing: 8) {
             ZStack {
@@ -299,8 +298,8 @@ extension VideoExporterBottomSheetView{
                         .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true).delay(0.3), value: isActive)
                 }
                 
-                // Icon or checkmark
-                if isCompleted && !isActive {
+                // Icon or checkmark - only show checkmark for truly completed stages
+                if isCompleted {
                     Image(systemName: "checkmark")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.blue)
@@ -601,11 +600,86 @@ extension VideoExporterBottomSheetView{
 
 }
 
-
-
-
-
-
+// MARK: - Reusable Animated Stage Icon
+struct AnimatedStageIcon: View {
+    let icon: String
+    let isActive: Bool
+    let shouldAnimate: Bool
+    
+    @State private var animationState: Bool = false
+    @State private var rotationDegrees: Double = 0
+    private let viewID = UUID().uuidString.prefix(8)
+    
+    var body: some View {
+        ZStack {
+            // Background circle
+            Circle()
+                .fill(Color.blue.opacity(0.1))
+                .frame(width: 80, height: 80)
+            
+            // Animated ring
+            Circle()
+                .stroke(Color.blue.opacity(0.3), lineWidth: 2)
+                .frame(width: 80, height: 80)
+                .scaleEffect(animationState && shouldAnimate ? 1.3 : 1.0)
+                .opacity(animationState && shouldAnimate ? 0.3 : 0.8)
+                .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: animationState)
+            
+            // Second animated ring for ripple effect
+            if shouldAnimate && animationState {
+                Circle()
+                    .stroke(Color.blue.opacity(0.2), lineWidth: 1)
+                    .frame(width: 80, height: 80)
+                    .scaleEffect(1.6)
+                    .opacity(0.2)
+                    .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true).delay(0.7), value: animationState)
+            }
+            
+            // Main icon with stage-specific animations
+            Image(systemName: icon)
+                .font(.system(size: 28, weight: .medium))
+                .foregroundColor(.blue)
+                .rotationEffect(.degrees(rotationDegrees))
+                .id(icon) // Force refresh when icon changes
+                .onAppear {
+                    print("🎭 [Icon] Displaying icon: \(icon)")
+                }
+        }
+        .onAppear {
+            print("🎭 [AnimatedStageIcon-\(viewID)] onAppear: icon=\(icon), isActive=\(isActive), shouldAnimate=\(shouldAnimate)")
+            startAnimations()
+        }
+        .onChange(of: isActive) { newValue in
+            print("🎭 [AnimatedStageIcon] isActive changed to: \(newValue)")
+            updateRotationAnimation()
+        }
+        .onChange(of: shouldAnimate) { newValue in
+            print("🎭 [AnimatedStageIcon] shouldAnimate changed to: \(newValue)")
+            updatePulseAnimation()
+        }
+    }
+    
+    private func startAnimations() {
+        updatePulseAnimation()
+        updateRotationAnimation()
+    }
+    
+    private func updatePulseAnimation() {
+        animationState = shouldAnimate
+    }
+    
+    private func updateRotationAnimation() {
+        if isActive {
+            withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
+                rotationDegrees = 360
+            }
+        } else {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                rotationDegrees = 0
+            }
+        }
+    }
+}
 
 // MARK: - Animated Dots View
 struct AnimatedDotsView: View {

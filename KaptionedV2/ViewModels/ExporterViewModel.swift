@@ -63,7 +63,7 @@ class ExporterViewModel: ObservableObject{
                 }
             )
             
-            await updateStage(.completed, progress: 1.0)
+            // Don't override the stage here - let the VideoEditor handle the final stage
             renderState = .loaded(url)
         }catch{
             renderState = .failed(error)
@@ -83,6 +83,8 @@ class ExporterViewModel: ObservableObject{
         switch stage {
         case "processing":
             exportStage = .firstPass  // Use firstPass stage for processing
+        case "finalizing":
+            exportStage = .saving  // Use saving stage for finalizing
         case "completed":
             exportStage = .completed
         default:
@@ -98,11 +100,11 @@ class ExporterViewModel: ObservableObject{
         case .preparing:
             newProgress = 0.0
         case .firstPass:  // This is our main processing stage
-            newProgress = 0.05 + (progress * 0.90)  // 5-95% (main export work)
+            newProgress = 0.05 + (progress * 0.85)  // 5-90% (main export work)
         case .encoding:
-            newProgress = 0.95  // Not used anymore
-        case .saving:
-            newProgress = 0.95 + (progress * 0.05)  // 95-100%
+            newProgress = 0.90  // Not used anymore
+        case .saving:  // Finalizing stage
+            newProgress = 0.90 + (progress * 0.10)  // 90-100%
         case .completed:
             newProgress = 1.0
         }
@@ -278,9 +280,9 @@ class ExporterViewModel: ObservableObject{
         var description: String {
             switch self {
             case .preparing:
-                return "Getting everything ready"
+                return "Preparing your video"
             case .firstPass:
-                return "Compositing video with text overlays and effects"
+                return "Adding your stunning captions and effects"
             case .encoding:
                 return "Encoding final video output"
             case .saving:
@@ -299,7 +301,7 @@ class ExporterViewModel: ObservableObject{
             case .encoding:
                 return "video.badge.plus"
             case .saving:
-                return "square.and.arrow.down"
+                return "arrow.down.circle"
             case .completed:
                 return "checkmark.circle"
             }

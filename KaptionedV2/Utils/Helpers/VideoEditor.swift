@@ -219,7 +219,6 @@ extension VideoEditor{
         for i in 1...steps {
             let progress = startProgress + (stepSize * Double(i))
             await progressCallback(stage, progress)
-            print("🎬 [VideoEditor] Completing: \(Int(progress * 100))%")
             
             // Slower steps at the end for smooth completion
             let delay = i < steps ? 50_000_000 : 100_000_000 // 50ms or 100ms

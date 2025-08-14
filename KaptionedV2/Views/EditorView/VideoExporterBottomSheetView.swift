@@ -4,7 +4,7 @@ import PermissionsSwiftUIPhoto
 struct VideoExporterBottomSheetView: View {
     @Binding var isPresented: Bool
     @StateObject private var viewModel: ExporterViewModel
-    @State private var lastStage: ExporterViewModel.ExportStage = .preparing
+
     
     init(isPresented: Binding<Bool>, video: Video) {
         self._isPresented = isPresented
@@ -162,12 +162,7 @@ extension VideoExporterBottomSheetView{
                         shouldAnimate: shouldAnimate
                     )
                     .id(viewModel.currentStage.rawValue) // Force recreation when stage changes
-                    .onChange(of: viewModel.currentStage) { newStage in
-                        print("🎭 [UI] Stage changed: \(lastStage.rawValue) -> \(newStage.rawValue)")
-                        print("🎭 [UI] New stage icon should be: \(newStage.icon)")
-                        print("🎭 [UI] isActiveStage: \(isActiveStage), shouldAnimate: \(shouldAnimate)")
-                        lastStage = newStage
-                    }
+
                     
                     VStack(spacing: 8) {
                         Text(viewModel.currentStage.rawValue)
@@ -641,20 +636,15 @@ struct AnimatedStageIcon: View {
                 .foregroundColor(.blue)
                 .rotationEffect(.degrees(rotationDegrees))
                 .id(icon) // Force refresh when icon changes
-                .onAppear {
-                    print("🎭 [Icon] Displaying icon: \(icon)")
-                }
+
         }
         .onAppear {
-            print("🎭 [AnimatedStageIcon-\(viewID)] onAppear: icon=\(icon), isActive=\(isActive), shouldAnimate=\(shouldAnimate)")
             startAnimations()
         }
         .onChange(of: isActive) { newValue in
-            print("🎭 [AnimatedStageIcon] isActive changed to: \(newValue)")
             updateRotationAnimation()
         }
         .onChange(of: shouldAnimate) { newValue in
-            print("🎭 [AnimatedStageIcon] shouldAnimate changed to: \(newValue)")
             updatePulseAnimation()
         }
     }

@@ -40,6 +40,7 @@ struct TimedSegment {
     let text: String
     let start: Double
     let end: Double
+    let wordIndices: (start: Int, end: Int) // Track which words belong to this segment
 }
 
 // MARK: - Debug stats (for minimal, change-focused logs)
@@ -176,11 +177,41 @@ private func segmentsWithTime(
     words: [WordWithTiming],
     joiner: String
 ) -> [TimedSegment] {
-    segments.map { (startIdx, endIdx) -> TimedSegment in
+    var result: [TimedSegment] = []
+    
+    for i in 0..<segments.count {
+        let (startIdx, endIdx) = segments[i]
         let slice = words[startIdx...endIdx]
         let text = slice.map(\.text).joined(separator: joiner)
-        return TimedSegment(text: text, start: slice.first!.start, end: slice.last!.end)
+        
+        let segmentStart = slice.first!.start
+        var segmentEnd = slice.last!.end
+        
+        // If this is not the last segment, extend the end to flow continuously to the next segment
+        if i < segments.count - 1 {
+            let nextSegmentStartIdx = segments[i + 1].0
+            let nextWordStart = words[nextSegmentStartIdx].start
+            
+            // If there's a gap between current segment end and next word start,
+            // extend current segment to fill the gap (minus a small buffer for readability)
+            if nextWordStart > segmentEnd {
+                let gap = nextWordStart - segmentEnd
+                // Only extend if gap is reasonable (< 1 second), otherwise keep original timing
+                if gap < 1.0 {
+                    segmentEnd = nextWordStart - 0.01 // Leave tiny gap for processing
+                }
+            }
+        }
+        
+        result.append(TimedSegment(
+            text: text, 
+            start: segmentStart, 
+            end: segmentEnd,
+            wordIndices: (start: startIdx, end: endIdx)
+        ))
     }
+    
+    return result
 }
 
 // MARK: - Timing normalization
@@ -224,7 +255,13 @@ private func normalizeTiming(
     // Enforce ordering, gap, and sentence window (no overlaps)
     for i in 0..<out.count {
         let nextStart = (i + 1 < out.count) ? out[i + 1].start : min(desiredEnds[i], hardEnd)
-        let maxEndByNext = nextStart - gap
+        
+        // Only enforce gap if there was originally a significant gap (> 0.1s)
+        // This prevents re-introducing gaps that were intentionally filled
+        let originalGap = (i + 1 < out.count) ? (nextStart - out[i].end) : 0
+        let shouldEnforceGap = originalGap > 0.1 // Only enforce gap if original gap was significant
+        
+        let maxEndByNext = shouldEnforceGap ? (nextStart - gap) : (nextStart - 0.001) // Minimal gap
         let maxEndByWindow = hardEnd - (i + 1 < out.count ? 0 : 0) // keep last inside window
         let targetEnd = min(desiredEnds[i], maxEndByNext, maxEndByWindow)
 
@@ -235,7 +272,15 @@ private func normalizeTiming(
         if abs(newDur - originalDur) > 0.05 {
             stats.durationAdjusted += 1
         }
-        out[i] = TimedSegment(text: out[i].text, start: out[i].start, end: newEnd)
+        
+
+        
+        out[i] = TimedSegment(
+            text: out[i].text, 
+            start: out[i].start, 
+            end: newEnd,
+            wordIndices: out[i].wordIndices
+        )
     }
 
     return out
@@ -337,7 +382,13 @@ func buildTextBoxesFromWordTimings(
     
     // Convert segments to TextBox objects, preserving all original styling
     return segments.map { segment in
-        TextBox(
+        // Extract only the words that belong to this segment
+        let segmentWords = Array(words[segment.wordIndices.start...segment.wordIndices.end])
+        
+        // Ensure segment end time matches the actual end time of the last word
+        let actualSegmentEnd = segmentWords.last?.end ?? segment.end
+        
+        return TextBox(
             text: segment.text,
             fontSize: font.pointSize,
             lastFontSize: originalTextBox.lastFontSize,
@@ -345,7 +396,7 @@ func buildTextBoxesFromWordTimings(
             fontColor: originalTextBox.fontColor,
             strokeColor: originalTextBox.strokeColor,
             strokeWidth: originalTextBox.strokeWidth,
-            timeRange: segment.start...segment.end,
+            timeRange: segment.start...actualSegmentEnd,
             offset: originalTextBox.offset,
             lastOffset: originalTextBox.lastOffset,
             backgroundPadding: originalTextBox.backgroundPadding,
@@ -355,7 +406,7 @@ func buildTextBoxesFromWordTimings(
             shadowX: originalTextBox.shadowX,
             shadowY: originalTextBox.shadowY,
             shadowOpacity: originalTextBox.shadowOpacity,
-            wordTimings: words, // Keep all original words
+            wordTimings: segmentWords, // Only words that belong to this segment
             isKaraokePreset: originalTextBox.isKaraokePreset,
             karaokeType: originalTextBox.karaokeType,
             highlightColor: originalTextBox.highlightColor,
@@ -412,6 +463,8 @@ func processTextBoxesForLayout(
         
         processedTextBoxes.append(contentsOf: newBoxes)
     }
+    
+
     
     return processedTextBoxes
 }

@@ -302,9 +302,9 @@ extension EditorViewModel{
                             editorVM: self,
                             joiner: " ",
                             targetCPS: 15,
-                            minDur: 0.2,
+                            minDur: 0.1,
                             maxDur: 4.5,
-                            gap: 0.08,
+                            gap: 0.01,
                             expandShortCues: false
                         )
                         print("🎬 [EditorViewModel] Text layout optimization applied")

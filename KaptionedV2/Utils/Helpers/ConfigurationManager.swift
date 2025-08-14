@@ -116,12 +116,36 @@ struct FeatureConfig: Codable {
     let enableAdvancedStyling: Bool
     let maxVideoDuration: TimeInterval
     let supportedVideoFormats: [String]
+    let enableTextLayoutOptimization: Bool
+    
+    // Custom decoding to handle missing fields in old configs
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        enableKaraoke = try container.decode(Bool.self, forKey: .enableKaraoke)
+        enableAdvancedStyling = try container.decode(Bool.self, forKey: .enableAdvancedStyling)
+        maxVideoDuration = try container.decode(TimeInterval.self, forKey: .maxVideoDuration)
+        supportedVideoFormats = try container.decode([String].self, forKey: .supportedVideoFormats)
+        
+        // Handle missing enableTextLayoutOptimization field gracefully with default
+        enableTextLayoutOptimization = try container.decodeIfPresent(Bool.self, forKey: .enableTextLayoutOptimization) ?? true
+    }
+    
+    // Standard initializer
+    init(enableKaraoke: Bool, enableAdvancedStyling: Bool, maxVideoDuration: TimeInterval, supportedVideoFormats: [String], enableTextLayoutOptimization: Bool) {
+        self.enableKaraoke = enableKaraoke
+        self.enableAdvancedStyling = enableAdvancedStyling
+        self.maxVideoDuration = maxVideoDuration
+        self.supportedVideoFormats = supportedVideoFormats
+        self.enableTextLayoutOptimization = enableTextLayoutOptimization
+    }
     
     static let `default` = FeatureConfig(
         enableKaraoke: true,
         enableAdvancedStyling: true,
         maxVideoDuration: 300.0, // 5 minutes
-        supportedVideoFormats: ["mp4", "mov", "avi", "mkv"]
+        supportedVideoFormats: ["mp4", "mov", "avi", "mkv"],
+        enableTextLayoutOptimization: true
     )
 }
 
@@ -406,6 +430,11 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.features.supportedVideoFormats
     }
     
+    /// Checks if text layout optimization is enabled
+    func isTextLayoutOptimizationEnabled() -> Bool {
+        return currentConfig.features.enableTextLayoutOptimization
+    }
+    
     /// Gets the default preset name for subtitle generation
     func getDefaultPreset() -> String {
         return currentConfig.transcription.defaultPreset
@@ -589,7 +618,8 @@ class ConfigurationManager: ObservableObject {
             enableKaraoke: remoteConfig.features.enableKaraoke,
             enableAdvancedStyling: remoteConfig.features.enableAdvancedStyling,
             maxVideoDuration: remoteConfig.features.maxVideoDuration > 0 ? remoteConfig.features.maxVideoDuration : defaultConfig.features.maxVideoDuration,
-            supportedVideoFormats: remoteConfig.features.supportedVideoFormats.isEmpty ? defaultConfig.features.supportedVideoFormats : remoteConfig.features.supportedVideoFormats
+            supportedVideoFormats: remoteConfig.features.supportedVideoFormats.isEmpty ? defaultConfig.features.supportedVideoFormats : remoteConfig.features.supportedVideoFormats,
+            enableTextLayoutOptimization: remoteConfig.features.enableTextLayoutOptimization
         )
         
         // Merge revenueCat config

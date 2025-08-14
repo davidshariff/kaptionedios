@@ -293,23 +293,32 @@ extension EditorViewModel{
                 case .success(let subs):
                     print("🎬 [EditorViewModel] Transcription completed with \(subs.count) subtitle segments")
                     
-                    // Optimize all subtitles at once
-                    let optimizedTextBoxes = processTextBoxesForLayout(
-                        subs: subs,
-                        editorVM: self,
-                        joiner: " ",
-                        targetCPS: 15,
-                        minDur: 0.5,
-                        maxDur: 4.5,
-                        gap: 0.08,
-                        expandShortCues: false
-                    )
+                    // Check if text layout optimization is enabled via remote config
+                    let finalTextBoxes: [TextBox]
+                    if ConfigurationManager.shared.isTextLayoutOptimizationEnabled() {
+                        // Optimize all subtitles at once
+                        finalTextBoxes = processTextBoxesForLayout(
+                            subs: subs,
+                            editorVM: self,
+                            joiner: " ",
+                            targetCPS: 15,
+                            minDur: 0.5,
+                            maxDur: 4.5,
+                            gap: 0.08,
+                            expandShortCues: false
+                        )
+                        print("🎬 [EditorViewModel] Text layout optimization applied")
+                    } else {
+                        // Use subtitles as-is without optimization
+                        finalTextBoxes = subs
+                        print("🎬 [EditorViewModel] Text layout optimization disabled, using raw subtitles")
+                    }
                     
                     // Update the text boxes - this will automatically save to the project
-                    self.setText(optimizedTextBoxes)
+                    self.setText(finalTextBoxes)
                     
                     // Notify the TextEditorViewModel about the new text boxes
-                    self.onTextBoxesUpdated?(optimizedTextBoxes)
+                    self.onTextBoxesUpdated?(finalTextBoxes)
                     
                     // Notify that subtitles have been generated
                     self.onSubtitlesGenerated?()

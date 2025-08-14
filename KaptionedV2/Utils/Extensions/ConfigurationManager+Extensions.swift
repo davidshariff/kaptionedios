@@ -44,6 +44,11 @@ extension ConfigurationManager {
         return getSupportedVideoFormats()
     }
     
+    /// Convenience method to check if text layout optimization is enabled
+    var textLayoutOptimizationEnabled: Bool {
+        return isTextLayoutOptimizationEnabled()
+    }
+    
     // MARK: - RevenueCat Configuration Convenience Properties
     
     /// Convenience method to get the configured paywall offering

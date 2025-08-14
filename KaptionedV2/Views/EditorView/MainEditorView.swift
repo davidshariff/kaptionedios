@@ -416,22 +416,23 @@ extension MainEditorView{
                     .foregroundColor(showCrossOverlay ? .yellow : .white)
 
                     Button {
-
-                        let processedTextBoxes = processTextBoxesForLayout(
-                            subs: editorVM.currentVideo?.textBoxes ?? [],
-                            editorVM: editorVM,
-                            joiner: " ",
-                            targetCPS: 15,
-                            minDur: 0.5,
-                            maxDur: 4.5,
-                            gap: 0.08,
-                            expandShortCues: false
-                        )
-
-                        // Update the video with the processed text boxes
-                        editorVM.setText(processedTextBoxes)
-
-                        
+                        // Check if text layout optimization is enabled via remote config
+                        if ConfigurationManager.shared.isTextLayoutOptimizationEnabled() {
+                            let processedTextBoxes = processTextBoxesForLayout(
+                                subs: editorVM.currentVideo?.textBoxes ?? [],
+                                editorVM: editorVM,
+                                joiner: " ",
+                                targetCPS: 15,
+                                minDur: 0.5,
+                                maxDur: 4.5,
+                                gap: 0.08,
+                                expandShortCues: false
+                            )
+                            // Update the video with the processed text boxes
+                            editorVM.setText(processedTextBoxes)
+                        } else {
+                            print("🎬 [MainEditorView] Text layout optimization disabled via remote config")
+                        }
                     } label: {
                         VStack(spacing: 4) {
                             Image(systemName: "rectangle.3.offgrid")

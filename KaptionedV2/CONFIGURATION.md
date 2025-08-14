@@ -37,6 +37,7 @@ let configManager = ConfigurationManager.shared
 let transcriptionURL = configManager.getTranscriptionURL()
 let defaultLanguage = configManager.getDefaultLanguage()
 let isKaraokeEnabled = configManager.isKaraokeEnabled()
+let textLayoutOptimizationEnabled = configManager.isTextLayoutOptimizationEnabled()
 
 // RevenueCat configuration
 let paywallOffering = configManager.getPaywallOffering()
@@ -54,6 +55,7 @@ let paywallAccentColor = configManager.getPaywallAccentColor()
 let url = AppConfig.transcriptionURL
 let language = AppConfig.defaultLanguage
 let karaokeEnabled = AppConfig.karaokeEnabled
+let textLayoutOptimizationEnabled = AppConfig.textLayoutOptimizationEnabled
 
 // RevenueCat configuration
 let offering = AppConfig.paywallOffering
@@ -81,6 +83,21 @@ struct MyView: View {
     }
 }
 ```
+
+## Feature Configuration
+
+### Text Layout Optimization
+
+The `enableTextLayoutOptimization` feature controls whether the app automatically optimizes subtitle layout during transcription. When enabled:
+
+- **Automatic optimization**: During subtitle generation, the app calls `processTextBoxesForLayout()` to optimize text positioning, timing, and readability
+- **Manual optimization**: The "Layout" button in the editor also respects this setting
+- **Performance**: When disabled, subtitles are used as-is from the transcription service without additional processing
+
+This feature can be toggled remotely to:
+- A/B test different subtitle processing approaches
+- Disable optimization for debugging purposes
+- Control processing overhead on different device types
 
 ## Configuration Loading
 
@@ -130,7 +147,8 @@ https://premium-tetra-together.ngrok-free.app/configs
             "enableKaraoke": true,
             "enableAdvancedStyling": true,
             "maxVideoDuration": 300.0,
-            "supportedVideoFormats": ["mp4", "mov"]
+            "supportedVideoFormats": ["mp4", "mov"],
+            "enableTextLayoutOptimization": true
         }
     },
     "message": "Configuration loaded successfully",

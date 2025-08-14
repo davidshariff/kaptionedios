@@ -1,4 +1,5 @@
 import SwiftUI
+import PermissionsSwiftUIPhoto
 
 struct VideoExporterBottomSheetView: View {
     @Binding var isPresented: Bool
@@ -20,7 +21,7 @@ struct VideoExporterBottomSheetView: View {
                 case .unknown:
                     list
                 case .failed:
-                    Text("Failed")
+                    failedView
                 case .loading, .loaded:
                     loadingView
                 case .saved:
@@ -35,14 +36,72 @@ struct VideoExporterBottomSheetView: View {
         .alert("Save video", isPresented: $viewModel.showAlert) {}
         .disabled(viewModel.renderState == .loading)
         .animation(.easeInOut, value: viewModel.renderState)
+        .JMModal(
+            showModal: $viewModel.showPhotoPermissionModal, 
+            for: [.photo], 
+            autoDismiss: true,
+            autoCheckAuthorization: true
+        ) {
+            // Permission granted, continue with export
+            Task {
+                await viewModel.onPhotoPermissionGranted()
+            }
+        } onDisappear: {
+            // Permission denied or modal dismissed
+            if viewModel.renderState == .unknown {
+                // Reset state if user dismissed without granting permission
+                viewModel.renderState = .unknown
+            }
+        }
+        .changeHeaderTo("Permission Needed")
+        .changeHeaderDescriptionTo("Allow Kaptioned to save your edited videos directly to your photo library for easy access and sharing.")
+        .changeBottomDescriptionTo("Your videos will be saved with all your custom text, effects, and styling. You can always manage this permission in Settings later.")
+        .setPermissionComponent(
+            for: .photo,
+            image: AnyView(
+                ZStack {
+                    // Beautiful gradient background
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.blue.opacity(0.1),
+                                    Color.blue.opacity(0.05)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 50, height: 50)
+                    
+                    // Icon with gradient
+                    Image(systemName: "photo.on.rectangle.angled")
+                        .font(.title2)
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Color.blue, Color.blue.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+            ),
+            title: "Photo Library Access",
+            description: "Save your beautifully edited video to your Photos app"
+        )
+        .setAccentColor(toPrimary: Color.blue, toTertiary: Color.blue.opacity(0.8))
     }
     
     private var dynamicSheetHeight: CGFloat {
         switch viewModel.renderState {
-        case .loading, .loaded, .saved:
-            return getRect().height / 2.2  // Bigger for export states
+        case .loading, .loaded:
+            return getRect().height / 1.8  // Bigger for export states
+        case .saved:
+            return getRect().height / 2.2  // Original size for saved state
+        case .failed:
+            return getRect().height / 1.8  // Even bigger for failed state
         default:
-            return getRect().height / 2.8  // Normal size for quality selection
+            return getRect().height / 2.4  // Bigger normal size for quality selection
         }
     }
 }
@@ -449,6 +508,94 @@ extension VideoExporterBottomSheetView{
     private func mainAction(_ action: ExporterViewModel.ActionEnum){
         Task{
            await viewModel.action(action)
+        }
+    }
+    
+    private var failedView: some View {
+        VStack(spacing: 40) {
+            // Error icon and message
+            VStack(spacing: 32) {
+                ZStack {
+                    // Background circle with error styling
+                    Circle()
+                        .fill(Color.red.opacity(0.1))
+                        .frame(width: 100, height: 100)
+                    
+                    // Error icon
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 40, weight: .medium))
+                        .foregroundColor(.red)
+                }
+                
+                VStack(spacing: 20) {
+                    Text("Permission Required")
+                        .font(.title2.bold())
+                        .foregroundColor(.primary)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Text("Photos permission is required to save videos to your photo library.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 20)
+                }
+            }
+            
+            // Action buttons
+            VStack(spacing: 20) {
+                // Open Settings button
+                Button {
+                    openAppSettings()
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "gear")
+                            .font(.system(size: 16, weight: .medium))
+                        Text("Open Settings")
+                            .font(.system(size: 16, weight: .semibold))
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [.blue, .blue.opacity(0.8)],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        ),
+                        in: RoundedRectangle(cornerRadius: 12)
+                    )
+                }
+                
+                // Try Again button
+                Button {
+                    viewModel.renderState = .unknown
+                } label: {
+                    Text("Try Again")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.secondary)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.gray.opacity(0.1))
+                        )
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .padding(.horizontal, 20)
+    }
+    
+    private func openAppSettings() {
+        if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(settingsUrl)
         }
     }
 

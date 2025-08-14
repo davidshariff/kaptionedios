@@ -85,6 +85,7 @@
 		F4740A002E4CEB1400AEF471 /* TakeoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F47409FF2E4CEB1400AEF471 /* TakeoverView.swift */; };
 		F4740A022E4CEB7E00AEF471 /* TakeoverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4740A012E4CEB7E00AEF471 /* TakeoverManager.swift */; };
 		F4740A042E4CEB8300AEF471 /* TakeoverExamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4740A032E4CEB8300AEF471 /* TakeoverExamples.swift */; };
+		F4776F712E4DA3460040D6AB /* PermissionsSwiftUIPhoto in Frameworks */ = {isa = PBXBuildFile; productRef = F4776F702E4DA3460040D6AB /* PermissionsSwiftUIPhoto */; };
 		F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F479D1F12E4753DD0051D208 /* PresetPreviewView.swift */; };
 		F480993B2E4A20AD00E9D936 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = F480993A2E4A20AD00E9D936 /* RevenueCat */; };
 		F480993D2E4A20AD00E9D936 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = F480993C2E4A20AD00E9D936 /* RevenueCatUI */; };
@@ -218,6 +219,7 @@
 			files = (
 				F480993D2E4A20AD00E9D936 /* RevenueCatUI in Frameworks */,
 				F480993B2E4A20AD00E9D936 /* RevenueCat in Frameworks */,
+				F4776F712E4DA3460040D6AB /* PermissionsSwiftUIPhoto in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -655,6 +657,7 @@
 			mainGroup = 5ACFF96229E944FA00827A37;
 			packageReferences = (
 				F48099392E4A20AD00E9D936 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				F4776F6F2E4DA3460040D6AB /* XCRemoteSwiftPackageReference "PermissionsSwiftUI" */,
 			);
 			productRefGroup = 5ACFF96C29E944FA00827A37 /* Products */;
 			projectDirPath = "";
@@ -904,7 +907,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 44;
 				DEVELOPMENT_ASSET_PATHS = "\"KaptionedV2/Preview Content\"";
 				DEVELOPMENT_TEAM = JDAS9UK2R4;
 				ENABLE_PREVIEWS = YES;
@@ -925,7 +928,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = KaptionedApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -943,7 +946,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 44;
 				DEVELOPMENT_ASSET_PATHS = "\"KaptionedV2/Preview Content\"";
 				DEVELOPMENT_TEAM = JDAS9UK2R4;
 				ENABLE_PREVIEWS = YES;
@@ -964,7 +967,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = KaptionedApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -1000,6 +1003,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		F4776F6F2E4DA3460040D6AB /* XCRemoteSwiftPackageReference "PermissionsSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jevonmao/PermissionsSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.11;
+			};
+		};
 		F48099392E4A20AD00E9D936 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
@@ -1011,6 +1022,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F4776F702E4DA3460040D6AB /* PermissionsSwiftUIPhoto */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F4776F6F2E4DA3460040D6AB /* XCRemoteSwiftPackageReference "PermissionsSwiftUI" */;
+			productName = PermissionsSwiftUIPhoto;
+		};
 		F480993A2E4A20AD00E9D936 /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F48099392E4A20AD00E9D936 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;

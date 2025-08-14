@@ -1,6 +1,15 @@
 {
-  "originHash" : "533de208f7207fdd36b99a2f0036707fca012c23defe0e4e99a820106aff336d",
+  "originHash" : "6717cb81121f8d09240888682692cd0c88f26d92c52efc1f026616229c69fe38",
   "pins" : [
+    {
+      "identity" : "permissionsswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jevonmao/PermissionsSwiftUI",
+      "state" : {
+        "revision" : "94b6eaf87d8009757bdf61b64caa74c097c418fa",
+        "version" : "1.5.11"
+      }
+    },
     {
       "identity" : "purchases-ios-spm",
       "kind" : "remoteSourceControl",
@@ -8,6 +17,15 @@
       "state" : {
         "revision" : "d9155fd20755ce900878275d56e4878c7fdfe2c1",
         "version" : "5.34.0"
+      }
+    },
+    {
+      "identity" : "swiftui-introspect",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/siteline/SwiftUI-Introspect",
+      "state" : {
+        "revision" : "121c146fe591b1320238d054ae35c81ffa45f45a",
+        "version" : "0.12.0"
       }
     }
   ],

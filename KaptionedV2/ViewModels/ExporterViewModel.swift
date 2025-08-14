@@ -10,6 +10,7 @@ import Combine
 import Photos
 import UIKit
 import SwiftUI
+import PermissionsSwiftUIPhoto
 
 
 class ExporterViewModel: ObservableObject{
@@ -24,6 +25,7 @@ class ExporterViewModel: ObservableObject{
     @Published var selectedQuality: VideoQuality = .medium
     @Published var currentStage: ExportStage = .preparing
     @Published var overallProgress: Double = 0.0
+    @Published var showPhotoPermissionModal: Bool = false
     private var cancellable = Set<AnyCancellable>()
     private var action: ActionEnum = .save
     private let editorHelper = VideoEditor()
@@ -125,6 +127,44 @@ class ExporterViewModel: ObservableObject{
    
     func action(_ action: ActionEnum) async{
         self.action = action
+        
+        // Check Photos permission before starting export for save action
+        if action == .save {
+
+                    // await MainActor.run {
+                    //     showPhotoPermissionModal = true
+                    // }
+                    // return
+
+            let status = PHPhotoLibrary.authorizationStatus()
+            switch status {
+                case .notDetermined:
+                    print("[ExporterViewModel] Photos permission: notDetermined - showing permission modal")
+                    await MainActor.run {
+                        showPhotoPermissionModal = true
+                    }
+                    return
+                case .denied, .restricted:
+                    print("[ExporterViewModel] Photos permission: denied or restricted - cannot save video")
+                    await MainActor.run {
+                        renderState = .failed(NSError(domain: "PhotosPermission", code: 1, userInfo: [NSLocalizedDescriptionKey: "Photos permission is required to save videos"]))
+                    }
+                    return
+                case .authorized, .limited:
+                    print("[ExporterViewModel] Photos permission: already authorized - proceeding with export")
+                    // Permission already granted, proceed with export
+                    break
+                @unknown default:
+                    print("[ExporterViewModel] Photos permission: unknown default case")
+                    break
+            }
+        }
+        
+        await renderVideo()
+    }
+    
+    /// Called when user grants Photos permission
+    func onPhotoPermissionGranted() async {
         await renderVideo()
     }
 
@@ -175,6 +215,18 @@ class ExporterViewModel: ObservableObject{
     }
     
     private func saveVideoInLib(_ url: URL){
+        
+        // Check if we have permission before attempting to save
+        let status = PHPhotoLibrary.authorizationStatus()
+        guard status == .authorized || status == .limited else {
+            print("[ExporterViewModel] Cannot save video - Photos permission not granted")
+            DispatchQueue.main.async {
+                self.renderState = .failed(NSError(domain: "PhotosPermission", code: 1, userInfo: [NSLocalizedDescriptionKey: "Photos permission is required to save videos"]))
+            }
+            return
+        }
+        
+        // Permission is granted, proceed with saving
         PHPhotoLibrary.shared().performChanges({
             PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
         }) {[weak self] saved, error in
@@ -182,6 +234,10 @@ class ExporterViewModel: ObservableObject{
             if saved {
                 DispatchQueue.main.async {
                     self.renderState = .saved
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.renderState = .failed(error ?? NSError(domain: "SaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to save video"]))
                 }
             }
         }

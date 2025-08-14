@@ -526,8 +526,9 @@ extension VideoEditor{
             qualityMaxDimension = 1080
         }
         
-        // Only scale down if the video is larger than the quality target
-        if maxDimension > qualityMaxDimension {
+        // Only scale down if the video is significantly larger than the quality target
+        // This preserves original dimensions for videos that are already good quality
+        if maxDimension > qualityMaxDimension * 1.2 {
             let scale = qualityMaxDimension / maxDimension
             outputSize = CGSize(width: outputSize.width * scale, height: outputSize.height * scale)
         }

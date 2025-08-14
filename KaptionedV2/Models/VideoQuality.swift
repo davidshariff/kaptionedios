@@ -55,9 +55,9 @@ enum VideoQuality: Int, CaseIterable{
     
     var bitrate: Double{
         switch self {
-        case .low: return 8
-        case .medium: return 15
-        case .high: return 25
+        case .low: return 15
+        case .medium: return 30
+        case .high: return 50
         }
     }
     

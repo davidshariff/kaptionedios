@@ -66,7 +66,7 @@ class VideoEditor{
         ///Prepair new video size
         let naturalSize = videoTrack.naturalSize
         let videoTrackPreferredTransform = try await videoTrack.load(.preferredTransform)
-        let outputSize = getSizeFromOrientation(newSize: videoQuality.size, videoTrackPreferredTransform: videoTrackPreferredTransform)
+        let outputSize = getPreservedVideoSize(naturalSize: naturalSize, videoTrackPreferredTransform: videoTrackPreferredTransform, videoQuality: videoQuality)
         await progressCallback?("processing", 0.15)
         
         ///Create layerInstructions and set new size, scale, mirror
@@ -281,27 +281,32 @@ extension VideoEditor{
     /// Create layers with progress tracking
     private func createLayersWithProgress(_ videoFrame: VideoFrames?, video: Video, size: CGSize, videoComposition: AVMutableVideoComposition, progressCallback: ProgressCallback?, startProgress: Double, endProgress: Double) async -> CMPersistentTrackID? {
         
-        guard let videoFrame else { return nil }
-        
-        let color = videoFrame.frameColor
-        let scale = videoFrame.scale
-        let scaleSize = CGSize(width: size.width * scale, height: size.height * scale)
-        let centerPoint = CGPoint(x: (size.width - scaleSize.width)/2, y: (size.height - scaleSize.height)/2)
-        
-        let videoLayer = CALayer()
-        videoLayer.frame = CGRect(origin: centerPoint, size: scaleSize)
-        let bgLayer = CALayer()
-        bgLayer.frame = CGRect(origin: .zero, size: size)
-        bgLayer.backgroundColor = UIColor(color).cgColor
-        
         let outputLayer = CALayer()
         outputLayer.frame = CGRect(origin: .zero, size: size)
         
         let progressRange = endProgress - startProgress
         let textLayerCount = video.textBoxes.count
         
-        #if targetEnvironment(simulator)
-        // When using additionalLayer variant we must not obscure the underlying video track, so we do NOT add bgLayer or videoLayer here.
+        // Handle frame effect if present
+        if let videoFrame = videoFrame {
+            let color = videoFrame.frameColor
+            let scale = videoFrame.scale
+            let scaleSize = CGSize(width: size.width * scale, height: size.height * scale)
+            let centerPoint = CGPoint(x: (size.width - scaleSize.width)/2, y: (size.height - scaleSize.height)/2)
+            
+            let videoLayer = CALayer()
+            videoLayer.frame = CGRect(origin: centerPoint, size: scaleSize)
+            
+            // Only add background layer if there's actual scaling (video is smaller than frame)
+            if scale < 1.0 {
+                let bgLayer = CALayer()
+                bgLayer.frame = CGRect(origin: .zero, size: size)
+                bgLayer.backgroundColor = UIColor(color).cgColor
+                outputLayer.addSublayer(bgLayer)
+            }
+        }
+        
+        // Always create text layers regardless of frame effect
         if !video.textBoxes.isEmpty {
             for (index, text) in video.textBoxes.enumerated() {
                 let layerProgress = startProgress + (Double(index) / Double(textLayerCount)) * progressRange
@@ -312,60 +317,44 @@ extension VideoEditor{
                 outputLayer.addSublayer(textLayer)
             }
         }
-        #else
-        // Device build keeps background/frame behaviour
-        outputLayer.addSublayer(bgLayer)
-        outputLayer.addSublayer(videoLayer)
-        if !video.textBoxes.isEmpty{
-            for (index, text) in video.textBoxes.enumerated() {
-                let layerProgress = startProgress + (Double(index) / Double(textLayerCount)) * progressRange
-                await progressCallback?("processing", layerProgress)
-                
-                let position = convertSize(text.offset, fromFrame: video.geometrySize, toFrame: size)
-                let textLayer = createTextLayer(with: text, size: size, position: position.size, ratio: position.ratio, duration: video.totalDuration)
-                outputLayer.addSublayer(textLayer)
-            }
-        }
-        #endif
 
-        #if targetEnvironment(simulator)
-        // Work-around simulator crash: use additionalLayer variant. We need to supply a unique trackID and add a matching layer instruction later.
+        // Always use additionalLayer approach to ensure video content is preserved
         let overlayTrackID: CMPersistentTrackID = CMPersistentTrackID(videoComposition.sourceTrackIDForFrameTiming == kCMPersistentTrackID_Invalid ? 1 : videoComposition.sourceTrackIDForFrameTiming + 1)
         videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
             additionalLayer: outputLayer,
             asTrackID: overlayTrackID)
         return overlayTrackID
-        #else
-        videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
-            postProcessingAsVideoLayer: videoLayer,
-            in: outputLayer)
-        return nil
-        #endif
     }
 
     @discardableResult
     private func createLayers(_ videoFrame: VideoFrames?, video: Video, size: CGSize, videoComposition: AVMutableVideoComposition) -> CMPersistentTrackID?{
         
-        guard let videoFrame else {return nil}
-        
-        let color = videoFrame.frameColor
-        let scale = videoFrame.scale
-        let scaleSize = CGSize(width: size.width * scale, height: size.height * scale)
-        let centerPoint = CGPoint(x: (size.width - scaleSize.width)/2, y: (size.height - scaleSize.height)/2)
-        
-        let videoLayer = CALayer()
-        videoLayer.frame = CGRect(origin: centerPoint, size: scaleSize)
-        let bgLayer = CALayer()
-        bgLayer.frame = CGRect(origin: .zero, size: size)
-        bgLayer.backgroundColor = UIColor(color).cgColor
-        
         let outputLayer = CALayer()
         outputLayer.frame = CGRect(origin: .zero, size: size)
         
+        // Handle frame effect if present
+        if let videoFrame = videoFrame {
+            let color = videoFrame.frameColor
+            let scale = videoFrame.scale
+            let scaleSize = CGSize(width: size.width * scale, height: size.height * scale)
+            let centerPoint = CGPoint(x: (size.width - scaleSize.width)/2, y: (size.height - scaleSize.height)/2)
+            
+            let videoLayer = CALayer()
+            videoLayer.frame = CGRect(origin: centerPoint, size: scaleSize)
+            let bgLayer = CALayer()
+            bgLayer.frame = CGRect(origin: .zero, size: size)
+            bgLayer.backgroundColor = UIColor(color).cgColor
+            
+            #if targetEnvironment(simulator)
+            // When using additionalLayer variant we must not obscure the underlying video track, so we do NOT add bgLayer or videoLayer here.
+            #else
+            // Device build keeps background/frame behaviour
+            outputLayer.addSublayer(bgLayer)
+            outputLayer.addSublayer(videoLayer)
+            #endif
+        }
         
-        
-        #if targetEnvironment(simulator)
-        // When using additionalLayer variant we must not obscure the underlying video track, so we do NOT add bgLayer or videoLayer here.
+        // Always create text layers regardless of frame effect
         if !video.textBoxes.isEmpty {
             video.textBoxes.forEach { text in
                 let position = convertSize(text.offset, fromFrame: video.geometrySize, toFrame: size)
@@ -373,18 +362,6 @@ extension VideoEditor{
                 outputLayer.addSublayer(textLayer)
             }
         }
-        #else
-        // Device build keeps background/frame behaviour
-        outputLayer.addSublayer(bgLayer)
-        outputLayer.addSublayer(videoLayer)
-        if !video.textBoxes.isEmpty{
-            video.textBoxes.forEach { text in
-                let position = convertSize(text.offset, fromFrame: video.geometrySize, toFrame: size)
-                let textLayer = createTextLayer(with: text, size: size, position: position.size, ratio: position.ratio, duration: video.totalDuration)
-                outputLayer.addSublayer(textLayer)
-            }
-        }
-        #endif
 
         #if targetEnvironment(simulator)
         // Work-around simulator crash: use additionalLayer variant. We need to supply a unique trackID and add a matching layer instruction later.
@@ -394,9 +371,27 @@ extension VideoEditor{
             asTrackID: overlayTrackID)
         return overlayTrackID
         #else
-        videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
-            postProcessingAsVideoLayer: videoLayer,
-            in: outputLayer)
+        // For device builds, we need to handle the case where there's no frame effect
+        if let videoFrame = videoFrame {
+            let scale = videoFrame.scale
+            let scaleSize = CGSize(width: size.width * scale, height: size.height * scale)
+            let centerPoint = CGPoint(x: (size.width - scaleSize.width)/2, y: (size.height - scaleSize.height)/2)
+            
+            let videoLayer = CALayer()
+            videoLayer.frame = CGRect(origin: centerPoint, size: scaleSize)
+            
+            videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
+                postProcessingAsVideoLayer: videoLayer,
+                in: outputLayer)
+        } else {
+            // No frame effect - create a full-size video layer
+            let videoLayer = CALayer()
+            videoLayer.frame = CGRect(origin: .zero, size: size)
+            
+            videoComposition.animationTool = AVVideoCompositionCoreAnimationTool(
+                postProcessingAsVideoLayer: videoLayer,
+                in: outputLayer)
+        }
         return nil
         #endif
     }
@@ -512,11 +507,44 @@ extension VideoEditor{
     }
     
     
-   private func getSizeFromOrientation(newSize: CGSize, videoTrackPreferredTransform: CGAffineTransform) -> CGSize{
+   private func getPreservedVideoSize(naturalSize: CGSize, videoTrackPreferredTransform: CGAffineTransform, videoQuality: VideoQuality) -> CGSize {
+        let orientation = self.orientationFromTransform(videoTrackPreferredTransform)
+        
+        // Use the original video dimensions - no need to swap since we want to preserve the original
+        var outputSize = naturalSize
+        
+        // Apply quality-based scaling if needed, but maintain aspect ratio
+        let maxDimension = max(outputSize.width, outputSize.height)
+        let qualityMaxDimension: CGFloat
+        
+        switch videoQuality {
+        case .low:
+            qualityMaxDimension = 480
+        case .medium:
+            qualityMaxDimension = 720
+        case .high:
+            qualityMaxDimension = 1080
+        }
+        
+        // Only scale down if the video is larger than the quality target
+        if maxDimension > qualityMaxDimension {
+            let scale = qualityMaxDimension / maxDimension
+            outputSize = CGSize(width: outputSize.width * scale, height: outputSize.height * scale)
+        }
+        
+        // Ensure dimensions are even numbers (required for some codecs)
+        outputSize.width = round(outputSize.width / 2) * 2
+        outputSize.height = round(outputSize.height / 2) * 2
+        
+        print("Original size: \(naturalSize), Output size: \(outputSize)")
+        return outputSize
+    }
+    
+    private func getSizeFromOrientation(newSize: CGSize, videoTrackPreferredTransform: CGAffineTransform) -> CGSize{
         let orientation = self.orientationFromTransform(videoTrackPreferredTransform)
         
         var outputSize = newSize
-        if !orientation.isPortrait{
+        if orientation.isPortrait{
             outputSize.width = newSize.height
             outputSize.height = newSize.width
         }

@@ -289,7 +289,6 @@ struct SubtitleStyle: Identifiable, Equatable {
             print("[SubtitleStyle] Excluded \(excludedPresets.count) presets: \(excludedPresets.joined(separator: ", "))")
         }
         
-        print("[SubtitleStyle] Final preset count: \(presets.count) (built-in + remote - excluded)")
         return presets
     }
     

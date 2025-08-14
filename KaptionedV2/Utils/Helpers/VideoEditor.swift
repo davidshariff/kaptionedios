@@ -577,8 +577,8 @@ extension VideoEditor{
         let calculatedShadowX = model.shadowX * ratio
         let calculatedShadowY = model.shadowY * ratio
 
-        // If wordTimings is present, render karaoke-style text highlighting
-        if let wordTimings = model.wordTimings {
+        // If isKaraokePreset and wordTimings is present, render karaoke-style text highlighting
+        if model.isKaraokePreset, let wordTimings = model.wordTimings {
             return createKaraokeTextLayer(
                 wordTimings: wordTimings,
                 model: model,
@@ -589,7 +589,7 @@ extension VideoEditor{
                 duration: duration
             )
         }
-        
+
         // Check if text has explicit line breaks for center alignment
         let hasExplicitLineBreaks = model.text.contains("\n")
         
@@ -736,11 +736,16 @@ extension VideoEditor{
 
         // Guard: Unwrap optional karaoke properties
         guard let karaokeType = model.karaokeType,
-              let highlightColor = model.highlightColor else {
-            print("❌ Karaoke properties not available for text: \(model.text)")
+              let highlightColor = model.highlightColor,
+              !wordTimings.isEmpty else {
+            print("❌ Karaoke properties not available or wordTimings is empty for text: \(model.text)")
             // Return a simple text layer without karaoke effects
             return createSimpleTextLayer(model: model, position: position, calculatedFontSize: calculatedFontSize, calculatedPadding: calculatedPadding, calculatedCornerRadius: calculatedCornerRadius, duration: duration)
         }
+        
+        // print("🎤 Creating karaoke text layer for: '\(model.text)' with \(wordTimings.count) words")
+        // print("📍 Position: \(position), Font size: \(calculatedFontSize), Karaoke type: \(karaokeType)")
+        // print("🎯 Word timings: \(wordTimings.map { "\($0.text): \($0.start)-\($0.end)" }.joined(separator: ", "))")
         
         // Calculate ratio from the already calculated font size
         let ratio = calculatedFontSize / model.fontSize
@@ -807,6 +812,12 @@ extension VideoEditor{
         let adjustedX = position.width - (paddedSize.width / 2)
         let adjustedY = position.height - (paddedSize.height / 2)
         textLayer.frame = CGRect(x: adjustedX, y: adjustedY, width: paddedSize.width, height: paddedSize.height)
+        
+        // print("🎯 Karaoke layer positioning:")
+        // print("   📍 Input position: \(position)")
+        // print("   📏 Padded size: \(paddedSize)")
+        // print("   📐 Final frame: \(textLayer.frame)")
+        // print("   ⚠️ Potential issue: position.width=\(position.width), position.height=\(position.height)")
         textLayer.backgroundColor = UIColor(model.bgColor).cgColor
         textLayer.cornerRadius = calculatedCornerRadius
 
@@ -817,6 +828,7 @@ extension VideoEditor{
         
         let renderer = UIGraphicsImageRenderer(size: paddedSize, format: rendererFormat)
         let textImage = renderer.image { context in
+
             // Enable high-quality text rendering
             let cgContext = context.cgContext
             cgContext.setShouldAntialias(true)
@@ -825,6 +837,7 @@ extension VideoEditor{
             cgContext.setAllowsFontSmoothing(true)
             cgContext.setAllowsFontSubpixelPositioning(true)
             cgContext.setAllowsFontSubpixelQuantization(true)
+
             // Loop through each word using pre-calculated positions
             for (i, word) in wordTimings.enumerated() {
                 let wordPosition = wordPositions[i]
@@ -883,6 +896,8 @@ extension VideoEditor{
                 let baseLayer = CALayer()
                 baseLayer.frame = wordRect
                 baseLayer.contentsScale = UIScreen.main.scale * 2.0
+                
+                // print("   🔤 Word \(i): '\(word.text)' at frame: \(wordRect)")
                 
                 // Word & Scale karaoke: Add scaling animation for active word
                 if karaokeType == .wordAndScale {
@@ -982,6 +997,14 @@ extension VideoEditor{
                     word.text.draw(in: drawRect, withAttributes: fillAttributes)
                 }
                 baseLayer.contents = baseImage.cgImage
+                
+                // Debug: Check if image was created successfully
+                // if baseImage.cgImage == nil {
+                //     print("   ❌ Failed to create base image for word: '\(word.text)'")
+                // } else {
+                //     print("   ✅ Base image created for word: '\(word.text)' - size: \(baseImage.size)")
+                // }
+                
                 textLayer.addSublayer(baseLayer)
 
                 // --- Highlight layer: green, animated opacity ---
@@ -1089,6 +1112,14 @@ extension VideoEditor{
                     word.text.draw(in: highlightDrawRect, withAttributes: highlightFillAttributes)
                 }
                 highlightLayer.contents = highlightImage.cgImage
+                
+                // Debug: Check if highlight image was created successfully
+                // if highlightImage.cgImage == nil {
+                //     print("   ❌ Failed to create highlight image for word: '\(word.text)'")
+                // } else {
+                //     print("   ✅ Highlight image created for word: '\(word.text)' - size: \(highlightImage.size)")
+                // }
+                
                 textLayer.addSublayer(highlightLayer)
 
                 // Animate the highlight layer's opacity to fade in at the correct time
@@ -1127,6 +1158,13 @@ extension VideoEditor{
         textLayer.contentsScale = UIScreen.main.scale * 2.0
         // Add appearance/disappearance animations for the whole text layer if needed
         addAnimation(to: textLayer, with: model.timeRange, duration: duration)
+        
+        // print("✅ Karaoke text layer created successfully:")
+        // print("   📐 Frame: \(textLayer.frame)")
+        // print("   🎨 Background color: \(textLayer.backgroundColor != nil ? "set" : "none")")
+        // print("   👥 Sublayers count: \(textLayer.sublayers?.count ?? 0)")
+        // print("   ⏱️ Time range: \(model.timeRange.lowerBound) - \(model.timeRange.upperBound)")
+        
         return textLayer
     }
     

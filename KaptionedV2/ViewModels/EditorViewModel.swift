@@ -302,7 +302,7 @@ extension EditorViewModel{
                             editorVM: self,
                             joiner: " ",
                             targetCPS: 15,
-                            minDur: 0.5,
+                            minDur: 0.2,
                             maxDur: 4.5,
                             gap: 0.08,
                             expandShortCues: false

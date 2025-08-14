@@ -1,5 +1,6 @@
 import SwiftUI
 import PermissionsSwiftUIPhoto
+import Photos
 
 struct VideoExporterBottomSheetView: View {
     @Binding var isPresented: Bool
@@ -19,14 +20,14 @@ struct VideoExporterBottomSheetView: View {
             VStack(alignment: .leading){
                 
                 switch viewModel.renderState{
-                case .unknown:
-                    list
-                case .failed:
-                    failedView
-                case .loading, .loaded:
-                    loadingView
-                case .saved:
-                    saveView
+                    case .unknown:
+                        list
+                    case .failed:
+                        failedView
+                    case .loading, .loaded:
+                        loadingView
+                    case .saved:
+                        saveView
                 }
             }
             .hCenter()
@@ -34,7 +35,6 @@ struct VideoExporterBottomSheetView: View {
             .frame(maxHeight: dynamicSheetHeight) // Prevent height changes
         }
         .ignoresSafeArea()
-        .alert("Save video", isPresented: $viewModel.showAlert) {}
         .disabled(viewModel.renderState == .loading)
         .animation(.easeInOut, value: viewModel.renderState)
         .JMModal(
@@ -43,15 +43,17 @@ struct VideoExporterBottomSheetView: View {
             autoDismiss: true,
             autoCheckAuthorization: true
         ) {
-            // Permission granted, continue with export
-            Task {
-                await viewModel.onPhotoPermissionGranted()
-            }
         } onDisappear: {
-            // Permission denied or modal dismissed
-            if viewModel.renderState == .unknown {
-                // Reset state if user dismissed without granting permission
-                viewModel.renderState = .unknown
+            let status = PHPhotoLibrary.authorizationStatus()
+            switch status {
+                case .authorized, .limited:
+                    print("🔐 [UI] Permission granted, starting export")
+                    Task {
+                        await viewModel.onPhotoPermissionGranted()
+                    }
+                default:
+                    print("🔐 [UI] Permission not granted, showing error")
+                    viewModel.renderState = .failed(NSError(domain: "PhotosPermission", code: 1, userInfo: [NSLocalizedDescriptionKey: "Photos permission is required to save videos"]))
             }
         }
         .changeHeaderTo("Permission Needed")
@@ -103,15 +105,6 @@ struct VideoExporterBottomSheetView: View {
             return getRect().height / 1.8  // Even bigger for failed state
         default:
             return getRect().height / 2.4  // Bigger normal size for quality selection
-        }
-    }
-}
-
-struct VideoQualityPopapView2_Previews: PreviewProvider {
-    static var previews: some View {
-        ZStack(alignment: .bottom){
-            Color.secondary.opacity(0.5)
-            VideoExporterBottomSheetView(isPresented: .constant(true), video: Video.mock)
         }
     }
 }

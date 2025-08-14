@@ -20,7 +20,6 @@ class ExporterViewModel: ObservableObject{
     var syncTextBoxes: (() -> [TextBox])?
     
     @Published var renderState: ExportState = .unknown
-    @Published var showAlert: Bool = false
     @Published var progressTimer: TimeInterval = .zero
     @Published var selectedQuality: VideoQuality = .medium
     @Published var currentStage: ExportStage = .preparing
@@ -117,14 +116,11 @@ class ExporterViewModel: ObservableObject{
         print("📊 [ExporterVM] Stage: \(stage), Progress: \(Int(progress * 100))%, Overall: \(Int(overallProgress * 100))%")
     }
     
-
-    
     @MainActor
     private func updateStageProgress(_ stage: ExportStage, progress: Double) {
         currentStage = stage
         overallProgress = progress
     }
-    
     
    
     func action(_ action: ActionEnum) async{
@@ -132,11 +128,6 @@ class ExporterViewModel: ObservableObject{
         
         // Check Photos permission before starting export for save action
         if action == .save {
-
-                    // await MainActor.run {
-                    //     showPhotoPermissionModal = true
-                    // }
-                    // return
 
             let status = PHPhotoLibrary.authorizationStatus()
             switch status {
@@ -154,7 +145,7 @@ class ExporterViewModel: ObservableObject{
                     return
                 case .authorized, .limited:
                     print("[ExporterViewModel] Photos permission: already authorized - proceeding with export")
-                    // Permission already granted, proceed with export
+                    await onPhotoPermissionGranted()
                     break
                 @unknown default:
                     print("[ExporterViewModel] Photos permission: unknown default case")
@@ -162,15 +153,14 @@ class ExporterViewModel: ObservableObject{
             }
         }
         
-        await renderVideo()
     }
     
-    /// Called when user grants Photos permission
+    /// Called when user grants Photos permission, or if already granted
     func onPhotoPermissionGranted() async {
         await renderVideo()
     }
 
-  private func startRenderStateSubs(){
+    private func startRenderStateSubs(){
         $renderState
             .sink {[weak self] state in
                 guard let self = self else {return}

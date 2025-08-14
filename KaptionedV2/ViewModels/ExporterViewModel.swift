@@ -159,6 +159,40 @@ class ExporterViewModel: ObservableObject{
     func onPhotoPermissionGranted() async {
         await renderVideo()
     }
+    
+    /// Calculate estimated export size for a given quality setting
+    func getEstimatedExportSize(for quality: VideoQuality) -> CGSize {
+        let naturalSize = video.frameSize
+        let preferredTransform = CGAffineTransform.identity // Default transform
+        
+        // Use the same logic as VideoEditor.getPreservedVideoSize
+        var outputSize = naturalSize
+        
+        // Apply quality-based scaling if needed, but maintain aspect ratio
+        let maxDimension = max(outputSize.width, outputSize.height)
+        let qualityMaxDimension: CGFloat
+        
+        switch quality {
+        case .low:
+            qualityMaxDimension = 480
+        case .medium:
+            qualityMaxDimension = 720
+        case .high:
+            qualityMaxDimension = 1080
+        }
+        
+        // Only scale down if the video is larger than the quality target
+        if maxDimension > qualityMaxDimension {
+            let scale = qualityMaxDimension / maxDimension
+            outputSize = CGSize(width: outputSize.width * scale, height: outputSize.height * scale)
+        }
+        
+        // Ensure dimensions are even numbers (required for some codecs)
+        outputSize.width = round(outputSize.width / 2) * 2
+        outputSize.height = round(outputSize.height / 2) * 2
+        
+        return outputSize
+    }
 
     private func startRenderStateSubs(){
         $renderState

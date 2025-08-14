@@ -440,7 +440,8 @@ extension VideoExporterBottomSheetView{
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                if let value = type.calculateVideoSize(duration: viewModel.video.totalDuration){
+                let estimatedSize = viewModel.getEstimatedExportSize(for: type)
+                if let value = type.calculateVideoSize(duration: viewModel.video.totalDuration, exportSize: estimatedSize){
                     Text(String(format: "%.1fMb", value))
                 }
             }

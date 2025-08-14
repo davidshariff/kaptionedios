@@ -55,9 +55,9 @@ enum VideoQuality: Int, CaseIterable{
     
     var bitrate: Double{
         switch self {
-        case .low: return 2.5
-        case .medium: return 5
-        case .high: return 8
+        case .low: return 8
+        case .medium: return 15
+        case .high: return 25
         }
     }
     
@@ -73,6 +73,17 @@ enum VideoQuality: Int, CaseIterable{
     
     func calculateVideoSize(duration: Double) -> Double? {
        duration * megaBytesPerSecond
+    }
+    
+    func calculateVideoSize(duration: Double, exportSize: CGSize) -> Double? {
+        let totalPixels = exportSize.width * exportSize.height
+        
+        // Use the original bitrate calculation but with actual export size
+        let bitsPerSecond = bitrate * Double(totalPixels)
+        let bytesPerSecond = bitsPerSecond / 8.0 // Convert to bytes
+        let megaBytesPerSecond = bytesPerSecond / (1024 * 1024)
+        
+        return duration * megaBytesPerSecond
     }
 
 }

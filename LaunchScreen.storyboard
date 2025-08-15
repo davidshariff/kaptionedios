@@ -17,28 +17,27 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="obG-Y5-kRd">
-                                <rect key="frame" x="0.0" y="518" width="393" height="43"/>
+                                <rect key="frame" x="165" y="517" width="74.666666666666686" height="43"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="43" id="5si-pM-IFc"/>
+                                    <constraint firstAttribute="height" constant="43" id="yx7-fl-daT"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
+                                <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LaunchScreen Icon" translatesAutoresizingMaskIntoConstraints="NO" id="5a9-Gj-g0U">
-                                <rect key="frame" x="61" y="222" width="271" height="315"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="Launch Icon 1" translatesAutoresizingMaskIntoConstraints="NO" id="w5J-cR-Q6O">
+                                <rect key="frame" x="32" y="172" width="329" height="318"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" red="0.058823529411764705" green="0.043137254901960784" blue="0.078431372549019607" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
-                            <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="Yd6-lO-GPk"/>
-                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="obG-Y5-kRd" secondAttribute="bottom" constant="257" id="dEo-zZ-jTQ"/>
-                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="163" id="fcM-wz-Edy"/>
-                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="centerX" secondItem="obG-Y5-kRd" secondAttribute="centerX" id="gBb-pp-lVd"/>
-                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="5a9-Gj-g0U" secondAttribute="bottom" constant="281" id="odL-2t-zct"/>
-                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="rgp-bA-Rh9"/>
-                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="61" id="z7y-2z-djk"/>
+                            <constraint firstItem="w5J-cR-Q6O" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="32" id="4hc-Uf-uGJ"/>
+                            <constraint firstItem="w5J-cR-Q6O" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="8GO-Az-bOj"/>
+                            <constraint firstItem="obG-Y5-kRd" firstAttribute="top" secondItem="w5J-cR-Q6O" secondAttribute="bottom" constant="27" id="FsT-3V-gGL"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="obG-Y5-kRd" secondAttribute="bottom" constant="258" id="ZT4-vb-xV6"/>
+                            <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="165" id="m6z-fq-NFM"/>
+                            <constraint firstItem="w5J-cR-Q6O" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="113" id="vuC-aB-3rK"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -48,6 +47,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchScreen Icon" width="1024" height="1024"/>
+        <image name="Launch Icon 1" width="500" height="500"/>
     </resources>
 </document>

@@ -37,7 +37,6 @@
 		5AADA50329F919800064EA7E /* FiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADA50229F919800064EA7E /* FiltersViewModel.swift */; };
 		5AADA50629F9204A0064EA7E /* CorrectionsToolView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADA50529F9204A0064EA7E /* CorrectionsToolView.swift */; };
 		5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */; };
-		5ACFF97629E944FC00827A37 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ACFF97529E944FC00827A37 /* Preview Assets.xcassets */; };
 		5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98029E9454200827A37 /* VideoPlayerManager.swift */; };
 		5ACFF98329E945C300827A37 /* MainEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98229E945C300827A37 /* MainEditorView.swift */; };
 		5ACFF98529E945E000827A37 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98429E945E000827A37 /* EditorViewModel.swift */; };
@@ -673,7 +672,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5ACFF97629E944FC00827A37 /* Preview Assets.xcassets in Resources */,
 				F4486D892E4B3DA7002A8A12 /* LaunchScreen.storyboard in Resources */,
 				F4D376862E4B35DA0056C00B /* Assets.xcassets in Resources */,
 				F48099432E4A27EF00E9D936 /* RevenueCatConfig.storekit in Resources */,

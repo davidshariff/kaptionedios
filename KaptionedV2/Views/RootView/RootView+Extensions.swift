@@ -113,6 +113,8 @@ extension RootView{
                 }
             }
             
+
+            
             // Enhanced new project button for empty state
             VStack(spacing: 12) {
                 AnimatedBorderPhotosPickerFast(selection: $item)

@@ -24,10 +24,20 @@ struct RootView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         
                         if rootVM.projects.isEmpty {
-                            Spacer()
-                            Spacer()
                             // Empty state with welcome design
-                            emptyStateView
+                            VStack {
+                                // Crown button (conditionally shown based on remote config)
+                                if ConfigurationManager.shared.showCrownInEmptyState {
+                                    HStack {
+                                        Spacer()
+                                        subscriptionStatusButton
+                                    }
+                                }
+                                else {
+                                    Spacer()
+                                }
+                                emptyStateView
+                            }
                         } else {
 
                             Text("My projects")
@@ -202,7 +212,7 @@ struct RootView: View {
     
     // MARK: - Subscription Status Button
     
-    private var subscriptionStatusButton: some View {
+    var subscriptionStatusButton: some View {
         Button {
             // Show RevenueCat paywall
             SubscriptionManager.shared.showUpgradePaywall()

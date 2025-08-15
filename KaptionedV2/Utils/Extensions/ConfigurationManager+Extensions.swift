@@ -49,6 +49,11 @@ extension ConfigurationManager {
         return isTextLayoutOptimizationEnabled()
     }
     
+    /// Convenience method to check if crown should be shown in empty state
+    var showCrownInEmptyState: Bool {
+        return shouldShowCrownInEmptyState()
+    }
+    
     // MARK: - RevenueCat Configuration Convenience Properties
     
     /// Convenience method to get the configured paywall offering

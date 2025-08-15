@@ -25,6 +25,21 @@ struct AppConfig {
 }
 ```
 
+### Feature Configuration
+
+The `FeatureConfig` includes various feature flags:
+
+```swift
+struct FeatureConfig {
+    let enableKaraoke: Bool              // Enable karaoke subtitle features
+    let enableAdvancedStyling: Bool      // Enable advanced text styling options
+    let maxVideoDuration: TimeInterval   // Maximum allowed video duration
+    let supportedVideoFormats: [String]  // Supported video file formats
+    let enableTextLayoutOptimization: Bool // Enable text layout optimization
+    let showCrownInEmptyState: Bool      // Show crown/upgrade section in empty state
+}
+```
+
 ## Usage
 
 ### Basic Usage
@@ -46,7 +61,9 @@ let useCustomPaywall = configManager.shouldUseCustomPaywall()
 // Paywall configuration
 let paywallTheme = configManager.getPaywallTheme()
 let paywallAccentColor = configManager.getPaywallAccentColor()
-```
+
+// Empty state crown configuration
+let showCrownInEmptyState = configManager.shouldShowCrownInEmptyState()
 
 ### Using Convenience Extensions
 
@@ -64,6 +81,9 @@ let customPaywall = AppConfig.useCustomPaywall
 // Paywall configuration
 let theme = AppConfig.paywallTheme
 let accentColor = AppConfig.paywallAccentColor
+
+// Empty state crown configuration
+let showCrownInEmptyState = AppConfig.showCrownInEmptyState
 ```
 
 ### In Views
@@ -98,6 +118,19 @@ This feature can be toggled remotely to:
 - A/B test different subtitle processing approaches
 - Disable optimization for debugging purposes
 - Control processing overhead on different device types
+
+### Empty State Crown
+
+The `showCrownInEmptyState` feature controls whether the crown/upgrade section is displayed in the empty state view. When enabled:
+
+- **Crown section**: Shows an animated crown icon with upgrade messaging
+- **Upgrade button**: Provides direct access to the RevenueCat paywall
+- **Visual appeal**: Enhances the empty state with premium branding
+
+This feature can be toggled remotely to:
+- A/B test different empty state designs
+- Control upgrade messaging visibility
+- Disable premium features for certain user segments
 
 ## Configuration Loading
 
@@ -148,7 +181,8 @@ https://premium-tetra-together.ngrok-free.app/configs
             "enableAdvancedStyling": true,
             "maxVideoDuration": 300.0,
             "supportedVideoFormats": ["mp4", "mov"],
-            "enableTextLayoutOptimization": true
+            "enableTextLayoutOptimization": true,
+            "showCrownInEmptyState": true
         }
     },
     "message": "Configuration loaded successfully",

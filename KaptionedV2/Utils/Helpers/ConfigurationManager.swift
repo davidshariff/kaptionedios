@@ -117,6 +117,7 @@ struct FeatureConfig: Codable {
     let maxVideoDuration: TimeInterval
     let supportedVideoFormats: [String]
     let enableTextLayoutOptimization: Bool
+    let showCrownInEmptyState: Bool
     
     // Custom decoding to handle missing fields in old configs
     init(from decoder: Decoder) throws {
@@ -127,17 +128,19 @@ struct FeatureConfig: Codable {
         maxVideoDuration = try container.decode(TimeInterval.self, forKey: .maxVideoDuration)
         supportedVideoFormats = try container.decode([String].self, forKey: .supportedVideoFormats)
         
-        // Handle missing enableTextLayoutOptimization field gracefully with default
+        // Handle missing fields gracefully with defaults
         enableTextLayoutOptimization = try container.decodeIfPresent(Bool.self, forKey: .enableTextLayoutOptimization) ?? true
+        showCrownInEmptyState = try container.decodeIfPresent(Bool.self, forKey: .showCrownInEmptyState) ?? true
     }
     
     // Standard initializer
-    init(enableKaraoke: Bool, enableAdvancedStyling: Bool, maxVideoDuration: TimeInterval, supportedVideoFormats: [String], enableTextLayoutOptimization: Bool) {
+    init(enableKaraoke: Bool, enableAdvancedStyling: Bool, maxVideoDuration: TimeInterval, supportedVideoFormats: [String], enableTextLayoutOptimization: Bool, showCrownInEmptyState: Bool) {
         self.enableKaraoke = enableKaraoke
         self.enableAdvancedStyling = enableAdvancedStyling
         self.maxVideoDuration = maxVideoDuration
         self.supportedVideoFormats = supportedVideoFormats
         self.enableTextLayoutOptimization = enableTextLayoutOptimization
+        self.showCrownInEmptyState = showCrownInEmptyState
     }
     
     static let `default` = FeatureConfig(
@@ -145,7 +148,8 @@ struct FeatureConfig: Codable {
         enableAdvancedStyling: true,
         maxVideoDuration: 300.0, // 5 minutes
         supportedVideoFormats: ["mp4", "mov", "avi", "mkv"],
-        enableTextLayoutOptimization: true
+        enableTextLayoutOptimization: true,
+        showCrownInEmptyState: true
     )
 }
 
@@ -435,6 +439,11 @@ class ConfigurationManager: ObservableObject {
         return currentConfig.features.enableTextLayoutOptimization
     }
     
+    /// Checks if crown should be shown in empty state
+    func shouldShowCrownInEmptyState() -> Bool {
+        return currentConfig.features.showCrownInEmptyState
+    }
+    
     /// Gets the default preset name for subtitle generation
     func getDefaultPreset() -> String {
         return currentConfig.transcription.defaultPreset
@@ -619,7 +628,8 @@ class ConfigurationManager: ObservableObject {
             enableAdvancedStyling: remoteConfig.features.enableAdvancedStyling,
             maxVideoDuration: remoteConfig.features.maxVideoDuration > 0 ? remoteConfig.features.maxVideoDuration : defaultConfig.features.maxVideoDuration,
             supportedVideoFormats: remoteConfig.features.supportedVideoFormats.isEmpty ? defaultConfig.features.supportedVideoFormats : remoteConfig.features.supportedVideoFormats,
-            enableTextLayoutOptimization: remoteConfig.features.enableTextLayoutOptimization
+            enableTextLayoutOptimization: remoteConfig.features.enableTextLayoutOptimization,
+            showCrownInEmptyState: remoteConfig.features.showCrownInEmptyState
         )
         
         // Merge revenueCat config

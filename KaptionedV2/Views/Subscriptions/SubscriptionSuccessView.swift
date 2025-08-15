@@ -143,7 +143,7 @@ struct SubscriptionSuccessView: View {
                         .opacity(isPresented ? 1.0 : 0.0)
                         .animation(.spring(response: 0.5, dampingFraction: 0.6).delay(0.8), value: isPresented)
                     
-                    Text("Enjoy unlimited video creation and premium features!")
+                    Text("Enjoy creating stunning captions for your videos.")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)

@@ -16,17 +16,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="captions.bubble.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="RFV-pj-Vfp">
-                                <rect key="frame" x="76" y="382.33333333333331" width="240" height="128"/>
-                                <color key="tintColor" red="0.90613921761641014" green="0.63535491264565525" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" misplaced="YES" image="video.badge.plus" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="KxT-Nh-GcW">
-                                <rect key="frame" x="128" y="343.33333333333331" width="134" height="88"/>
-                                <color key="tintColor" red="0.40042472280586072" green="1" blue="0.77975659132857922" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="89" id="bsD-uv-ilP"/>
-                                </constraints>
-                            </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loading..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="obG-Y5-kRd">
                                 <rect key="frame" x="0.0" y="518" width="393" height="43"/>
                                 <constraints>
@@ -36,20 +25,20 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LaunchScreen Icon" translatesAutoresizingMaskIntoConstraints="NO" id="5a9-Gj-g0U">
+                                <rect key="frame" x="61" y="222" width="271" height="315"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
+                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="obG-Y5-kRd" firstAttribute="top" secondItem="RFV-pj-Vfp" secondAttribute="bottom" constant="8" id="AfQ-tW-sfI"/>
-                            <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="KIl-tX-aZ3"/>
-                            <constraint firstItem="KxT-Nh-GcW" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="130" id="Y3R-D8-b21"/>
+                            <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" id="Yd6-lO-GPk"/>
                             <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="obG-Y5-kRd" secondAttribute="bottom" constant="257" id="dEo-zZ-jTQ"/>
-                            <constraint firstItem="RFV-pj-Vfp" firstAttribute="centerX" secondItem="obG-Y5-kRd" secondAttribute="centerX" id="k5M-BE-hWM"/>
-                            <constraint firstAttribute="trailing" secondItem="obG-Y5-kRd" secondAttribute="trailing" id="kme-hi-dlp"/>
-                            <constraint firstItem="KxT-Nh-GcW" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="282" id="oPH-qR-KDd"/>
-                            <constraint firstItem="RFV-pj-Vfp" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="76" id="oay-Xp-Nyy"/>
-                            <constraint firstItem="RFV-pj-Vfp" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="322" id="pHt-0R-Hwi"/>
-                            <constraint firstItem="KxT-Nh-GcW" firstAttribute="centerX" secondItem="RFV-pj-Vfp" secondAttribute="centerX" id="u22-TB-0LV"/>
+                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="163" id="fcM-wz-Edy"/>
+                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="centerX" secondItem="obG-Y5-kRd" secondAttribute="centerX" id="gBb-pp-lVd"/>
+                            <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="5a9-Gj-g0U" secondAttribute="bottom" constant="281" id="odL-2t-zct"/>
+                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="rgp-bA-Rh9"/>
+                            <constraint firstItem="5a9-Gj-g0U" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="61" id="z7y-2z-djk"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -59,10 +48,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="captions.bubble.fill" catalog="system" width="128" height="110"/>
-        <image name="video.badge.plus" catalog="system" width="128" height="93"/>
-        <systemColor name="viewFlipsideBackgroundColor">
-            <color red="0.12156862745098039" green="0.12941176470588237" blue="0.14117647058823529" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
+        <image name="LaunchScreen Icon" width="1024" height="1024"/>
     </resources>
 </document>

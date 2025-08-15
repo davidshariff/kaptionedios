@@ -26,7 +26,7 @@
                                 <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="Launch Icon 1" translatesAutoresizingMaskIntoConstraints="NO" id="w5J-cR-Q6O">
-                                <rect key="frame" x="32" y="172" width="329" height="318"/>
+                                <rect key="frame" x="32" y="198" width="329" height="318"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
@@ -34,10 +34,10 @@
                         <constraints>
                             <constraint firstItem="w5J-cR-Q6O" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="32" id="4hc-Uf-uGJ"/>
                             <constraint firstItem="w5J-cR-Q6O" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="8GO-Az-bOj"/>
-                            <constraint firstItem="obG-Y5-kRd" firstAttribute="top" secondItem="w5J-cR-Q6O" secondAttribute="bottom" constant="27" id="FsT-3V-gGL"/>
+                            <constraint firstItem="obG-Y5-kRd" firstAttribute="top" secondItem="w5J-cR-Q6O" secondAttribute="bottom" constant="1" id="FsT-3V-gGL"/>
                             <constraint firstItem="Bcu-3y-fUS" firstAttribute="bottom" secondItem="obG-Y5-kRd" secondAttribute="bottom" constant="258" id="ZT4-vb-xV6"/>
                             <constraint firstItem="obG-Y5-kRd" firstAttribute="leading" secondItem="Bcu-3y-fUS" secondAttribute="leading" constant="165" id="m6z-fq-NFM"/>
-                            <constraint firstItem="w5J-cR-Q6O" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="113" id="vuC-aB-3rK"/>
+                            <constraint firstItem="w5J-cR-Q6O" firstAttribute="top" secondItem="Bcu-3y-fUS" secondAttribute="top" constant="139" id="vuC-aB-3rK"/>
                         </constraints>
                     </view>
                 </viewController>

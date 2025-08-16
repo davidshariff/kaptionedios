@@ -1,8 +1,7 @@
 import SwiftUI
 import AVKit
 
-struct ToolsSectionView: View {
-
+struct PrimaryToolbarView: View {
     
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var editorVM: EditorViewModel

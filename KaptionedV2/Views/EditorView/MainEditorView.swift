@@ -65,7 +65,7 @@ struct MainEditorView: View {
                     Spacer()
 
                     if !showEditSubtitlesMode {
-                        ToolsSectionView(
+                        PrimaryToolbarView(
                             videoPlayer: videoPlayer, 
                             editorVM: editorVM, 
                             textEditor: textEditor, 

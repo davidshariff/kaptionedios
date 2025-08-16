@@ -21,19 +21,33 @@ extension AVAsset {
         }
     }
     
-    func getImage(_ second: Int, compressionQuality: Double = 0.05) -> UIImage?{
-        let imgGenerator = AVAssetImageGenerator(asset: self)
-        guard let cgImage = try? imgGenerator.copyCGImage(at: .init(seconds: Double(second), preferredTimescale: 1), actualTime: nil) else { return nil}
-        let uiImage = UIImage(cgImage: cgImage)
-        guard let imageData = uiImage.jpegData(compressionQuality: compressionQuality), let compressedUIImage = UIImage(data: imageData) else { return nil }
-        return compressedUIImage
-    }
+
     
     
     func videoDuration() -> Double{
         
         self.duration.seconds
 
+    }
+    
+    func generateThumbnail() -> UIImage? {
+        let imgGenerator = AVAssetImageGenerator(asset: self)
+        imgGenerator.appliesPreferredTrackTransform = true
+        
+        // Try to get thumbnail from the middle of the video
+        let duration = self.duration.seconds
+        let middleTime = CMTime(seconds: duration / 2, preferredTimescale: 1)
+        
+        guard let cgImage = try? imgGenerator.copyCGImage(at: middleTime, actualTime: nil) else { 
+            return nil 
+        }
+        
+        let uiImage = UIImage(cgImage: cgImage)
+        
+        // Generate thumbnail that matches the grid cell aspect ratio
+        // Grid cells have fixed height of 150 and adaptive width (roughly square-ish)
+        let targetSize = CGSize(width: 150, height: 150) // Square aspect ratio to match grid cells
+        return uiImage.resize(to: targetSize)
     }
     
 //    guard let duration = try? await self.load(.duration) else { return nil }

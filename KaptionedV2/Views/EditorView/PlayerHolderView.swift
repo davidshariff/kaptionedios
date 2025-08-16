@@ -89,11 +89,9 @@ extension PlayerHolderView{
                     ZStack {
                         Color.white
                         ZStack {
-                            // this is the video player with grid
-                            PlayerViewWithGrid(
-                                player: videoPlayer.videoPlayer,
-                                showGrid: false,
-                                originalVideoSize: video.frameSize
+                            // this is the video player
+                            PlayerView(
+                                player: videoPlayer.videoPlayer
                             )
                             ZStack {
                                 

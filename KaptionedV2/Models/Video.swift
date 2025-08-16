@@ -14,7 +14,7 @@ struct Video: Identifiable{
     var url: URL
     var asset: AVAsset
     let originalDuration: Double
-    var thumbnailsImages = [ThumbnailImage]()
+
     var frameSize: CGSize = .zero
     var geometrySize: CGSize = .zero
     var toolsApplied = [Int]()
@@ -64,38 +64,7 @@ struct Video: Identifiable{
         self.originalDuration = asset.videoDuration()
     }
     
-    mutating func updateThumbnails(_ geo: GeometryProxy){
-        let imagesCount = thumbnailCount(geo)
-        
-        var offset: Float64 = 0
-        for i in 0..<imagesCount{
-            let thumbnailImage = ThumbnailImage(image: asset.getImage(Int(offset)))
-            offset = Double(i) * (originalDuration / Double(imagesCount))
-            thumbnailsImages.append(thumbnailImage)
-        }
-    }
-        
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    
-    private func thumbnailCount(_ geo: GeometryProxy) -> Int {
-        
-        let num = Double(geo.size.width - 32) / Double(70 / 1.5)
-        
-        return Int(ceil(num))
-    }
     
     
     static var mock: Video = .init(url:URL(string: "https://www.google.com/")!)
@@ -123,15 +92,7 @@ extension Double{
 
 
 
-struct ThumbnailImage: Identifiable{
-    var id: UUID = UUID()
-    var image: UIImage?
-    
-    
-    init(image: UIImage? = nil) {
-        self.image = image?.resize(to: .init(width: 250, height: 350))
-    }
-}
+
 
 
 

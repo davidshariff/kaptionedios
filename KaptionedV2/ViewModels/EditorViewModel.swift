@@ -101,7 +101,6 @@ class EditorViewModel: ObservableObject{
 
     func setNewVideo(_ url: URL, geo: GeometryProxy){
         currentVideo = .init(url: url)
-        currentVideo?.updateThumbnails(geo)
         createProject()
         
         // Automatically generate subtitles for new videos
@@ -115,11 +114,6 @@ class EditorViewModel: ObservableObject{
         
         currentVideo = .init(url: url)
         currentVideo?.toolsApplied = project.wrappedTools
-
-
-
-
-        currentVideo?.updateThumbnails(geo)
         currentVideo?.textBoxes = project.wrappedTextBoxes
 
 

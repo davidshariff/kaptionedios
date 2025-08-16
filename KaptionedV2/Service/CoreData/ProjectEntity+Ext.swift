@@ -163,9 +163,12 @@ extension ProjectEntity{
     static func create(video: Video, context: NSManagedObjectContext) -> ProjectEntity {
         let project = ProjectEntity(context: context)
         let id = UUID().uuidString
-        if let image = video.thumbnailsImages.first?.image{
-            FileManager.default.saveImage(with: id, image: image)
+        
+        // Generate and save a single thumbnail for the project
+        if let thumbnail = video.asset.generateThumbnail() {
+            FileManager.default.saveImage(with: id, image: thumbnail)
         }
+        
         project.id = id
         project.createAt = Date.now
         project.url = video.url.lastPathComponent

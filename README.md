@@ -1,6 +1,6 @@
 # VideoEditorSwiftUI
 
-Video editing application with great functionality of tools and the ability to export video in different formats.
+Video editing application that allows users to customize a video and export it exactly as previewed / edited.
 
 ## Features
 
@@ -19,26 +19,6 @@ Video editing application with great functionality of tools and the ability to e
 - Core Data
 - AVFoundation
 - AVKit
-
-## Screenshots 📷
-
-### Projects and editor views
-
-  <div align="center">
-  <img src="screenshots/mainScreen.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/editor_screen.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/fullscreen.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/export_screen.png" height="350" alt="Screenshot"/>
-  </div>
-  
-### Editor tools
-
-  <div align="center">
-  <img src="screenshots/tool_text.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_templates.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_style.png" height="350" alt="Screenshot"/>
-  </div>
-
 
 ### Text Features
 

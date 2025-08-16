@@ -9,38 +9,60 @@ import AVFoundation
 
 class AudioExtractor {
     static func extractAudio(from videoURL: URL, completion: @escaping (URL?) -> Void) {
-        let asset = AVAsset(url: videoURL)
-        guard let audioTrack = asset.tracks(withMediaType: .audio).first else {
-            completion(nil)
-            return
-        }
-        
-        let composition = AVMutableComposition()
-        guard let compositionAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
-            completion(nil)
-            return
-        }
-        
-        do {
-            try compositionAudioTrack.insertTimeRange(CMTimeRange(start: .zero, duration: asset.duration), of: audioTrack, at: .zero)
-            
-            let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("extracted_audio.m4a")
-            
-            let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
-            exportSession?.outputURL = outputURL
-            exportSession?.outputFileType = .m4a
-            
-            exportSession?.exportAsynchronously {
+        Task {
+            do {
+                let asset = AVAsset(url: videoURL)
+                let audioTracks = try await asset.loadTracks(withMediaType: .audio)
+                
+                guard let audioTrack = audioTracks.first else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                    return
+                }
+                
+                let composition = AVMutableComposition()
+                guard let compositionAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                    return
+                }
+                
+                let duration = try await asset.load(.duration)
+                try compositionAudioTrack.insertTimeRange(CMTimeRange(start: .zero, duration: duration), of: audioTrack, at: .zero)
+                
+                let outputURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString + ".m4a")
+                
+                guard let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A) else {
+                    DispatchQueue.main.async {
+                        completion(nil)
+                    }
+                    return
+                }
+                
+                exportSession.outputURL = outputURL
+                exportSession.outputFileType = .m4a
+                
+                await exportSession.export()
+                
                 DispatchQueue.main.async {
-                    if exportSession?.status == .completed {
+                    if exportSession.status == .completed {
                         completion(outputURL)
                     } else {
+                        print("❌ [AudioExtractor] Export failed with status: \(exportSession.status.rawValue)")
+                        if let error = exportSession.error {
+                            print("❌ [AudioExtractor] Export error: \(error)")
+                        }
                         completion(nil)
                     }
                 }
+            } catch {
+                print("❌ [AudioExtractor] Error extracting audio: \(error)")
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
             }
-        } catch {
-            completion(nil)
         }
     }
 }

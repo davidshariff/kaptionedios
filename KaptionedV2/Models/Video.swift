@@ -79,25 +79,15 @@ struct Video: Identifiable{
     
 
     
-    mutating func appliedTool(for tool: ToolEnum){
-        if !isAppliedTool(for: tool){
-            toolsApplied.append(tool.rawValue)
-        }
-    }
+
     
 
     
-    mutating func removeTool(for tool: ToolEnum){
-        if isAppliedTool(for: tool){
-            toolsApplied.removeAll(where: {$0 == tool.rawValue})
-        }
-    }
+
     
 
     
-    func isAppliedTool(for tool: ToolEnum) -> Bool{
-        toolsApplied.contains(tool.rawValue)
-    }
+
     
     
     private func thumbnailCount(_ geo: GeometryProxy) -> Int {

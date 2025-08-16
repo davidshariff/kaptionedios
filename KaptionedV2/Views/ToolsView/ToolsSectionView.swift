@@ -7,7 +7,7 @@ struct ToolsSectionView: View {
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var textEditor: TextEditorViewModel
-    @Binding var showCustomSubslistSheet: Bool
+
     @Binding var showEditSubtitlesMode: Bool
     @Binding var showPresetsBottomSheet: Bool
     @Binding var showPresetConfirm: Bool
@@ -19,11 +19,6 @@ struct ToolsSectionView: View {
         let mainContent = ZStack {
             toolGrid
                 .padding()
-                .opacity(editorVM.selectedTools != nil ? 0 : 1)
-            if let toolState = editorVM.selectedTools, let video = editorVM.currentVideo {
-                bottomSheet(toolState, video)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
         }
                 return mainContent
             .confirmationDialog(
@@ -109,25 +104,14 @@ struct ToolsSectionView: View {
             } message: {
                 Text("This will replace the style of all subtitles with the selected preset.")
             }
-            .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
+
         .onChange(of: editorVM.currentVideo){ newValue in
                     if let video = newValue{
             textEditor.textBoxes = video.textBoxes
         }
         }
-        .onChange(of: textEditor.selectedTextBox) { box in
-            if box != nil{
-                // Text selection is no longer handled through tools
-            }else{
-                editorVM.selectedTools = nil
-            }
-        }
-        .onChange(of: editorVM.selectedTools) { newValue in
-            
-            if newValue == nil{
-                editorVM.setText(textEditor.textBoxes)
-            }
-        }
+
+
     }
 
     private var toolGrid: some View {
@@ -164,116 +148,31 @@ struct ToolsSectionView: View {
                         .multilineTextAlignment(.center)
                 }
             }
-            ForEach(Array(ToolEnum.allCases.filter { $0 != .subslist }.enumerated()), id: \.element) { index, tool in
-                VStack(spacing: 4) {
-                    ToolButtonView(label: tool.title, image: tool.image, isChange: editorVM.currentVideo?.isAppliedTool(for: tool) ?? false) {
-                        editorVM.selectedTools = tool
-                    }
-                    Text(toolLabel(for: tool))
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 4)
-                        .frame(height: 32)
-                        .multilineTextAlignment(.center)
-                }
-            }
-        }
-    }
-}
-
-struct ToolsSectionView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainEditorView(selectedVideoURl: Video.mock.url)
-    }
-}
-
-
-extension ToolsSectionView{
-    
-    @ViewBuilder
-    private func bottomSheet(_ tool: ToolEnum, _ video: Video) -> some View{
-        
-        VStack(spacing: 16){
-            
-            sheetHeader(tool)
-            switch tool {
-            case .subslist:
-                // Trigger custom bottom sheet
-                Color.clear.onAppear {
-                    showCustomSubslistSheet = true
-                    // Close the regular bottom sheet
-                    DispatchQueue.main.async {
-                        editorVM.selectedTools = nil
-                    }
-                }
-            case .presets:
-                // Open the custom bottom sheet and close the bottom sheet
-                Color.clear.onAppear {
+            // Presets button
+            VStack(spacing: 4) {
+                ToolButtonView(label: "Templates", image: "camera.filters", isChange: false) {
                     showPresetsBottomSheet = true
-                    // Close the bottom sheet
-                    DispatchQueue.main.async {
-                        editorVM.selectedTools = nil
-                    }
                 }
+                Text(selectedPreset?.name ?? "Pre-made Templates")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .padding(.top, 4)
+                    .frame(height: 32)
+                    .multilineTextAlignment(.center)
             }
-            Spacer()
         }
-        .padding([.horizontal, .top])
-        .background(Color(.systemGray6))
+    }
+}
+    
+private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
+    switch style.name {
+        case "Highlight by word": return .word
+        case "Background by word": return .wordbg
+        case "Word & Scale": return .wordAndScale
+        default: return .word
     }
 }
 
-extension ToolsSectionView{
-    
-    private func sheetHeader(_ tool: ToolEnum) -> some View{
-        HStack {
-            Button {
-                editorVM.selectedTools = nil
-            } label: {
-                Image(systemName: "chevron.down")
-                    .imageScale(.small)
-                    .foregroundColor(.white)
-                    .padding(10)
-                    .background(Color(.systemGray5), in: RoundedRectangle(cornerRadius: 5))
-            }
-            Spacer()
-            Button {
-                editorVM.reset()
-            } label: {
-                Text("Reset")
-                    .font(.subheadline)
-            }
-            .buttonStyle(.plain)
-        }
-        .overlay {
-            Text(tool.title)
-                .font(.headline)
-        }
-    }
-    
-}
-
-extension ToolsSectionView {
-
-    private func toolLabel(for tool: ToolEnum) -> String {
-        switch tool {
-        case .presets:
-            return selectedPreset?.name ?? "Pre-made Templates"
-        case .subslist:
-            return "Subtitle list"
-        }
-    }
-    
-    private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
-        switch style.name {
-            case "Highlight by word": return .word
-            case "Background by word": return .wordbg
-            case "Word & Scale": return .wordAndScale
-            default: return .word
-        }
-    }
-
-}
 
 
 

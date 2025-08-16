@@ -12,7 +12,7 @@ struct MainEditorView: View {
 
     @State var showVideoQualitySheet: Bool = false
     @State var showBackConfirmation: Bool = false
-    @State var showCustomSubslistSheet: Bool = false
+
     @State var showCrossOverlay: Bool = false // New state for cross overlay
     @State var showEditSubtitlesMode: Bool = false // New state for edit subtitles mode
     @State var showPresetsBottomSheet: Bool = false // State to track presets bottom sheet
@@ -69,7 +69,7 @@ struct MainEditorView: View {
                             videoPlayer: videoPlayer, 
                             editorVM: editorVM, 
                             textEditor: textEditor, 
-                            showCustomSubslistSheet: $showCustomSubslistSheet,
+
                             showEditSubtitlesMode: $showEditSubtitlesMode,
                             showPresetsBottomSheet: $showPresetsBottomSheet,
                             showPresetConfirm: $showPresetConfirm,
@@ -459,7 +459,6 @@ extension MainEditorView{
             Button {
                 // Ensure text boxes are synced before export
                 editorVM.setText(textEditor.textBoxes)
-                editorVM.selectedTools = nil
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                     showVideoQualitySheet.toggle()
                 }

@@ -7,7 +7,7 @@ import Combine
 class EditorViewModel: ObservableObject{
     
     @Published var currentVideo: Video?
-    @Published var selectedTools: ToolEnum?
+
 
     @Published var isSelectVideo: Bool = true
     
@@ -161,7 +161,6 @@ extension EditorViewModel{
     
     func setText(_ textBox: [TextBox]){
         currentVideo?.textBoxes = textBox
-        setTools()
         // Trigger saving indicator and update project
         onSaving?()
         updateProject()
@@ -179,32 +178,11 @@ extension EditorViewModel{
     
 
     
-    func setTools(){
-        guard let selectedTools else { return }
-        currentVideo?.appliedTool(for: selectedTools)
-    }
-    
-    func removeTool(){
-        guard let selectedTools else { return }
-        self.currentVideo?.removeTool(for: selectedTools)
-    }
+
     
 
   
-    func reset(){
-        guard let selectedTools else {return}
-       
-        switch selectedTools{
-            
-        case .subslist:
-            break
-        case .presets:
-            break
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-            self.removeTool()
-        }
-    }
+
     
     /// Generates subtitles for the current video
     /// This method can be used both for manual generation (via Generate button) and automatic generation (for new videos)

@@ -699,9 +699,7 @@ extension MainEditorView{
         if let project, let url = project.videoURL{
             videoPlayer.loadState = .loaded(url)
             editorVM.setProject(project, geo: proxy)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                videoPlayer.setFilters(mainFilter: CIFilter(name: project.filterName ?? ""))
-            }
+
             // Log video information when loading project
             logVideoInfo(url: url, isNewVideo: false)
         }

@@ -274,24 +274,7 @@ extension VideoPlayerManager{
 extension VideoPlayerManager{
     
 
-    func setFilters(mainFilter: CIFilter?){
-       
-        let filters = FilterHelper.createFilters(mainFilter: mainFilter, nil)
-        
-        if filters.isEmpty{
-            return
-        }
-        self.pause()
-        DispatchQueue.global(qos: .userInteractive).async {
-            let composition = self.videoPlayer.currentItem?.asset.setFilters(filters)
-            self.videoPlayer.currentItem?.videoComposition = composition
-        }
-    }
-        
-    func removeFilter(){
-        pause()
-        videoPlayer.currentItem?.videoComposition = nil
-    }
+
 }
 
 enum LoadState: Identifiable, Equatable {
@@ -315,37 +298,4 @@ enum PlayerScrubState{
 }
 
 
-extension AVAsset{
-    
-    func setFilter(_ filter: CIFilter) -> AVVideoComposition{
-        let composition = AVVideoComposition(asset: self, applyingCIFiltersWithHandler: { request in
-            filter.setValue(request.sourceImage, forKey: kCIInputImageKey)
-            
-            guard let output = filter.outputImage else {return}
-            
-            request.finish(with: output, context: nil)
-        })
-        
-        return composition
-    }
-    
-    func setFilters(_ filters: [CIFilter]) -> AVVideoComposition{
-        let composition = AVVideoComposition(asset: self, applyingCIFiltersWithHandler: { request in
-            
-            let source = request.sourceImage
-            var output = source
-            
-            filters.forEach { filter in
-                filter.setValue(output, forKey: kCIInputImageKey)
-                if let image = filter.outputImage{
-                    output = image
-                }
-            }
-            
-            request.finish(with: output, context: nil)
-        })
-        
-        return composition
-    }
 
-}

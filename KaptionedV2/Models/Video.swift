@@ -18,7 +18,7 @@ struct Video: Identifiable{
     var frameSize: CGSize = .zero
     var geometrySize: CGSize = .zero
     var toolsApplied = [Int]()
-    var filterName: String? = nil
+
 
     var textBoxes: [TextBox] = []
     var audio: Audio?
@@ -97,9 +97,7 @@ struct Video: Identifiable{
         }
     }
     
-    mutating func setFilter(_ filter: String?){
-        filterName = filter
-    }
+
     
     func isAppliedTool(for tool: ToolEnum) -> Bool{
         toolsApplied.contains(tool.rawValue)

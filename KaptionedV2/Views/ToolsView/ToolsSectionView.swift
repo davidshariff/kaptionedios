@@ -3,7 +3,7 @@ import AVKit
 
 struct ToolsSectionView: View {
 
-    @StateObject var filtersVM = FiltersViewModel()
+    
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var textEditor: TextEditorViewModel
@@ -111,10 +111,9 @@ struct ToolsSectionView: View {
             }
             .animation(.easeIn(duration: 0.15), value: editorVM.selectedTools)
         .onChange(of: editorVM.currentVideo){ newValue in
-            if let video = newValue, let image = video.thumbnailsImages.first?.image{
-                filtersVM.loadFilters(for: image)
-                textEditor.textBoxes = video.textBoxes
-            }
+                    if let video = newValue{
+            textEditor.textBoxes = video.textBoxes
+        }
         }
         .onChange(of: textEditor.selectedTextBox) { box in
             if box != nil{

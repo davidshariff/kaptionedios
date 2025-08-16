@@ -115,7 +115,7 @@ class EditorViewModel: ObservableObject{
         
         currentVideo = .init(url: url)
         currentVideo?.toolsApplied = project.wrappedTools
-        currentVideo?.filterName = project.filterName
+
 
 
 
@@ -158,14 +158,7 @@ extension EditorViewModel{
 extension EditorViewModel{
     
     
-    func setFilter(_ filter: String?){
-        currentVideo?.setFilter(filter)
-        if filter != nil{
-            setTools()
-        }else{
-            removeTool()
-        }
-    }
+
     
     
     func setText(_ textBox: [TextBox]){

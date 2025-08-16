@@ -170,8 +170,6 @@ extension ProjectEntity{
         project.createAt = Date.now
         project.url = video.url.lastPathComponent
 
-        project.filterName = video.filterName
-
         project.textBoxes = []
     
         context.saveContext()
@@ -181,8 +179,6 @@ extension ProjectEntity{
     
     static func update(for video: Video, project: ProjectEntity){
         if let context = project.managedObjectContext {
-            project.filterName = video.filterName
-
             project.appliedTools = video.toolsApplied.map({String($0)}).joined(separator: ",")
 
             let boxes = createTextBoxes(context: context, boxes: video.textBoxes)

@@ -11,7 +11,6 @@ struct MainEditorView: View {
     var selectedVideoURl: URL?
 
     @State var showVideoQualitySheet: Bool = false
-    @State var showRecordView: Bool = false
     @State var showBackConfirmation: Bool = false
     @State var showCustomSubslistSheet: Bool = false
     @State var showCrossOverlay: Bool = false // New state for cross overlay
@@ -297,11 +296,7 @@ struct MainEditorView: View {
         }
         .navigationBarBackButtonHidden(true)
         .ignoresSafeArea(.all, edges: .top)
-        .fullScreenCover(isPresented: $showRecordView) {
-            RecordVideoView{ url in
-                videoPlayer.loadState = .loaded(url)
-            }
-        }
+
         .statusBar(hidden: true)
         .onChange(of: scenePhase) { phase in
             saveProject(phase)

@@ -29,4 +29,16 @@ extension TimeInterval {
         return String(format: "%0.2d:%0.2d", minutes, seconds)
         
     }
+    
+    func formatterTimeString() -> String {
+        guard self > 0 && self < Double.infinity else {
+            return "0:00"
+        }
+        let time = NSInteger(self)
+        
+        let seconds = time % 60
+        let minutes = (time / 60) % 60
+        
+        return String(format: "%d:%02d", minutes, seconds)
+    }
 }

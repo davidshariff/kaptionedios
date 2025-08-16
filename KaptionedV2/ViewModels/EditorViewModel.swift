@@ -120,7 +120,7 @@ class EditorViewModel: ObservableObject{
         
         guard let url = project.videoURL else {return}
         
-        currentVideo = .init(url: url, rate: Float(project.rate), rotation: project.rotation)
+        currentVideo = .init(url: url, rotation: project.rotation)
         currentVideo?.toolsApplied = project.wrappedTools
         currentVideo?.filterName = project.filterName
 
@@ -195,10 +195,7 @@ extension EditorViewModel{
     
 
     
-    func updateRate(rate: Float){
-        currentVideo?.updateRate(rate)
-        setTools()
-    }
+
     
     func rotate(){
         currentVideo?.rotate()

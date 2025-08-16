@@ -170,7 +170,6 @@ extension ProjectEntity{
         project.createAt = Date.now
         project.url = video.url.lastPathComponent
         project.rotation = video.rotation
-        project.rate = Double(video.rate)
         project.isMirror = video.isMirror
         project.filterName = video.filterName
 
@@ -189,7 +188,6 @@ extension ProjectEntity{
 
             project.appliedTools = video.toolsApplied.map({String($0)}).joined(separator: ",")
             project.rotation = video.rotation
-            project.rate = Double(video.rate)
             project.frameColor = video.videoFrames?.frameColor.toHex()
             project.frameScale = video.videoFrames?.scaleValue ?? 0
             let boxes = createTextBoxes(context: context, boxes: video.textBoxes)

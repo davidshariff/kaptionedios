@@ -15,7 +15,6 @@ struct Video: Identifiable{
     var asset: AVAsset
     let originalDuration: Double
     var thumbnailsImages = [ThumbnailImage]()
-    var rate: Float = 1.0
     var rotation: Double = 0
     var frameSize: CGSize = .zero
     var geometrySize: CGSize = .zero
@@ -76,11 +75,10 @@ struct Video: Identifiable{
         self.originalDuration = asset.videoDuration()
     }
     
-    init(url: URL, rate: Float = 1.0, rotation: Double = 0){
+    init(url: URL, rotation: Double = 0){
         self.url = url
         self.asset = AVAsset(url: url)
         self.originalDuration = asset.videoDuration()
-        self.rate = rate
         self.rotation = rotation
     }
     
@@ -95,14 +93,7 @@ struct Video: Identifiable{
         }
     }
         
-    ///reset and update
-    mutating func updateRate(_ rate: Float){
-        self.rate = rate
-    }
-    
-    mutating func resetRate(){
-        updateRate(1.0)
-    }
+
     
     mutating func rotate(){
         rotation = rotation.nextAngle()

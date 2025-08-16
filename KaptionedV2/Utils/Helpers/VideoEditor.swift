@@ -54,7 +54,7 @@ class VideoEditor{
         await progressCallback?("processing", 0.05)
         
         ///Set new timeScale
-        try await setTimeScaleAndAddTracks(to: composition, from: asset, audio: video.audio, timeScale: Float64(video.rate), videoVolume: video.volume)
+        try await setTimeScaleAndAddTracks(to: composition, from: asset, audio: video.audio, timeScale: 1.0, videoVolume: video.volume)
         await progressCallback?("processing", 0.10)
         
         ///Get new timeScale video track

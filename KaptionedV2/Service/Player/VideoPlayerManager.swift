@@ -55,7 +55,7 @@ final class VideoPlayerManager: ObservableObject{
         if isPlaying{
             pause()
         }else{
-            play(video.rate)
+            play()
         }
     }
     
@@ -143,7 +143,7 @@ final class VideoPlayerManager: ObservableObject{
         }
     }
 
-    private func play(_ rate: Float?){
+    private func play(){
         
         AVAudioSession.sharedInstance().configurePlaybackSession()
         
@@ -163,13 +163,6 @@ final class VideoPlayerManager: ObservableObject{
         videoPlayer.play()
         if isSetAudio{
             audioPlayer.play()
-        }
-        
-        if let rate{
-            videoPlayer.rate = rate
-            if isSetAudio{
-                audioPlayer.play()
-            }
         }
         
         if let currentDurationRange, videoPlayer.currentItem?.duration.seconds ?? 0 >= currentDurationRange.upperBound{

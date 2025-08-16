@@ -33,7 +33,6 @@
 		5A5F95732A0166D90041C3F6 /* Swipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F95722A0166D90041C3F6 /* Swipe.swift */; };
 		5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A62B4792A02B85500E84093 /* AudioRecorderManager.swift */; };
 		5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8B3FCE29F0360B00FB9858 /* Video.swift */; };
-		5A9EDD0029F03DCD0014A1CF /* VideoSpeedSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9EDCFF29F03DCD0014A1CF /* VideoSpeedSlider.swift */; };
 		5AADA50329F919800064EA7E /* FiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AADA50229F919800064EA7E /* FiltersViewModel.swift */; };
 		5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */; };
 		5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98029E9454200827A37 /* VideoPlayerManager.swift */; };
@@ -130,7 +129,6 @@
 		5A5F95722A0166D90041C3F6 /* Swipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Swipe.swift; sourceTree = "<group>"; };
 		5A62B4792A02B85500E84093 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		5A8B3FCE29F0360B00FB9858 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
-		5A9EDCFF29F03DCD0014A1CF /* VideoSpeedSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoSpeedSlider.swift; sourceTree = "<group>"; };
 		5AADA50229F919800064EA7E /* FiltersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiltersViewModel.swift; sourceTree = "<group>"; };
 		5ACFF96B29E944FA00827A37 /* KaptionedV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KaptionedV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEditorSwiftUIApp.swift; sourceTree = "<group>"; };
@@ -272,7 +270,6 @@
 				5AFA25C229FA726900B820D0 /* Frames */,
 				5AE2A2AC29F880B6003D217F /* Filters */,
 				5AE2A2AB29F8808F003D217F /* Crop */,
-				5AE2A2AA29F88077003D217F /* Speed */,
 				5AF25B5A29F14907005E0467 /* CropperView */,
 				5ACFF9B129EEA93400827A37 /* ToolsSectionView.swift */,
 			);
@@ -470,14 +467,6 @@
 				5AE2A29F29F465BD003D217F /* VideoEditor.swift */,
 			);
 			path = Helpers;
-			sourceTree = "<group>";
-		};
-		5AE2A2AA29F88077003D217F /* Speed */ = {
-			isa = PBXGroup;
-			children = (
-				5A9EDCFF29F03DCD0014A1CF /* VideoSpeedSlider.swift */,
-			);
-			path = Speed;
 			sourceTree = "<group>";
 		};
 		5AE2A2AB29F8808F003D217F /* Crop */ = {
@@ -681,7 +670,6 @@
 				F48099B12E4B1B5F00E9D936 /* SubscriptionSuccessView.swift in Sources */,
 				F48099B22E4B1B5F00E9D936 /* NoVideosLeftView.swift in Sources */,
 				5A5F95712A0135490041C3F6 /* TextEditorViewModel.swift in Sources */,
-				5A9EDD0029F03DCD0014A1CF /* VideoSpeedSlider.swift in Sources */,
 				5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */,
 				F420A4D12E3F807200D0763E /* RulerView.swift in Sources */,
 				5A3D13B829F2A3E60027E25E /* TestCroppedView.swift in Sources */,

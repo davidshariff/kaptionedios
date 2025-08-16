@@ -15,10 +15,8 @@ struct Video: Identifiable{
     var asset: AVAsset
     let originalDuration: Double
     var thumbnailsImages = [ThumbnailImage]()
-    var rotation: Double = 0
     var frameSize: CGSize = .zero
     var geometrySize: CGSize = .zero
-    var isMirror: Bool = false
     var toolsApplied = [Int]()
     var filterName: String? = nil
     var videoFrames: VideoFrames? = nil
@@ -39,10 +37,8 @@ struct Video: Identifiable{
             return .zero
         }
         
-        // Account for rotation - swap dimensions if rotated 90° or 270°
-        let isRotated = Int(rotation) % 180 != 0
-        let videoWidth = isRotated ? frameSize.height : frameSize.width
-        let videoHeight = isRotated ? frameSize.width : frameSize.height
+        let videoWidth = frameSize.width
+        let videoHeight = frameSize.height
         
         // Calculate aspect ratio and fit within container
         let aspectRatio = videoWidth / videoHeight
@@ -75,13 +71,6 @@ struct Video: Identifiable{
         self.originalDuration = asset.videoDuration()
     }
     
-    init(url: URL, rotation: Double = 0){
-        self.url = url
-        self.asset = AVAsset(url: url)
-        self.originalDuration = asset.videoDuration()
-        self.rotation = rotation
-    }
-    
     mutating func updateThumbnails(_ geo: GeometryProxy){
         let imagesCount = thumbnailCount(geo)
         
@@ -95,9 +84,7 @@ struct Video: Identifiable{
         
 
     
-    mutating func rotate(){
-        rotation = rotation.nextAngle()
-    }
+
     
     mutating func appliedTool(for tool: ToolEnum){
         if !isAppliedTool(for: tool){

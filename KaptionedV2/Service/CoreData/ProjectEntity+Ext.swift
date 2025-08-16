@@ -169,8 +169,7 @@ extension ProjectEntity{
         project.id = id
         project.createAt = Date.now
         project.url = video.url.lastPathComponent
-        project.rotation = video.rotation
-        project.isMirror = video.isMirror
+
         project.filterName = video.filterName
 
         project.textBoxes = []
@@ -182,12 +181,9 @@ extension ProjectEntity{
     
     static func update(for video: Video, project: ProjectEntity){
         if let context = project.managedObjectContext {
-            project.isMirror = video.isMirror
-
             project.filterName = video.filterName
 
             project.appliedTools = video.toolsApplied.map({String($0)}).joined(separator: ",")
-            project.rotation = video.rotation
             project.frameColor = video.videoFrames?.frameColor.toHex()
             project.frameScale = video.videoFrames?.scaleValue ?? 0
             let boxes = createTextBoxes(context: context, boxes: video.textBoxes)

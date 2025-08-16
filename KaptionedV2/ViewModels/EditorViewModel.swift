@@ -76,10 +76,8 @@ class EditorViewModel: ObservableObject{
         let containerHeight = calculateVideoPlayerHeight(for: videoPlayerSize, screenHeight: screenHeight, headerHeight: headerHeight)
         let containerWidth = screenWidth
         
-        // Account for rotation - swap dimensions if rotated 90° or 270°
-        let isRotated = Int(video.rotation) % 180 != 0
-        let videoWidth = isRotated ? naturalSize.height : naturalSize.width
-        let videoHeight = isRotated ? naturalSize.width : naturalSize.height
+        let videoWidth = naturalSize.width
+        let videoHeight = naturalSize.height
         
         // Calculate aspect ratio and fit within container
         let aspectRatio = videoWidth / videoHeight
@@ -120,7 +118,7 @@ class EditorViewModel: ObservableObject{
         
         guard let url = project.videoURL else {return}
         
-        currentVideo = .init(url: url, rotation: project.rotation)
+        currentVideo = .init(url: url)
         currentVideo?.toolsApplied = project.wrappedTools
         currentVideo?.filterName = project.filterName
 
@@ -197,15 +195,7 @@ extension EditorViewModel{
     
 
     
-    func rotate(){
-        currentVideo?.rotate()
-        setTools()
-    }
-    
-    func toggleMirror(){
-        currentVideo?.isMirror.toggle()
-        setTools()
-    }
+
     
     func setAudio(_ audio: Audio){
         currentVideo?.audio = audio

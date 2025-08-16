@@ -76,7 +76,7 @@ class VideoEditor{
             newSize: outputSize,
             track: videoTrack,
             scale: video.videoFrames?.scale ?? 1,
-            isMirror: video.isMirror
+            isMirror: false
         )
         await progressCallback?("processing", 0.20)
         

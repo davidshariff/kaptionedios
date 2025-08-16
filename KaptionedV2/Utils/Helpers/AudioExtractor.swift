@@ -1,4 +1,10 @@
-import Foundation
+//
+//  AudioExtractor.swift
+//  VideoEditorSwiftUI
+//
+//  Created by Bogdan Zykov on 04.05.2023.
+//
+
 import AVFoundation
 
 class AudioExtractor {
@@ -8,27 +14,33 @@ class AudioExtractor {
             completion(nil)
             return
         }
+        
         let composition = AVMutableComposition()
         guard let compositionAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: kCMPersistentTrackID_Invalid) else {
             completion(nil)
             return
         }
+        
         do {
             try compositionAudioTrack.insertTimeRange(CMTimeRange(start: .zero, duration: asset.duration), of: audioTrack, at: .zero)
-            let outputURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(UUID().uuidString + ".m4a")
-            guard let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A) else {
-                completion(nil)
-                return
-            }
-            exporter.outputURL = outputURL
-            exporter.outputFileType = .m4a
-            exporter.exportAsynchronously {
+            
+            let outputURL = FileManager.default.temporaryDirectory.appendingPathComponent("extracted_audio.m4a")
+            
+            let exportSession = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A)
+            exportSession?.outputURL = outputURL
+            exportSession?.outputFileType = .m4a
+            
+            exportSession?.exportAsynchronously {
                 DispatchQueue.main.async {
-                    completion(exporter.status == .completed ? outputURL : nil)
+                    if exportSession?.status == .completed {
+                        completion(outputURL)
+                    } else {
+                        completion(nil)
+                    }
                 }
             }
         } catch {
             completion(nil)
         }
     }
-} 
+}

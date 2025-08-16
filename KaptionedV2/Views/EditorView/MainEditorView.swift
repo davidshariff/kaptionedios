@@ -34,7 +34,7 @@ struct MainEditorView: View {
     @StateObject var editorVM = EditorViewModel()
     @StateObject var videoPlayer = VideoPlayerManager()
     @StateObject var textEditor = TextEditorViewModel()
-    @StateObject var audioRecorder = AudioRecorderManager()
+
     
 
     
@@ -480,11 +480,11 @@ extension MainEditorView{
     
     private func centerSection() -> some View {
 
-        VStack(spacing: 0) {
+                VStack(spacing: 0) {
 
             // PlayerControl section - always present but conditionally visible
             if !showEditSubtitlesMode, !showPresetsBottomSheet {
-                PlayerControl(recorderManager: audioRecorder, editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
+                PlayerControl(editorVM: editorVM, videoPlayer: videoPlayer, textEditor: textEditor)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
                     .animation(.easeInOut(duration: 0.3), value: showEditSubtitlesMode)
                 Spacer()

@@ -184,13 +184,7 @@ extension ProjectEntity{
             let boxes = createTextBoxes(context: context, boxes: video.textBoxes)
             project.wrappedBoxes = Set(boxes)
             
-            if let audio = video.audio{
-                project.audio = AudioEntity.createAudio(context: context,
-                                             url: audio.url.absoluteString,
-                                             duration: audio.duration)
-            }else{
-                project.audio = nil
-            }
+
             
             context.saveContext()
         }

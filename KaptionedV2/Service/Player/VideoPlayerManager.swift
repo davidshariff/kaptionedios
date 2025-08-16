@@ -18,10 +18,8 @@ final class VideoPlayerManager: ObservableObject{
     @Published var selectedItem: PhotosPickerItem?
     @Published var loadState: LoadState = .unknown
     @Published private(set) var videoPlayer = AVPlayer()
-    @Published private(set) var audioPlayer = AVPlayer()
     @Published private(set) var isPlaying: Bool = false
     @Published var isMuted: Bool = false
-    private var isSetAudio: Bool = false
     private var cancellable = Set<AnyCancellable>()
     private var timeObserver: Any?
     private var currentDurationRange: ClosedRange<Double>?
@@ -42,9 +40,7 @@ final class VideoPlayerManager: ObservableObject{
             case .scrubEnded(let seekTime):
                 pause()
                 seek(seekTime, player: videoPlayer)
-                if isSetAudio{
-                    seek(seekTime, player: audioPlayer)
-                }
+
             default : break
             }
         }
@@ -59,14 +55,7 @@ final class VideoPlayerManager: ObservableObject{
         }
     }
     
-    func setAudio(_ url: URL?){
-        guard let url else {
-            isSetAudio = false
-            return
-        }
-        audioPlayer = .init(url: url)
-        isSetAudio = true
-    }
+
     
     private func onSubsUrl(){
         $loadState
@@ -113,33 +102,20 @@ final class VideoPlayerManager: ObservableObject{
     func pause(){
         if isPlaying{
             videoPlayer.pause()
-            if isSetAudio{
-                audioPlayer.pause()
-            }
         }
     }
     
-    func setVolume(_ isVideo: Bool, value: Float){
+    func setVolume(_ value: Float){
         pause()
-        if isVideo{
-            videoPlayer.volume = value
-        }else{
-            audioPlayer.volume = value
-        }
+        videoPlayer.volume = value
     }
     
     func toggleMute() {
         isMuted.toggle()
         if isMuted {
             videoPlayer.volume = 0
-            if isSetAudio {
-                audioPlayer.volume = 0
-            }
         } else {
             videoPlayer.volume = 1
-            if isSetAudio {
-                audioPlayer.volume = 1
-            }
         }
     }
 
@@ -150,20 +126,11 @@ final class VideoPlayerManager: ObservableObject{
         if let currentDurationRange{
             if currentTime >= currentDurationRange.upperBound{
                 seek(currentDurationRange.lowerBound, player: videoPlayer)
-                if isSetAudio{
-                    seek(currentDurationRange.lowerBound, player: audioPlayer)
-                }
             }else{
                 seek(videoPlayer.currentTime().seconds, player: videoPlayer)
-                if isSetAudio{
-                    seek(audioPlayer.currentTime().seconds, player: audioPlayer)
-                }
             }
         }
         videoPlayer.play()
-        if isSetAudio{
-            audioPlayer.play()
-        }
         
         if let currentDurationRange, videoPlayer.currentItem?.duration.seconds ?? 0 >= currentDurationRange.upperBound{
             NotificationCenter.default.addObserver(forName: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: videoPlayer.currentItem, queue: .main) { _ in
@@ -178,9 +145,6 @@ final class VideoPlayerManager: ObservableObject{
     
     func seekToTime(_ seconds: Double) {
         seek(seconds, player: videoPlayer)
-        if isSetAudio {
-            seek(seconds, player: audioPlayer)
-        }
         // Update currentTime immediately so the UI reflects the new position
         currentTime = seconds
     }
@@ -231,13 +195,11 @@ final class VideoPlayerManager: ObservableObject{
         
         // Clear players by replacing with empty ones
         videoPlayer = AVPlayer()
-        audioPlayer = AVPlayer()
         
         // Reset state
         currentTime = .zero
         loadState = .unknown
         isPlaying = false
-        isSetAudio = false
         currentDurationRange = nil
         scrubState = .reset
         

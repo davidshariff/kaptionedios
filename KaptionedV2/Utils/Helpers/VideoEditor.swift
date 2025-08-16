@@ -54,7 +54,7 @@ class VideoEditor{
         await progressCallback?("processing", 0.05)
         
         ///Set new timeScale
-        try await setTimeScaleAndAddTracks(to: composition, from: asset, audio: video.audio, timeScale: 1.0, videoVolume: video.volume)
+        try await setTimeScaleAndAddTracks(to: composition, from: asset, timeScale: 1.0)
         await progressCallback?("processing", 0.10)
         
         ///Get new timeScale video track
@@ -344,9 +344,7 @@ extension VideoEditor{
     ///Set new time scale for audio and video tracks
     private func setTimeScaleAndAddTracks(to composition: AVMutableComposition,
                                           from asset: AVAsset,
-                                          audio: Audio?,
-                                          timeScale: Float64,
-                                          videoVolume: Float) async throws{
+                                          timeScale: Float64) async throws{
         
         let videoTracks =  try await asset.loadTracks(withMediaType: .video)
         let audioTracks = try await asset.loadTracks(withMediaType: .audio)
@@ -355,10 +353,10 @@ extension VideoEditor{
         //TotalTimeRange
         let oldTimeRange = CMTimeRangeMake(start: CMTime.zero, duration: duration)
         let destinationTimeRange = CMTimeMultiplyByFloat64(duration, multiplier:(1/timeScale))
-        // set new time range in audio track
+        // set new time range in audio track - always include original video audio if it exists
         if audioTracks.count > 0 {
             let compositionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID: kCMPersistentTrackID_Invalid)
-            compositionAudioTrack?.preferredVolume = videoVolume
+            compositionAudioTrack?.preferredVolume = 1.0 // Default volume for original audio
             let audioTrack = audioTracks.first!
             try compositionAudioTrack?.insertTimeRange(oldTimeRange, of: audioTrack, at: CMTime.zero)
             compositionAudioTrack?.scaleTimeRange(oldTimeRange, toDuration: destinationTimeRange)
@@ -379,15 +377,7 @@ extension VideoEditor{
             compositionVideoTrack?.preferredTransform = videoPreferredTransform
         }
         
-        // Adding audio
-        if let audio{
-            let asset = AVAsset(url: audio.url)
-            guard let secondAudioTrack = try await asset.loadTracks(withMediaType: .audio).first else { return }
-            let compositionAudioTrack = composition.addMutableTrack(withMediaType: AVMediaType.audio, preferredTrackID: kCMPersistentTrackID_Invalid)
-            compositionAudioTrack?.preferredVolume = audio.volume
-            try compositionAudioTrack?.insertTimeRange(oldTimeRange, of: secondAudioTrack, at: CMTime.zero)
-            compositionAudioTrack?.scaleTimeRange(oldTimeRange, toDuration: destinationTimeRange)
-        }
+
     }
     
 

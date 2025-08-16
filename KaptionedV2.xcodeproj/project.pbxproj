@@ -18,17 +18,11 @@
 		5A3D13B629F190260027E25E /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3D13B529F190260027E25E /* Preview.swift */; };
 		5A5E6F972A039EFD00F5EBF8 /* AVAudioSession+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F962A039EFD00F5EBF8 /* AVAudioSession+Ext.swift */; };
 		5A5E6F992A03A11D00F5EBF8 /* TimeInterval+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F982A03A11D00F5EBF8 /* TimeInterval+Ext.swift */; };
-		5A5E6F9B2A03A24B00F5EBF8 /* AudioButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F9A2A03A24B00F5EBF8 /* AudioButtonView.swift */; };
-		5A5E6F9D2A03C88A00F5EBF8 /* AudioSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F9C2A03C88A00F5EBF8 /* AudioSheetView.swift */; };
-		5A5E6F9F2A03CA1800F5EBF8 /* AudioModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F9E2A03CA1800F5EBF8 /* AudioModel.swift */; };
-		5A5E6FA12A03CCFE00F5EBF8 /* AudioEntity+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA02A03CCFE00F5EBF8 /* AudioEntity+Ext.swift */; };
-		5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA22A04F3BF00F5EBF8 /* RecorderButtonView.swift */; };
 		5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA42A05124700F5EBF8 /* UIImage+Ext.swift */; };
 		5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F956C2A00FA180041C3F6 /* TextToolsView.swift */; };
 		5A5F956F2A01351B0041C3F6 /* TextEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F956E2A01351B0041C3F6 /* TextEditorView.swift */; };
 		5A5F95712A0135490041C3F6 /* TextEditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F95702A0135490041C3F6 /* TextEditorViewModel.swift */; };
 		5A5F95732A0166D90041C3F6 /* Swipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5F95722A0166D90041C3F6 /* Swipe.swift */; };
-		5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A62B4792A02B85500E84093 /* AudioRecorderManager.swift */; };
 		5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8B3FCE29F0360B00FB9858 /* Video.swift */; };
 		5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */; };
 		5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98029E9454200827A37 /* VideoPlayerManager.swift */; };
@@ -61,7 +55,6 @@
 		F4486D892E4B3DA7002A8A12 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F4486D882E4B3DA7002A8A12 /* LaunchScreen.storyboard */; };
 		F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */; };
 		F459F77B2E34D970006E9DD1 /* TranscriptionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */; };
-		F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */; };
 		F459F77F2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */; };
 		F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */; };
 		F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */; };
@@ -85,6 +78,7 @@
 		F48A90912E4876840031E9DF /* BottomSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90902E4876840031E9DF /* BottomSheetView.swift */; };
 		F48A90932E487EB40031E9DF /* LanguagePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */; };
 		F48A90992E4893290031E9DF /* RootView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48A90982E4893290031E9DF /* RootView+Extensions.swift */; };
+		F48D1AEB2E50770900F9BF8F /* AudioExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48D1AEA2E50770900F9BF8F /* AudioExtractor.swift */; };
 		F4A4B7892E40DABC00016ED9 /* StyleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */; };
 		F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */; };
 		F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */; };
@@ -105,17 +99,11 @@
 		5A3D13B529F190260027E25E /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		5A5E6F962A039EFD00F5EBF8 /* AVAudioSession+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioSession+Ext.swift"; sourceTree = "<group>"; };
 		5A5E6F982A03A11D00F5EBF8 /* TimeInterval+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Ext.swift"; sourceTree = "<group>"; };
-		5A5E6F9A2A03A24B00F5EBF8 /* AudioButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioButtonView.swift; sourceTree = "<group>"; };
-		5A5E6F9C2A03C88A00F5EBF8 /* AudioSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSheetView.swift; sourceTree = "<group>"; };
-		5A5E6F9E2A03CA1800F5EBF8 /* AudioModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioModel.swift; sourceTree = "<group>"; };
-		5A5E6FA02A03CCFE00F5EBF8 /* AudioEntity+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioEntity+Ext.swift"; sourceTree = "<group>"; };
-		5A5E6FA22A04F3BF00F5EBF8 /* RecorderButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecorderButtonView.swift; sourceTree = "<group>"; };
 		5A5E6FA42A05124700F5EBF8 /* UIImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Ext.swift"; sourceTree = "<group>"; };
 		5A5F956C2A00FA180041C3F6 /* TextToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextToolsView.swift; sourceTree = "<group>"; };
 		5A5F956E2A01351B0041C3F6 /* TextEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditorView.swift; sourceTree = "<group>"; };
 		5A5F95702A0135490041C3F6 /* TextEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEditorViewModel.swift; sourceTree = "<group>"; };
 		5A5F95722A0166D90041C3F6 /* Swipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Swipe.swift; sourceTree = "<group>"; };
-		5A62B4792A02B85500E84093 /* AudioRecorderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorderManager.swift; sourceTree = "<group>"; };
 		5A8B3FCE29F0360B00FB9858 /* Video.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Video.swift; sourceTree = "<group>"; };
 		5ACFF96B29E944FA00827A37 /* KaptionedV2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KaptionedV2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ACFF96E29E944FA00827A37 /* VideoEditorSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoEditorSwiftUIApp.swift; sourceTree = "<group>"; };
@@ -149,7 +137,6 @@
 		F4486D882E4B3DA7002A8A12 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeSubsHelper.swift; sourceTree = "<group>"; };
 		F459F77A2E34D970006E9DD1 /* TranscriptionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionHelper.swift; sourceTree = "<group>"; };
-		F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
 		F459F77E2E34E5FC006E9DD1 /* InteractiveVerticalScrubber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveVerticalScrubber.swift; sourceTree = "<group>"; };
 		F466E1252E473DB900517F2E /* KaraokeColorSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaraokeColorSelectionView.swift; sourceTree = "<group>"; };
 		F4727B6F2E37E6130072FBE6 /* PlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayheadView.swift; sourceTree = "<group>"; };
@@ -170,6 +157,7 @@
 		F48A90902E4876840031E9DF /* BottomSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetView.swift; sourceTree = "<group>"; };
 		F48A90922E487EB40031E9DF /* LanguagePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerSheet.swift; sourceTree = "<group>"; };
 		F48A90982E4893290031E9DF /* RootView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView+Extensions.swift"; sourceTree = "<group>"; };
+		F48D1AEA2E50770900F9BF8F /* AudioExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioExtractor.swift; sourceTree = "<group>"; };
 		F4A4B7872E40DABC00016ED9 /* StyleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleEditorView.swift; sourceTree = "<group>"; };
 		F4AFDAE72E3BD87400D3466A /* TimelineSliderUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineSliderUtils.swift; sourceTree = "<group>"; };
 		F4AFDAEA2E3E301B00D3466A /* PresetsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsListView.swift; sourceTree = "<group>"; };
@@ -208,7 +196,6 @@
 				5A3D13AA29F184330027E25E /* CoreDataContainer.xcdatamodeld */,
 				5A3D13AF29F186160027E25E /* CoreDataManager.swift */,
 				5A3D13B129F187960027E25E /* ProjectEntity+Ext.swift */,
-				5A5E6FA02A03CCFE00F5EBF8 /* AudioEntity+Ext.swift */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -225,29 +212,12 @@
 			path = Text;
 			sourceTree = "<group>";
 		};
-		5A62B4772A0284E400E84093 /* Audio */ = {
-			isa = PBXGroup;
-			children = (
-				5A5E6F9C2A03C88A00F5EBF8 /* AudioSheetView.swift */,
-			);
-			path = Audio;
-			sourceTree = "<group>";
-		};
-		5A62B4782A02B83700E84093 /* Recorder */ = {
-			isa = PBXGroup;
-			children = (
-				5A62B4792A02B85500E84093 /* AudioRecorderManager.swift */,
-			);
-			path = Recorder;
-			sourceTree = "<group>";
-		};
 		5A9EDCFE29F03D800014A1CF /* ToolsView */ = {
 			isa = PBXGroup;
 			children = (
 				F4A4B7882E40DABC00016ED9 /* Style */,
 				F4AFDAEB2E3E301B00D3466A /* PresetsList */,
 				F42230EE2E350495001CCAE5 /* PresetsList */,
-				5A62B4772A0284E400E84093 /* Audio */,
 				5A5F95692A004BBF0041C3F6 /* Text */,
 				5ACFF9B129EEA93400827A37 /* ToolsSectionView.swift */,
 			);
@@ -289,7 +259,6 @@
 		5ACFF97C29E9450000827A37 /* Service */ = {
 			isa = PBXGroup;
 			children = (
-				5A62B4782A02B83700E84093 /* Recorder */,
 				5A17E08A29F1804B00DB4A47 /* CoreData */,
 				5ACFF99329EC89FD00827A37 /* Player */,
 			);
@@ -319,7 +288,6 @@
 				5AE2A2A529F6A949003D217F /* VideoQuality.swift */,
 				F418B72A2E40919D0021E298 /* VideoPlayerSize.swift */,
 				5AFA25C729FC186F00B820D0 /* TextBox.swift */,
-				5A5E6F9E2A03CA1800F5EBF8 /* AudioModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -377,8 +345,6 @@
 			children = (
 				F4D67B702E47C46700164273 /* SubtitleGenerationLoader.swift */,
 				5ACFF9A829EE878500827A37 /* ToolButtonView.swift */,
-				5A5E6F9A2A03A24B00F5EBF8 /* AudioButtonView.swift */,
-				5A5E6FA22A04F3BF00F5EBF8 /* RecorderButtonView.swift */,
 			);
 			path = Buttons;
 			sourceTree = "<group>";
@@ -431,10 +397,10 @@
 			isa = PBXGroup;
 			children = (
 				F485E5362E49EB64007A680B /* ConfigurationManager.swift */,
+				F48D1AEA2E50770900F9BF8F /* AudioExtractor.swift */,
 				F4E9C1C02E4C4FB000DD5330 /* TextSizingHelper.swift */,
 				F4740A032E4CEB8300AEF471 /* TakeoverExamples.swift */,
 				F480993F2E4A258200E9D936 /* RevenueCatManager.swift */,
-				F459F77C2E34DB51006E9DD1 /* AudioExtractor.swift */,
 				F4740A012E4CEB7E00AEF471 /* TakeoverManager.swift */,
 				F485E53C2E4A05B0007A680B /* SubscriptionManager.swift */,
 				F459F7762E34D32C006E9DD1 /* KaraokeSubsHelper.swift */,
@@ -570,7 +536,6 @@
 				5A3D13B229F187960027E25E /* ProjectEntity+Ext.swift in Sources */,
 				5ACFF9AC29EE8B9400827A37 /* PlayerView.swift in Sources */,
 				F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */,
-				5A5E6F9F2A03CA1800F5EBF8 /* AudioModel.swift in Sources */,
 				F4E9C1C12E4C4FB000DD5330 /* TextSizingHelper.swift in Sources */,
 				5ACFF98529E945E000827A37 /* EditorViewModel.swift in Sources */,
 				F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */,
@@ -585,13 +550,10 @@
 				5A8B3FCF29F0360B00FB9858 /* Video.swift in Sources */,
 				F479D1F22E4753DD0051D208 /* PresetPreviewView.swift in Sources */,
 				F418B72B2E40919D0021E298 /* VideoPlayerSize.swift in Sources */,
-				5A62B47A2A02B85500E84093 /* AudioRecorderManager.swift in Sources */,
 				5ACFF99829ED53FB00827A37 /* View+Ext.swift in Sources */,
 				5A5F956F2A01351B0041C3F6 /* TextEditorView.swift in Sources */,
 				F4AFDAE82E3BD87400D3466A /* TimelineSliderUtils.swift in Sources */,
-				5A5E6FA12A03CCFE00F5EBF8 /* AudioEntity+Ext.swift in Sources */,
 				5ACFF98129E9454200827A37 /* VideoPlayerManager.swift in Sources */,
-				F459F77D2E34DB51006E9DD1 /* AudioExtractor.swift in Sources */,
 				5AE2A2A629F6A949003D217F /* VideoQuality.swift in Sources */,
 				5A3D13AE29F185400027E25E /* FileManager.swift in Sources */,
 				5ACFF9A129ED9C4000827A37 /* CustomSlider.swift in Sources */,
@@ -599,12 +561,12 @@
 				F459F7772E34D32C006E9DD1 /* KaraokeSubsHelper.swift in Sources */,
 				F485E53B2E4A0589007A680B /* SubscriptionModel.swift in Sources */,
 				5ACFF9B029EE8C6C00827A37 /* PlayerHolderView.swift in Sources */,
-				5A5E6FA32A04F3BF00F5EBF8 /* RecorderButtonView.swift in Sources */,
 				5ACFF9B229EEA93400827A37 /* ToolsSectionView.swift in Sources */,
 				F48099B02E4B1B5F00E9D936 /* AlreadySubscribedView.swift in Sources */,
 				F48099B12E4B1B5F00E9D936 /* SubscriptionSuccessView.swift in Sources */,
 				F48099B22E4B1B5F00E9D936 /* NoVideosLeftView.swift in Sources */,
 				5A5F95712A0135490041C3F6 /* TextEditorViewModel.swift in Sources */,
+				F48D1AEB2E50770900F9BF8F /* AudioExtractor.swift in Sources */,
 				5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */,
 				F420A4D12E3F807200D0763E /* RulerView.swift in Sources */,
 				5ACFF96F29E944FA00827A37 /* VideoEditorSwiftUIApp.swift in Sources */,
@@ -613,7 +575,6 @@
 				5A5E6F992A03A11D00F5EBF8 /* TimeInterval+Ext.swift in Sources */,
 				F423FFC22E3E581D0024399E /* PresetsListView.swift in Sources */,
 				F4727B702E37E6130072FBE6 /* PlayheadView.swift in Sources */,
-				5A5E6F9B2A03A24B00F5EBF8 /* AudioButtonView.swift in Sources */,
 				5ACFF99F29ED709B00827A37 /* RangeSliderView.swift in Sources */,
 				F4740A002E4CEB1400AEF471 /* TakeoverView.swift in Sources */,
 				5A5E6F972A039EFD00F5EBF8 /* AVAudioSession+Ext.swift in Sources */,
@@ -626,7 +587,6 @@
 				5AE2A2A829F6BA29003D217F /* ExporterViewModel.swift in Sources */,
 				5ACFF99D29ED5C4900827A37 /* SliderView.swift in Sources */,
 				F408C7812E407AB60091D316 /* TextToolbar.swift in Sources */,
-				5A5E6F9D2A03C88A00F5EBF8 /* AudioSheetView.swift in Sources */,
 				F4AFDAEC2E3E301B00D3466A /* PresetsListView.swift in Sources */,
 				5A5F95732A0166D90041C3F6 /* Swipe.swift in Sources */,
 				F485E5372E49EB64007A680B /* ConfigurationManager.swift in Sources */,

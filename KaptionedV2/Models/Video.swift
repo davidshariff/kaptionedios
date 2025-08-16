@@ -21,8 +21,6 @@ struct Video: Identifiable{
 
 
     var textBoxes: [TextBox] = []
-    var audio: Audio?
-    var volume: Float = 1.0
 
     var totalDuration: Double{
         originalDuration
@@ -87,9 +85,7 @@ struct Video: Identifiable{
         }
     }
     
-    mutating func setVolume(_ value: Float){
-        volume = value
-    }
+
     
     mutating func removeTool(for tool: ToolEnum){
         if isAppliedTool(for: tool){

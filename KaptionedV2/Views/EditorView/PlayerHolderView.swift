@@ -139,10 +139,8 @@ extension PlayerHolderView{
 
 }
 
-
 struct PlayerControl: View{
 
-    @ObservedObject var recorderManager: AudioRecorderManager
     @ObservedObject var editorVM: EditorViewModel
     @ObservedObject var videoPlayer: VideoPlayerManager
     @ObservedObject var textEditor: TextEditorViewModel
@@ -176,11 +174,6 @@ struct PlayerControl: View{
             )
             .frame(width: 300)
         }
-    }
-    
-    private var recordButton: some View{
-        Rectangle()
-            .opacity(0)
     }
     
     private var controlsSection: some View{
@@ -232,3 +225,6 @@ struct PlayerControl: View{
         .frame(height: 70)
     }
 }
+
+
+

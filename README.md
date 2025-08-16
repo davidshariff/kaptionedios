@@ -5,13 +5,10 @@ Video editing application with great functionality of tools and the ability to e
 ## Features
 
 - **Creating a video project and saving its progress**
-- **Cropping video**
-- **Changing the video duration**
-- **Adding filters and effects to videos**
-- **Adding text to a video**
-- **Recording and editing audio**
-- **Adding frames to videos**
+- **Adding text to a video with advanced styling**
+- **Karaoke subtitle effects with word-by-word highlighting**
 - **Saving or share videos in different sizes**
+- **Professional subtitle burning with native iOS frameworks**
 
 ## Includes
 
@@ -37,14 +34,9 @@ Video editing application with great functionality of tools and the ability to e
 ### Editor tools
 
   <div align="center">
-  <img src="screenshots/tool_cut.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_speed.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_audio.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_filters.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_crop.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_frame.png" height="350" alt="Screenshot"/>
   <img src="screenshots/tool_text.png" height="350" alt="Screenshot"/>
-  <img src="screenshots/tool_corrections.png" height="350" alt="Screenshot"/>
+  <img src="screenshots/tool_templates.png" height="350" alt="Screenshot"/>
+  <img src="screenshots/tool_style.png" height="350" alt="Screenshot"/>
   </div>
 
 
@@ -74,8 +66,8 @@ This app implements professional-grade subtitle burning using **native iOS frame
 
 The app uses a **two-pass rendering pipeline** in `VideoEditor.swift`:
 
-1. **First Pass**: `resizeAndLayerOperation()` - Handles video resizing, text overlay composition, and basic effects
-2. **Second Pass**: `applyFiltersOperations()` - Applies color filters and final processing
+1. **First Pass**: `resizeAndLayerOperation()` - Handles video resizing and text overlay composition
+2. **Second Pass**: Final processing and export with native subtitle burning
 
 ### 🚀 Native Text Rendering (No FFmpeg)
 
@@ -148,11 +140,11 @@ attributedString.draw(in: drawingRect) // Respects paragraph alignment
 
 ### 🎤 Karaoke Subtitle System
 
-The app has sophisticated karaoke support with three modes:
+The app has sophisticated karaoke support with multiple modes:
 
-1. **Letter-by-letter**: `KaraokeType.letter` - Highlights each letter progressively
-2. **Word-by-word**: `KaraokeType.word` - Highlights each word
-3. **Word background**: `KaraokeType.wordbg` - Adds background highlighting per word
+1. **Word-by-word**: `KaraokeType.word` - Highlights each word progressively
+2. **Word background**: `KaraokeType.wordbg` - Adds background highlighting per word
+3. **Word & Scale**: `KaraokeType.wordAndScale` - Combines highlighting with dynamic scaling
 
 #### 🎯 Multi-Line Karaoke Implementation
 
@@ -407,7 +399,7 @@ case .wordAndScale:                     // ✅ Handle new type
 
 #### 3. UI Integration (Preset Selection)
 
-**Update `ToolsSectionView.swift`:**
+**Update `PrimaryToolbarView.swift`:**
 ```swift
 private func getKaraokeType(for style: SubtitleStyle) -> KaraokeType {
     switch style.name {
@@ -731,3 +723,35 @@ The app includes a comprehensive subscription system that enforces video creatio
 The system is now ready to use! Users will get 1 free video, and then be prompted to upgrade when they try to create more. The encrypted storage ensures they can't simply reset the app to get more free videos.
 
 The app now uses RevenueCat for professional subscription management with built-in paywall UI! 🎉
+
+## 🧹 Recent Codebase Cleanup
+
+The codebase has been streamlined to focus on core subtitle and text editing functionality:
+
+### **Removed Features:**
+- Camera and video recording functionality
+- Video cropping and rotation tools
+- Speed adjustment controls
+- Audio recording and overlay features
+- Video filters and effects
+- Frame/border effects
+- Color correction tools
+- Cut/trim functionality
+
+### **Retained Core Features:**
+- ✅ Professional subtitle burning with native iOS frameworks
+- ✅ Advanced text styling (font, color, stroke, shadow, background)
+- ✅ Karaoke subtitle effects with multiple animation modes
+- ✅ Multi-line text support with explicit line breaks
+- ✅ WYSIWYG preview-export consistency
+- ✅ Project management with thumbnail generation
+- ✅ Subscription system with RevenueCat integration
+
+### **Architecture Improvements:**
+- Simplified `PrimaryToolbarView` (renamed from `ToolsSectionView`)
+- Removed unused slider components and test views
+- Streamlined thumbnail system (single thumbnail per project)
+- Cleaner video player without grid overlay functionality
+- Optimized memory usage by removing unused components
+
+The app now focuses on its core strength: **professional-grade subtitle creation and burning** with native iOS performance and App Store compliance.

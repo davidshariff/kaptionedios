@@ -8,7 +8,7 @@ class EditorViewModel: ObservableObject{
     
     @Published var currentVideo: Video?
     @Published var selectedTools: ToolEnum?
-    @Published var frames = VideoFrames()
+
     @Published var isSelectVideo: Bool = true
     
     @Published var isLoading: Bool = false
@@ -90,12 +90,7 @@ class EditorViewModel: ObservableObject{
             renderedWidth = containerHeight * aspectRatio
         }
         
-        // Apply video frames scaling if active
-        if let frames = video.videoFrames, frames.isActive {
-            let scale = frames.scale
-            renderedWidth *= scale
-            renderedHeight *= scale
-        }
+
         
         // Center the video in the container
         let x = (containerWidth - renderedWidth) / 2
@@ -123,10 +118,7 @@ class EditorViewModel: ObservableObject{
         currentVideo?.filterName = project.filterName
 
 
-        let frame = VideoFrames(scaleValue: project.frameScale, frameColor: project.wrappedColor)
-        currentVideo?.videoFrames = frame
 
-        self.frames = frame
         currentVideo?.updateThumbnails(geo)
         currentVideo?.textBoxes = project.wrappedTextBoxes
 
@@ -186,10 +178,7 @@ extension EditorViewModel{
         onTextBoxesUpdated?(textBox)
     }
     
-    func setFrames(){
-        currentVideo?.videoFrames = frames
-        setTools()
-    }
+
     
 
     

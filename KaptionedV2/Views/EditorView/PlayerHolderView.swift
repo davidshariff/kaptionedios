@@ -87,7 +87,7 @@ extension PlayerHolderView{
             if let video = editorVM.currentVideo {
                 GeometryReader { proxy in
                     ZStack {
-                        editorVM.frames.frameColor
+                        Color.white
                         ZStack {
                             // this is the video player with grid
                             PlayerViewWithGrid(
@@ -118,7 +118,7 @@ extension PlayerHolderView{
                         .onTapGesture {
                             textEditor.deselectTextBox()
                         }
-                        .scaleEffect(editorVM.frames.scale)
+                        .scaleEffect(1.0)
                     }
                     .frame(
                         width: min(proxy.size.width, proxy.size.height * (video.frameSize.width / video.frameSize.height)),

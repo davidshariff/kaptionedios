@@ -19,7 +19,7 @@ struct Video: Identifiable{
     var geometrySize: CGSize = .zero
     var toolsApplied = [Int]()
     var filterName: String? = nil
-    var videoFrames: VideoFrames? = nil
+
     var textBoxes: [TextBox] = []
     var audio: Audio?
     var volume: Float = 1.0
@@ -51,12 +51,7 @@ struct Video: Identifiable{
             renderedWidth = geometrySize.height * aspectRatio
         }
         
-        // Apply video frames scaling if active
-        if let frames = videoFrames, frames.isActive {
-            let scale = frames.scale
-            renderedWidth *= scale
-            renderedHeight *= scale
-        }
+
         
         // Center the video in the container
         let x = (geometrySize.width - renderedWidth) / 2
@@ -155,20 +150,4 @@ struct ThumbnailImage: Identifiable{
 }
 
 
-struct VideoFrames{
-    var scaleValue: Double = 0
-    var frameColor: Color = .white
-    
-    var scale: Double{
-        1 - scaleValue
-    }
-    
-    var isActive: Bool{
-        scaleValue > 0
-    }
-    
-    mutating func reset(){
-        scaleValue = 0
-        frameColor = .white
-    }
-}
+

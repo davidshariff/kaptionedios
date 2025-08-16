@@ -184,8 +184,7 @@ extension ProjectEntity{
             project.filterName = video.filterName
 
             project.appliedTools = video.toolsApplied.map({String($0)}).joined(separator: ",")
-            project.frameColor = video.videoFrames?.frameColor.toHex()
-            project.frameScale = video.videoFrames?.scaleValue ?? 0
+
             let boxes = createTextBoxes(context: context, boxes: video.textBoxes)
             project.wrappedBoxes = Set(boxes)
             

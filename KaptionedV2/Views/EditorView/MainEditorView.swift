@@ -700,7 +700,7 @@ extension MainEditorView{
             videoPlayer.loadState = .loaded(url)
             editorVM.setProject(project, geo: proxy)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1){
-                videoPlayer.setFilters(mainFilter: CIFilter(name: project.filterName ?? ""), colorCorrection: editorVM.currentVideo?.colorCorrection)
+                videoPlayer.setFilters(mainFilter: CIFilter(name: project.filterName ?? ""))
             }
             // Log video information when loading project
             logVideoInfo(url: url, isNewVideo: false)

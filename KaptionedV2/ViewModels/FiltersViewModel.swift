@@ -12,7 +12,6 @@ import CoreImage.CIFilterBuiltins
 class FiltersViewModel: ObservableObject{
     
     @Published var images = [FilteredImage]()
-    @Published var colorCorrection = ColorCorrection()
     @Published var value: Double = 1.0
     
     var image: UIImage?

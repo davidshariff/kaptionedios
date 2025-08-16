@@ -23,7 +23,6 @@ struct Video: Identifiable{
     var isMirror: Bool = false
     var toolsApplied = [Int]()
     var filterName: String? = nil
-    var colorCorrection = ColorCorrection()
     var videoFrames: VideoFrames? = nil
     var textBoxes: [TextBox] = []
     var audio: Audio?

@@ -3,14 +3,11 @@ import Foundation
 import SwiftUI
 
 struct FilterHelper {
-    static func createFilters(mainFilter: CIFilter?, _ colorCorrection: ColorCorrection?) -> [CIFilter] {
+    static func createFilters(mainFilter: CIFilter?, _: Any?) -> [CIFilter] {
         var filters = [CIFilter]()
         if let mainFilter {
             filters.append(mainFilter)
         }
-        if let colorFilter = ColorFilterHelper.createColorFilter(colorCorrection) {
-            filters.append(colorFilter)
-        }
         return filters
     }
-} 
+}

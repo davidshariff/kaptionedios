@@ -15,7 +15,6 @@
 		5A3D13B029F186160027E25E /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3D13AF29F186160027E25E /* CoreDataManager.swift */; };
 		5A3D13B229F187960027E25E /* ProjectEntity+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3D13B129F187960027E25E /* ProjectEntity+Ext.swift */; };
 		5A3D13B429F18E4D0027E25E /* RootViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3D13B329F18E4D0027E25E /* RootViewModel.swift */; };
-		5A3D13B629F190260027E25E /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A3D13B529F190260027E25E /* Preview.swift */; };
 		5A5E6F972A039EFD00F5EBF8 /* AVAudioSession+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F962A039EFD00F5EBF8 /* AVAudioSession+Ext.swift */; };
 		5A5E6F992A03A11D00F5EBF8 /* TimeInterval+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6F982A03A11D00F5EBF8 /* TimeInterval+Ext.swift */; };
 		5A5E6FA52A05124700F5EBF8 /* UIImage+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A5E6FA42A05124700F5EBF8 /* UIImage+Ext.swift */; };
@@ -94,7 +93,6 @@
 		5A3D13AF29F186160027E25E /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		5A3D13B129F187960027E25E /* ProjectEntity+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProjectEntity+Ext.swift"; sourceTree = "<group>"; };
 		5A3D13B329F18E4D0027E25E /* RootViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewModel.swift; sourceTree = "<group>"; };
-		5A3D13B529F190260027E25E /* Preview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		5A5E6F962A039EFD00F5EBF8 /* AVAudioSession+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAudioSession+Ext.swift"; sourceTree = "<group>"; };
 		5A5E6F982A03A11D00F5EBF8 /* TimeInterval+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Ext.swift"; sourceTree = "<group>"; };
 		5A5E6FA42A05124700F5EBF8 /* UIImage+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Ext.swift"; sourceTree = "<group>"; };
@@ -312,7 +310,6 @@
 				5ACFF99729ED53FB00827A37 /* View+Ext.swift */,
 				5A3D13AD29F185400027E25E /* FileManager.swift */,
 				F485E5382E49EB81007A680B /* ConfigurationManager+Extensions.swift */,
-				5A3D13B529F190260027E25E /* Preview.swift */,
 				5AFA25C529FA7D9300B820D0 /* Color.swift */,
 				5A5E6F962A039EFD00F5EBF8 /* AVAudioSession+Ext.swift */,
 				5A5E6F982A03A11D00F5EBF8 /* TimeInterval+Ext.swift */,
@@ -514,7 +511,6 @@
 				F48D1AF22E50788200F9BF8F /* KaraokeColorSelectionView.swift in Sources */,
 				F485E53D2E4A05B0007A680B /* SubscriptionManager.swift in Sources */,
 				5A3D13B429F18E4D0027E25E /* RootViewModel.swift in Sources */,
-				5A3D13B629F190260027E25E /* Preview.swift in Sources */,
 				F42230F42E350697001CCAE5 /* TranscriptionModels.swift in Sources */,
 				5A5F956D2A00FA180041C3F6 /* TextToolsView.swift in Sources */,
 				5AFA25C629FA7D9300B820D0 /* Color.swift in Sources */,

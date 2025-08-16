@@ -14,7 +14,6 @@ struct Video: Identifiable{
     var url: URL
     var asset: AVAsset
     let originalDuration: Double
-    var rangeDuration: ClosedRange<Double>
     var thumbnailsImages = [ThumbnailImage]()
     var rate: Float = 1.0
     var rotation: Double = 0
@@ -29,7 +28,7 @@ struct Video: Identifiable{
     var volume: Float = 1.0
 
     var totalDuration: Double{
-        rangeDuration.upperBound - rangeDuration.lowerBound
+        originalDuration
     }
     
     /// Returns the actual rendered rect of the video within its container
@@ -75,14 +74,12 @@ struct Video: Identifiable{
         self.url = url
         self.asset = AVAsset(url: url)
         self.originalDuration = asset.videoDuration()
-        self.rangeDuration = 0...originalDuration
     }
     
-    init(url: URL, rangeDuration: ClosedRange<Double>, rate: Float = 1.0, rotation: Double = 0){
+    init(url: URL, rate: Float = 1.0, rotation: Double = 0){
         self.url = url
         self.asset = AVAsset(url: url)
         self.originalDuration = asset.videoDuration()
-        self.rangeDuration = rangeDuration
         self.rate = rate
         self.rotation = rotation
     }
@@ -100,16 +97,7 @@ struct Video: Identifiable{
         
     ///reset and update
     mutating func updateRate(_ rate: Float){
-       
-        let lowerBound = (rangeDuration.lowerBound * Double(self.rate)) / Double(rate)
-        let upperBound = (rangeDuration.upperBound *  Double(self.rate)) / Double(rate)
-        rangeDuration = lowerBound...upperBound
-        
         self.rate = rate
-    }
-    
-    mutating func resetRangeDuration(){
-        self.rangeDuration = 0...originalDuration
     }
     
     mutating func resetRate(){
@@ -153,7 +141,7 @@ struct Video: Identifiable{
     }
     
     
-    static var mock: Video = .init(url:URL(string: "https://www.google.com/")!, rangeDuration: 0...250)
+    static var mock: Video = .init(url:URL(string: "https://www.google.com/")!)
 }
 
 

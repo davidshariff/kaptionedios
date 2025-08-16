@@ -161,7 +161,7 @@ struct PlayerControl: View{
         if let video = editorVM.currentVideo{
             RulerView(
                 value: $videoPlayer.currentTime,
-                bounds: video.rangeDuration,
+                bounds: 0...video.originalDuration,
                 disableOffset: false,
                 duration: video.originalDuration,
                 currentTime: videoPlayer.currentTime,
@@ -190,7 +190,7 @@ struct PlayerControl: View{
             HStack {
                 // Time / Duration on the left
                 if let video = editorVM.currentVideo {
-                    Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
+                    Text("\(videoPlayer.currentTime.formatterTimeString()) / \(video.totalDuration.formatterTimeString())")
                         .font(.caption)
                         .fontWeight(.bold)
                         .foregroundColor(.white)

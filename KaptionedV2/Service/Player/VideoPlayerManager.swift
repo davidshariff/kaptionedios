@@ -51,7 +51,7 @@ final class VideoPlayerManager: ObservableObject{
     }
     
     func action(_ video: Video){
-        self.currentDurationRange = video.rangeDuration
+        self.currentDurationRange = 0...video.originalDuration
         if isPlaying{
             pause()
         }else{

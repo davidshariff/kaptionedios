@@ -42,7 +42,6 @@
 		5ACFF98729E949A900827A37 /* VideoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF98629E949A900827A37 /* VideoItem.swift */; };
 		5ACFF99629EC8A2400827A37 /* AVAssets+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF99529EC8A2400827A37 /* AVAssets+Ext.swift */; };
 		5ACFF99829ED53FB00827A37 /* View+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF99729ED53FB00827A37 /* View+Ext.swift */; };
-		5ACFF99A29ED57BC00827A37 /* ThumbnailsSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF99929ED57BC00827A37 /* ThumbnailsSliderView.swift */; };
 		5ACFF99D29ED5C4900827A37 /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF99C29ED5C4900827A37 /* SliderView.swift */; };
 		5ACFF99F29ED709B00827A37 /* RangeSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF99E29ED709B00827A37 /* RangeSliderView.swift */; };
 		5ACFF9A129ED9C4000827A37 /* CustomSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACFF9A029ED9C4000827A37 /* CustomSlider.swift */; };
@@ -141,7 +140,6 @@
 		5ACFF98629E949A900827A37 /* VideoItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoItem.swift; sourceTree = "<group>"; };
 		5ACFF99529EC8A2400827A37 /* AVAssets+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVAssets+Ext.swift"; sourceTree = "<group>"; };
 		5ACFF99729ED53FB00827A37 /* View+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Ext.swift"; sourceTree = "<group>"; };
-		5ACFF99929ED57BC00827A37 /* ThumbnailsSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailsSliderView.swift; sourceTree = "<group>"; };
 		5ACFF99C29ED5C4900827A37 /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
 		5ACFF99E29ED709B00827A37 /* RangeSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSliderView.swift; sourceTree = "<group>"; };
 		5ACFF9A029ED9C4000827A37 /* CustomSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSlider.swift; sourceTree = "<group>"; };
@@ -275,7 +273,6 @@
 				5AE2A2AC29F880B6003D217F /* Filters */,
 				5AE2A2AB29F8808F003D217F /* Crop */,
 				5AE2A2AA29F88077003D217F /* Speed */,
-				5AE2A2A929F8806E003D217F /* CutView */,
 				5AF25B5A29F14907005E0467 /* CropperView */,
 				5ACFF9B129EEA93400827A37 /* ToolsSectionView.swift */,
 			);
@@ -475,14 +472,6 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		5AE2A2A929F8806E003D217F /* CutView */ = {
-			isa = PBXGroup;
-			children = (
-				5ACFF99929ED57BC00827A37 /* ThumbnailsSliderView.swift */,
-			);
-			path = CutView;
-			sourceTree = "<group>";
-		};
 		5AE2A2AA29F88077003D217F /* Speed */ = {
 			isa = PBXGroup;
 			children = (
@@ -656,7 +645,6 @@
 				5AE2A2AE29F880D0003D217F /* FiltersView.swift in Sources */,
 				F423649A2E373F0500057C86 /* WordTimelineSlider.swift in Sources */,
 				5A5E6F9F2A03CA1800F5EBF8 /* AudioModel.swift in Sources */,
-				5ACFF99A29ED57BC00827A37 /* ThumbnailsSliderView.swift in Sources */,
 				F4E9C1C12E4C4FB000DD5330 /* TextSizingHelper.swift in Sources */,
 				5ACFF98529E945E000827A37 /* EditorViewModel.swift in Sources */,
 				F466E1262E473DB900517F2E /* KaraokeColorSelectionView.swift in Sources */,

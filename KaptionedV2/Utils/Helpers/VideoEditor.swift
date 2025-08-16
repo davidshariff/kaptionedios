@@ -49,7 +49,7 @@ class VideoEditor{
         await progressCallback?("processing", 0.0)
         let composition = AVMutableComposition()
         
-        let timeRange = getTimeRange(for: video.originalDuration, with: video.rangeDuration)
+        let timeRange = CMTimeRange(start: .zero, duration: CMTime(seconds: video.originalDuration, preferredTimescale: 600))
         let asset = video.asset
         await progressCallback?("processing", 0.05)
         
@@ -445,17 +445,7 @@ extension VideoEditor{
         }
     }
     
-    ///create CMTimeRange
-    private func getTimeRange(for duration: Double, with timeRange: ClosedRange<Double>) -> CMTimeRange {
-        let start = timeRange.lowerBound.clamped(to: 0...duration)
-        let end = timeRange.upperBound.clamped(to: start...duration)
-        
-        let startTime = CMTimeMakeWithSeconds(start, preferredTimescale: 1000)
-        let endTime = CMTimeMakeWithSeconds(end, preferredTimescale: 1000)
-        
-        let timeRange = CMTimeRangeFromTimeToTime(start: startTime, end: endTime)
-        return timeRange
-    }
+
     
     
     ///set video size for AVMutableVideoCompositionLayerInstruction

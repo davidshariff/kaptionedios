@@ -173,8 +173,7 @@ extension ProjectEntity{
         project.rate = Double(video.rate)
         project.isMirror = video.isMirror
         project.filterName = video.filterName
-        project.lowerBound = video.rangeDuration.lowerBound
-        project.upperBound = video.rangeDuration.upperBound
+
         project.textBoxes = []
     
         context.saveContext()
@@ -185,8 +184,7 @@ extension ProjectEntity{
     static func update(for video: Video, project: ProjectEntity){
         if let context = project.managedObjectContext {
             project.isMirror = video.isMirror
-            project.lowerBound = video.rangeDuration.lowerBound
-            project.upperBound = video.rangeDuration.upperBound
+
             project.filterName = video.filterName
 
             project.appliedTools = video.toolsApplied.map({String($0)}).joined(separator: ",")

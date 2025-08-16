@@ -504,7 +504,7 @@ extension MainEditorView{
                                 // Time / Duration on the left with fixed width
                                 if let video = editorVM.currentVideo {
                                     HStack(spacing: 2) {
-                                        Text("\((videoPlayer.currentTime - video.rangeDuration.lowerBound).formatterTimeString())")
+                                        Text("\(videoPlayer.currentTime.formatterTimeString())")
                                             .font(.caption)
                                             .fontWeight(.bold)
                                             .foregroundColor(.white)
@@ -588,7 +588,7 @@ extension MainEditorView{
                             WordTimelineSlider(
                                 value: $videoPlayer.currentTime,
                                 selectedTextBox: $textEditor.selectedTextBox,
-                                bounds: video.rangeDuration,
+                                bounds: 0...video.originalDuration,
                                 disableOffset: false,
                                 textBoxes: video.textBoxes,
                                 duration: video.originalDuration,
@@ -600,7 +600,7 @@ extension MainEditorView{
                                 backgroundView: {
                                     RulerView(
                                         value: $videoPlayer.currentTime,
-                                        bounds: video.rangeDuration,
+                                        bounds: 0...video.originalDuration,
                                         disableOffset: false,
                                         duration: video.originalDuration, 
                                         currentTime: videoPlayer.currentTime, 

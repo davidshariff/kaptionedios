@@ -120,7 +120,7 @@ class EditorViewModel: ObservableObject{
         
         guard let url = project.videoURL else {return}
         
-        currentVideo = .init(url: url, rangeDuration: project.lowerBound...project.upperBound, rate: Float(project.rate), rotation: project.rotation)
+        currentVideo = .init(url: url, rate: Float(project.rate), rotation: project.rotation)
         currentVideo?.toolsApplied = project.wrappedTools
         currentVideo?.filterName = project.filterName
 
@@ -240,7 +240,7 @@ extension EditorViewModel{
         switch selectedTools{
             
         case .subslist:
-            currentVideo?.resetRangeDuration()
+            break
         case .presets:
             break
         }

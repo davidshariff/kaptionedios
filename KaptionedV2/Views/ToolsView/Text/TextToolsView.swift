@@ -52,7 +52,7 @@ extension TextToolsView{
         }
         .frame(width: 80, height: 80)
         .onTapGesture {
-            editor.openTextEditor(isEdit: false, timeRange: video.rangeDuration)
+            editor.openTextEditor(isEdit: false, timeRange: 0...video.originalDuration)
         }
     }
 }
